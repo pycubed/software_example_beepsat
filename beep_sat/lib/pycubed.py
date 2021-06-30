@@ -2,37 +2,28 @@
 CircuitPython driver for PyCubed satellite board
 
 PyCubed mainboard-v04g
+CircuitPython version 7.0 alpha
+
 
 * Author(s): Max Holliday
 
 """
 import board, microcontroller
 import busio, time, sys
-import adafruit_sdcard
 from storage import mount,umount,VfsFat
 from analogio import AnalogIn
-import digitalio
+import digitalio, sdcardio, tasko
 
 from pycubed_gps import GPS
 import pycubed_rfm9x
 import bmx160
-import adafruit_tsl2561
 
 import neopixel
 import bq25883
 import adm1176
-import ads124s08
 from os import listdir, stat, statvfs, mkdir,chdir
 from bitflags import bitFlag,multiBitFlag,multiByte
 from micropython import const
-import sx1280
-
-'''
-import builtins
-builtins.tasko_logging = True
-'''
-
-import tasko
 
 # import adafruit_tsl2561
 _ROLLOVER_S  = const(281475) # seconds
@@ -104,7 +95,7 @@ class Satellite:
     c_gpsfile   = multiByte(lowest_register=25,num_bytes=2)
 
 
-    UHF_FREQ = 433 #915.6
+    UHF_FREQ = 433
     SBAND_FREQ = 2.4
     SCTIME   = bytearray(5)
 
@@ -112,14 +103,8 @@ class Satellite:
         """
         Big init routine as the whole board is brought up.
         """
-        #Initialize tasko functions
-        self.add_task = tasko.add_task
-        self.run_later = tasko.run_later
-        self.schedule = tasko.schedule
-        self.schedule_later = tasko.schedule_later
-        self.sleep = tasko.sleep
-        self.suspend = tasko.suspend
-        self.run= tasko.run
+        #Assign tasko object
+        self.tasko=tasko
 
         #Initialize list to store scheduled objects
         self.scheduled_objects=[]
@@ -156,19 +141,15 @@ class Satellite:
         self._chrg.switch_to_input()
 
         # Define SPI,I2C,UART
-        self.i2c1  = busio.I2C(board.SCL1,board.SDA1)
-        self.i2c2  = busio.I2C(board.SCL2,board.SDA2)
-        # self.spi  = busio.SPI(board.SCK,MOSI=board.MOSI,MISO=board.MISO)
-        self.spi  = board.SPI()
-        self.uart = busio.UART(board.TX,board.RX, baudrate=9600,receiver_buffer_size=512,timeout=5)
+        self.i2c1  = busio.I2C(board.SCL,board.SDA)
+        self.spi   = board.SPI()
+        self.uart  = busio.UART(board.TX,board.RX, baudrate=9600,receiver_buffer_size=512,timeout=5)
 
         # Define GPS
         self.en_gps = digitalio.DigitalInOut(board.EN_GPS)
         self.en_gps.switch_to_output()
 
-        # Define sdcard
-        self._sdcs = digitalio.DigitalInOut(board.SD_CS)
-        self._sdcs.switch_to_output(value=True)
+        # Define filesystem stuff
         self.filename="/sd/default.txt"
         self.filesize=0
         self.logfile="/sd/log.txt"
@@ -178,43 +159,20 @@ class Satellite:
                 'rad':self.c_radfile,
                 'gps':self.c_gpsfile}
 
+
         # Define radio
-        self._rf_cs1 = digitalio.DigitalInOut(board.RF1_CS)
-        self._rf_rst1 = digitalio.DigitalInOut(board.RF1_RST)
-        self._rf_busy1 = digitalio.DigitalInOut(board.RF1_IO4)
-        self.radio1_DIO1=digitalio.DigitalInOut(board.RF1_IO1)
-        self.radio1_DIO1.switch_to_input()
-        self._rf_cs1.switch_to_output(value=True)
-        self._rf_rst1.switch_to_output(value=True)
-        # self._rf_busy1.switch_to_input()
-        _rf_cs2 = digitalio.DigitalInOut(board.RF2_CS)
-        _rf_rst2 = digitalio.DigitalInOut(board.RF2_RST)
-        radio2_DIO0 = digitalio.DigitalInOut(board.RF2_IO1)
-        _rf_cs2.switch_to_output(value=True)
-        _rf_rst2.switch_to_output(value=True)
-        radio2_DIO0.switch_to_input()
-        # Define Rad Sensor
-        xtb_cs = digitalio.DigitalInOut(board.PB22)
-        xtb_DRDY = digitalio.DigitalInOut(board.PA22)
-        xtb_cs.switch_to_output(value=True)
-        xtb_DRDY.switch_to_input(pull=digitalio.Pull.UP)
+        _rf_cs1 = digitalio.DigitalInOut(board.RF1_CS)
+        _rf_rst1 = digitalio.DigitalInOut(board.RF1_RST)
+        self.enable_rf = digitalio.DigitalInOut(board.EN_RF)
+        self.radio1_DIO0=digitalio.DigitalInOut(board.RF1_IO0)
+        self.enable_rf.switch_to_output(value=True)
+        _rf_cs1.switch_to_output(value=True)
+        _rf_rst1.switch_to_output(value=True)
+        self.radio1_DIO0.switch_to_input()
 
-        # Initialize USB charger
+        # Initialize sdcard (always init SD before anything else on spi bus)
         try:
-            self.usb = bq25883.BQ25883(self.i2c1)
-            self.usb.charging = False
-            self.usb.wdt = False
-            self.usb.led=False
-            # TODO: check ILIM registers
-            self.usb.charging_current=8 #400mA
-            self.usb_charging=False
-            self.hardware['USB'] = True
-        except Exception as e:
-            if self.debug: print('[ERROR][USB Charger]',e)
-
-        # Initialize sdcard
-        try:
-            _sd   = adafruit_sdcard.SDCard(self.spi, self._sdcs)
+            _sd = sdcardio.SDCard(self.spi, board.SD_CS, baudrate=4000000)
             _vfs = VfsFat(_sd)
             mount(_vfs, "/sd")
             self.fs=_vfs
@@ -231,36 +189,26 @@ class Satellite:
         except Exception as e:
             if self.debug: print('[WARNING][Neopixel]',e)
 
-
-        # # Initialize radio #1 - S-BAND
-        # try:
-        #     self.radio1 = sx1280.SX1280(self.spi, _rf_cs1, _rf_rst1, _rf_busy1, self.SBAND_FREQ,debug=False)
-        #     self.radio1.sleep()
-        #     self.radio1.default_dio=radio1_DIO1
-        #     self.radio1.timeout_handler=self.timeout_handler
-
-        #     self.hardware['Radio1'] = True
-        # except Exception as e:
-        #     if self.debug: print('[ERROR][RADIO 1]',e)
-
-        # Initialize radio #2 - UHF
+        # Initialize USB charger
         try:
-            self.radio2 = pycubed_rfm9x.RFM9x(spi=self.spi, cs=self._rf_cs1, reset=self._rf_rst1, frequency=self.UHF_FREQ,code_rate=8,baudrate=1000000)
-            self.radio2.enable_crc=True
-            self.radio2.crc_errs = self.c_uhfcrc # crc error counter
-            self.radio2.sleep()
-            self.hardware['Radio2'] = True
+            self.usb = bq25883.BQ25883(self.i2c1)
+            self.usb.charging = False
+            self.usb.wdt = False
+            self.usb.led=False
+            # TODO: check ILIM registers
+            self.usb.charging_current=8 #400mA
+            self.usb_charging=False
+            self.hardware['USB'] = True
         except Exception as e:
-            if self.debug: print('[ERROR][RADIO 2]',e)
+            if self.debug: print('[ERROR][USB Charger]',e)
 
         # Initialize Power Monitor
         try:
             self.pwr = adm1176.ADM1176(self.i2c1)
-            self.pwr.sense_resistor = 1
+            self.pwr.sense_resistor = 0.1
             self.hardware['PWR'] = True
         except Exception as e:
             if self.debug: print('[ERROR][Power Monitor]',e)
-            # pass
 
         # Initialize IMU
         try:
@@ -268,7 +216,6 @@ class Satellite:
             self.hardware['IMU'] = True
         except Exception as e:
             if self.debug: print('[ERROR][IMU]',e)
-            # pass
 
         # # Initialize GPS
         # try:
@@ -277,6 +224,25 @@ class Satellite:
         #     self.hardware['GPS'] = True
         # except Exception as e:
         #     if self.debug: print('[ERROR][GPS]',e)
+
+        # Initialize radio #1 - UHF
+        try:
+            self.radio1 = pycubed_rfm9x.RFM9x(self.spi, _rf_cs1, _rf_rst1, self.UHF_FREQ,
+                code_rate=8,baudrate=1320000,rfm95pw=False)
+            self.radio1.dio0=self.radio1_DIO0
+            self.radio1.enable_crc=True
+            self.radio1.crc_errs = self.c_uhfcrc # crc error counter
+            self.radio1.tx_power=13
+            self.radio1.sleep()
+            self.hardware['Radio1'] = True
+        except Exception as e:
+            if self.debug: print('[ERROR][RADIO 1]',e)
+
+        # turn off things we don't need
+        if self.hardware['IMU']:
+            self.IMU.accel_powermode = 0x10 # suspend mode
+            self.IMU.mag_powermode   = 0x18 # suspend mode
+
 
     def reinit(self,dev):
         dev=dev.lower()
@@ -303,16 +269,6 @@ class Satellite:
         # t should be units of ms (i.e. time.monotonic_ns() // 1000000)
         self.SCTIME[:]=(t+self.timeoffset).to_bytes(5,'big')
         return self.SCTIME
-
-    @property
-    def acceleration(self):
-        if self.hardware['IMU']:
-            return self.IMU.accel
-
-    @property
-    def magnetic(self):
-        if self.hardware['IMU']:
-            return self.IMU.mag
 
     @property
     def gyro(self):
@@ -408,11 +364,10 @@ class Satellite:
             try:
                 umount('/sd')
                 self.spi.deinit()
-                self._sdcs.value=False
                 self.enable_rf.value=False
                 time.sleep(3)
-            except:
-                print('vbus reset error?')
+            except Exception as e:
+                print('vbus reset error?', e)
                 pass
             self._resetReg.drive_mode=digitalio.DriveMode.PUSH_PULL
             self._resetReg.value=1
@@ -544,7 +499,6 @@ class Satellite:
             self.micro.reset()
         else:
             self.micro.nvm[_TOUTS] += 1
-
 
 
 cubesat = Satellite()
