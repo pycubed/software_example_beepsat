@@ -3,6 +3,7 @@
 from pycubed import cubesat
 import os
 
+
 # schedule all tasks in the directory
 for file in os.listdir('Tasks'):
     # ignore these files
@@ -10,7 +11,7 @@ for file in os.listdir('Tasks'):
         continue
     # auto-magically import the task files
     exec('import Tasks.{}'.format(file[:-3]))
-    # create a helper object
+    # create a helper object for the task
     task_obj=eval('Tasks.'+file[:-3]).task(cubesat)
 
     # schedule each task object and add it to our dict

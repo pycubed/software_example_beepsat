@@ -62,7 +62,7 @@ BIT_4 = const(4)
 BIT_8 = const(8)
 
 class Satellite:
-    # General NVM bytes
+    # General NVM counters
     c_boot      = multiBitFlag(register=_BOOTCNT, lowest_bit=BIT_0,num_bits=BIT_8)
     c_vbusrst   = multiBitFlag(register=_VBUSRST, lowest_bit=BIT_0,num_bits=BIT_8)
     c_state_err = multiBitFlag(register=_STATECNT,lowest_bit=BIT_0,num_bits=BIT_8)
@@ -108,6 +108,9 @@ class Satellite:
 
         # Dict to store scheduled objects by name
         self.scheduled_tasks={}
+
+        self.data_cache={}
+        self.vlowbatt=6.0
 
         self.BOOTTIME= const(self.time())
         self.send_buff = memoryview(SEND_BUFF)

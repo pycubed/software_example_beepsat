@@ -1,3 +1,5 @@
+from debugcolor import co
+
 class Task:
 
     """
@@ -12,6 +14,7 @@ class Task:
     priority = 10
     frequency = 1
     name = 'temp'
+    color = 'gray'
 
     def __init__(self, satellite):
         """
@@ -21,8 +24,12 @@ class Task:
         :param satellite: The cubesat to be registered
 
         """
-        print('id: {}, freq: {}, priority: {}'.format(self.task_id,self.frequency,self.priority))
         self.cubesat = satellite
+
+    def debug(self,action,tabs=1):
+        # print(co(msg='hello!',color='red'))
+        print('{}{:>30}  {}'.format('\t'*tabs,'['+co(msg=self.name,color=self.color)+']',action))
+        # print('{}{:>15}  {}'.format('\t'*tabs,'['+self.name+']',action))
 
     async def main_task(self, *args, **kwargs):
         """
