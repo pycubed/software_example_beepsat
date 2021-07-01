@@ -1,12 +1,12 @@
 # Task to obtain IMU sensor readings
 
-class Task:
+from Tasks.template_task import Task
+
+class task(Task):
     priority = 2
     frequency = 0.1
     task_id = 2
-
-    def __init__(self, satellite):
-        self.cubesat = satellite
+    name='imu'
 
     async def main_task(self):
         reading = self.cubesat.IMU.gyro

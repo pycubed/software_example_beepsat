@@ -103,11 +103,11 @@ class Satellite:
         """
         Big init routine as the whole board is brought up.
         """
-        #Assign tasko object
+        # Assign tasko object
         self.tasko=tasko
 
-        #Initialize list to store scheduled objects
-        self.scheduled_tasks=[]
+        # Initialize list to store scheduled objects
+        self.scheduled_tasks={}
 
         self.BOOTTIME= const(self.time())
         self.send_buff = memoryview(SEND_BUFF)

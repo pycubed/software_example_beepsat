@@ -1,21 +1,20 @@
 # Task to listen for "killswitch" command on Radio
 
-# import Tasks.stop_tasks as stop_tasks
+from Tasks.template_task import Task
 
-class Task:
+class task(Task):
     priority = 1
     frequency = 1
     task_id = 1
+    name='receive'
 
-    def __init__(self, satellite):
-        self.cubesat = satellite
-        self.include = True
+    # if the task needs to run code at the start
+    def __init__(self,satellite):
+        super(self.__class__, self).__init__(satellite)
         self.cubesat.radio1.listen()
-
 
     # this should be moved to radio library for generic await receive
     def __await__(self):
-
         while not self.cubesat.radio1.rx_done():
             yield
         message = self.cubesat.radio1.receive()
@@ -29,10 +28,12 @@ class Task:
 
             #Stop all tasks
             for t in self.cubesat.scheduled_tasks:
-                t.stop()
+                print('Stopping {} task'.format(t))
+                self.cubesat.scheduled_tasks[t].stop()
 
     async def main_task(self):
         print("Awaiting message")
+        self.cubesat.radio1.listen()
         await self
         print("Done awaiting message")
 

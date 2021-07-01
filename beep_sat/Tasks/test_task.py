@@ -4,6 +4,7 @@ class task(Task):
     priority = 1
     frequency = 1
     task_id = 20
+    name='test'
 
     # if the task needs to run code at the start
     def __init__(self,satellite):

@@ -1,12 +1,12 @@
 # Task to send "Hello World" on the radio
 
-class Task:
+from Tasks.template_task import Task
+
+class task(Task):
     priority = 3
     frequency = 1
     task_id = 3
-
-    def __init__(self, satellite):
-        self.cubesat = satellite
+    name='beacon'
 
     async def main_task(self):
         print("Sending message from PyCubed....")

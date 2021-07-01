@@ -1,8 +1,4 @@
-"""
-Beep-Sat Demo
-
-
-"""
+# Beep-Sat Demo
 
 from pycubed import cubesat
 import os
@@ -19,9 +15,10 @@ for file in os.listdir('Tasks'):
     # create a helper object
     task_obj=eval('Tasks.'+file[:-3]).task(cubesat)
 
-    # schedule each task object and add it to our list
-    cubesat.scheduled_tasks.append(
-        cubesat.tasko.schedule(task_obj.frequency,task_obj.main_task,task_obj.priority,task_obj.task_id)
-    )
+    # schedule each task object and add it to our dict
+    cubesat.scheduled_tasks[task_obj.name]=cubesat.tasko.schedule(
+        task_obj.frequency,task_obj.main_task,task_obj.priority)
+
+print(cubesat.scheduled_tasks)
 
 cubesat.tasko.run()
