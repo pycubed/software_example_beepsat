@@ -15,9 +15,7 @@ class Task:
 
     def __init__(self, satellite):
         """
-        Initialise the Task by registering the cubesat object on it. 
-        This is required to access the functionalities offered by the 
-        PyCubed board.
+        Initialize the Task using the PyCubed cubesat object.
         
         :type satellite: Satellite
         :param satellite: The cubesat to be registered

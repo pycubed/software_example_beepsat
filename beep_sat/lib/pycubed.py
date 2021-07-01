@@ -1,7 +1,7 @@
 """
 CircuitPython driver for PyCubed satellite board
 
-PyCubed mainboard-v04g
+PyCubed mainboard-v05a
 CircuitPython version 7.0 alpha
 
 
