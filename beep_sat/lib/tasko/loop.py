@@ -47,17 +47,16 @@ class Sleeper:
 
 
 class Task:
-    def __init__(self, coroutine, priority, task_id):
+    def __init__(self, coroutine, priority):
         # Added a priority level
         self.coroutine = coroutine
         self.priority = priority
-        self.task_id= task_id
 
     def priority_sort(self):
         return self.priority
 
     def __repr__(self):
-        return "{{Task {}, Priority {}, TaskID {}}}".format(self.coroutine, self.priority, self.task_id)
+        return "{{Task {}, Priority {}}}".format(self.coroutine, self.priority)
 
     __str__ = __repr__
 
@@ -77,10 +76,10 @@ class ScheduledTask:
         if not self._scheduled_to_run:
             # Don't double-up the task if it's still in the run list!
             # print("Added task to loop._task")
-            self._loop.add_task(self._run_at_fixed_rate(), self._priority, self._task_id)
+            self._loop.add_task(self._run_at_fixed_rate(), self._priority)
 
     def __init__(
-        self, loop, hz, forward_async_fn, priority, task_id, forward_args, forward_kwargs
+        self, loop, hz, forward_async_fn, priority, forward_args, forward_kwargs
     ):
         self._loop = loop
         self._forward_async_fn = forward_async_fn
@@ -92,15 +91,9 @@ class ScheduledTask:
         self._scheduled_to_run = False
         # Added a priority level
         self._priority = priority
-        self._task_id= task_id
 
     def get_priority(self):
-
         return self._priority
-
-    def get_task_id (self):
-
-        return self._task_id
 
     async def _run_at_fixed_rate(self):
         self._scheduled_to_run = True
@@ -170,7 +163,7 @@ class Loop:
         else:
             self._debug = lambda *arg, **kwargs: None
 
-    def add_task(self, awaitable_task, priority, task_id):
+    def add_task(self, awaitable_task, priority):
         """
         Add a concurrent task (known as a coroutine, implemented as a generator in CircuitPython)
         Use:
@@ -179,7 +172,7 @@ class Loop:
         """
         self._debug("adding task ", awaitable_task)
         # Added a priority parameter
-        self._tasks.append(Task(awaitable_task, priority, task_id))
+        self._tasks.append(Task(awaitable_task, priority))
 
     async def sleep(self, seconds):
         """
@@ -230,7 +223,7 @@ class Loop:
         self._current = None
         return _yield_once(), resume
 
-    def schedule(self, hz: float, coroutine_function, priority, task_id, *args, **kwargs):
+    def schedule(self, hz: float, coroutine_function, priority, *args, **kwargs):
         """
         Describe how often a method should be called.
 
@@ -252,11 +245,11 @@ class Loop:
         :param event_loop: An event loop that can .sleep() and .add_task.  Like BudgetEventLoop.
         """
         assert coroutine_function is not None, "coroutine function must not be none"
-        task = ScheduledTask(self, hz, coroutine_function, priority, task_id, args, kwargs)
+        task = ScheduledTask(self, hz, coroutine_function, priority, args, kwargs)
         task.start()
         return task
 
-    def schedule_later(self, hz: float, coroutine_function, priority, task_id, *args, **kwargs):
+    def schedule_later(self, hz: float, coroutine_function, priority, *args, **kwargs):
         """
         Like schedule, but invokes the coroutine_function after the first hz interval.
 
@@ -272,7 +265,7 @@ class Loop:
                 await _yield_once()
                 ran_once = True
 
-        return self.schedule(hz, call_later, priority, task_id)
+        return self.schedule(hz, call_later, priority)
 
     def run(self):
         """
