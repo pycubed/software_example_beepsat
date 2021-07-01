@@ -4,19 +4,24 @@ from pycubed import cubesat
 import os
 
 
+# schedule all tasks in the directory
 for file in os.listdir('Tasks'):
-    if file == "stop_tasks.py" or file=="task.py":
+    # ignore these files
+    if file in ("stop_tasks.py","template_task.py"):
         continue
+
+    # auto-magically import the task files
     exec('import Tasks.{}'.format(file[:-3]))
+    # create a helper object
+    task_obj=eval('Tasks.'+file[:-3]).Task
 
-    task=eval('Tasks.'+file[:-3])
-
-    cubesat.scheduled_objects.append(
+    # schedule each task object and add it to our list
+    cubesat.scheduled_tasks.append(
         cubesat.tasko.schedule(
-            task.Task(cubesat).frequency,
-            task.Task(cubesat).main_task,
-            task.Task(cubesat).priority,
-            task.Task(cubesat).task_id,
+            task_obj(cubesat).frequency,
+            task_obj(cubesat).main_task,
+            task_obj(cubesat).priority,
+            task_obj(cubesat).task_id,
         )
     )
 

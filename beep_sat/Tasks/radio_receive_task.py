@@ -27,10 +27,9 @@ class Task:
                 "Killswitch received, Bye World......", keep_listening=True
             )
 
-            #Stop desired tasks
-            for t in self.cubesat.scheduled_objects:
+            #Stop all tasks
+            for t in self.cubesat.scheduled_tasks:
                 t.stop()
-            # stop_tasks.StopTask(self.cubesat, 3, [1,2,3]).stop()
 
     async def main_task(self):
         print("Awaiting message")

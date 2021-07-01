@@ -107,7 +107,7 @@ class Satellite:
         self.tasko=tasko
 
         #Initialize list to store scheduled objects
-        self.scheduled_objects=[]
+        self.scheduled_tasks=[]
 
         self.BOOTTIME= const(self.time())
         self.send_buff = memoryview(SEND_BUFF)
