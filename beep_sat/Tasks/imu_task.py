@@ -4,8 +4,7 @@ from Tasks.template_task import Task
 
 class task(Task):
     priority = 2
-    frequency = 0.1
-    task_id = 2
+    frequency = 1/10
     name='imu'
 
     async def main_task(self):

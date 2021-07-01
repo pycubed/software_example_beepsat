@@ -4,8 +4,7 @@ from Tasks.template_task import Task
 
 class task(Task):
     priority = 3
-    frequency = 1
-    task_id = 3
+    frequency = 1/20
     name='beacon'
 
     async def main_task(self):

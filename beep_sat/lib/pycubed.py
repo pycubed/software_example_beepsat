@@ -106,7 +106,7 @@ class Satellite:
         # Assign tasko object
         self.tasko=tasko
 
-        # Initialize list to store scheduled objects
+        # Dict to store scheduled objects by name
         self.scheduled_tasks={}
 
         self.BOOTTIME= const(self.time())
