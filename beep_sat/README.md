@@ -4,9 +4,7 @@ This is an educational "flight software" example for a simple beeping-satellite 
 
 There are countless ways to implement a mission's software stack. This particular example demonstrates the usage of a lightweight async library performing routine satellite functions utilizing PyCubed hardware capabilities.
 
-complexity:
-
--  `basic`
+complexity: `basic`
 
 features:
 
