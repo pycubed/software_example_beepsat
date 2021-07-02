@@ -748,6 +748,17 @@ class RFM9x:
         # else:
         return (self._read_u8(_RH_RF95_REG_12_IRQ_FLAGS) & 0x40) >> 6
 
+    async def await_rx(self,timeout=60):
+        # TODO choose irq source
+        _t=time.monotonic()+timeout
+        # while not self.dio0.value:
+        while not self.rx_done():
+            if time.monotonic() < _t:
+                yield
+            else:
+                return False
+        return True
+
     def crc_error(self):
         """crc status"""
         return (self._read_u8(_RH_RF95_REG_12_IRQ_FLAGS) & 0x20) >> 5

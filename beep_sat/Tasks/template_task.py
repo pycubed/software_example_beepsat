@@ -9,6 +9,7 @@ class Task:
         priority:    The priority level assigned to the task.
         frequency:   Number of times the task must be executed in 1 second (Hz).
         name:        Name of the task object for future reference
+        color:       Debug color for serial terminal
     """
 
     priority = 10
@@ -26,10 +27,15 @@ class Task:
         """
         self.cubesat = satellite
 
-    def debug(self,action,tabs=1):
-        # print(co(msg='hello!',color='red'))
-        print('{}{:>30}  {}'.format('\t'*tabs,'['+co(msg=self.name,color=self.color)+']',action))
-        # print('{}{:>15}  {}'.format('\t'*tabs,'['+self.name+']',action))
+    def debug(self,msg,tabs=1):
+        """
+        Print a debug message formatted with the task name and color
+
+        :param msg: Debug message to print
+        :param tabs: Number of leading tabs. Default = 1
+
+        """
+        print('{}{:>30}  {}'.format('\t'*tabs,'['+co(msg=self.name,color=self.color)+']',msg))
 
     async def main_task(self, *args, **kwargs):
         """
