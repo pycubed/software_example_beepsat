@@ -2,11 +2,6 @@
 
 from Tasks.template_task import Task
 
-# async def check_for_message():
-#     def __await__(self):
-#         while not self.cubesat.radio1.rx_done():
-#             yield
-
 class task(Task):
     priority = 1
     frequency = 1/10

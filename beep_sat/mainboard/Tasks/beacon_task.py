@@ -4,7 +4,7 @@ from Tasks.template_task import Task
 
 class task(Task):
     priority = 1
-    frequency = 1/30
+    frequency = 1/30 # once every 30s
     name='beacon'
     color = 'blue'
 

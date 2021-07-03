@@ -5,7 +5,7 @@ import time
 
 class task(Task):
     priority = 3
-    frequency = 1/10
+    frequency = 1/10 # once every 10s
     name='vbatt'
     color = 'orange'
 
