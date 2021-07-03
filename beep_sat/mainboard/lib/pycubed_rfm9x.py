@@ -1,35 +1,7 @@
-# The MIT License (MIT)
-#
-# Copyright (c) 2017 Tony DiCola for Adafruit Industries
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
 """
-`pycubed_rfm9x`
-====================================================
+MODIFIED VERSION of adafruit_rfm9x CircuitPython Library
 
-CircuitPython module for the RFM95/6/7/8 LoRa 433/915mhz radio modules.  This is
-adapted from the Radiohead library RF95 code from:
-http: www.airspayce.com/mikem/arduino/RadioHead/
 
-* Author(s): Tony DiCola, Jerry Needell
-
-** MODIFIED FOR VR3X MISSION ** https://vr3x.space
 """
 import time
 from random import random
@@ -258,12 +230,11 @@ class RFM9x:
         code_rate=5,
         high_power=True,
         baudrate=5000000,
-        rfm95pw=False
+        max_output=False
     ):
         self.high_power = high_power
-        self.RFM95PW=rfm95pw
+        self.max_output=max_output
         self.dio0=False
-        self.debug=True
         # Device support SPI mode 0 (polarity & phase = 0) up to a max of 10mhz.
         # Set Default Baudrate to 5MHz to avoid problems
         self._device = spidev.SPIDevice(spi, cs, baudrate=baudrate, polarity=0, phase=0)
@@ -577,15 +548,13 @@ class RFM9x:
     @tx_power.setter
     def tx_power(self, val):
         val = int(val)
-        if self.RFM95PW is True:
+        if self.max_output is True:
             self._write_u8(_RH_RF95_REG_0B_OCP,0x3F) # set Ocp to 240mA
             self.pa_dac = _RH_RF95_PA_DAC_ENABLE
             self.pa_select = True
             self.max_power = 0b111
             self.output_power=0x0F
             return
-        else:
-            print('Set RFM95PW=True for max power')
 
         if self.high_power:
             if val < 5 or val > 23:
