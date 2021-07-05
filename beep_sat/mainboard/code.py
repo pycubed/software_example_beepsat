@@ -1,10 +1,18 @@
-# Beep-Sat Demo
+"""
+PyCubed Beep-Sat Demo
 
+
+M. Holliday
+"""
+
+print('\n{lines}\n{:^30}\n{lines}\n'.format('Beep-Sat Demo',lines='-'*30))
+
+print('Initializing PyCubed Hardware...')
 import os
 from pycubed import cubesat
 
-print('-'*30+'\nBeep-Sat Demo\n'+'-'*30)
 
+print('Loading Tasks...')
 # schedule all tasks in directory
 for file in os.listdir('Tasks'):
     # remove the '.py' from file name
@@ -14,7 +22,7 @@ for file in os.listdir('Tasks'):
     if file in ("template_task","test_task","listen_task"):
         continue
 
-    # auto-magically import the task files
+    # auto-magically import the task file
     exec('import Tasks.{}'.format(file))
     # create a helper object for scheduling the task
     task_obj=eval('Tasks.'+file).task(cubesat)
@@ -28,5 +36,6 @@ for file in os.listdir('Tasks'):
     # schedule each task object and add it to our dict
     cubesat.scheduled_tasks[task_obj.name]=schedule(task_obj.frequency,task_obj.main_task,task_obj.priority)
 
+print('Running...')
 # runs forever
 cubesat.tasko.run()
