@@ -5,7 +5,7 @@ PyCubed Beep-Sat Demo
 M. Holliday
 """
 
-print('\n{lines}\n{:^30}\n{lines}\n'.format('Beep-Sat Demo',lines='-'*30))
+print('\n{lines}\n{:^40}\n{lines}\n'.format('Beep-Sat Demo',lines='-'*40))
 
 print('Initializing PyCubed Hardware...')
 import os
