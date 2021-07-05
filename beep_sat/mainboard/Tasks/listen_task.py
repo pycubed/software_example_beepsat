@@ -6,7 +6,7 @@ class task(Task):
     priority = 1
     frequency = 1/10
     name='listen'
-    color = 'teal'
+    color = 'blue'
 
     schedule_later=True
 

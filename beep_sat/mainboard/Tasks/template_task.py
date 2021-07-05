@@ -35,7 +35,7 @@ class Task:
         :param tabs: Number of leading tabs. Default = 1
 
         """
-        print('{}{:>30}  {}'.format('\t'*tabs,'['+co(msg=self.name,color=self.color)+']',msg))
+        print('{:>30}  {}'.format('['+co(msg=self.name,color=self.color)+']',msg))
 
     async def main_task(self, *args, **kwargs):
         """

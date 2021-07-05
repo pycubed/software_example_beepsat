@@ -65,7 +65,9 @@ class Satellite:
         # Dict to store scheduled objects by name
         self.scheduled_tasks={}
 
-        self.data_cache={}
+        self.data_cache={
+            'imu':{},
+            }
         self.vlowbatt=6.0
 
         self.BOOTTIME= const(time.time())
@@ -80,9 +82,7 @@ class Satellite:
                        'GPS':    False,
                        'WDT':    False,
                        'USB':    False,
-                       'PWR':    False,
-                       'Sun':    False,
-                       'XTB':    False}
+                       'PWR':    False}
         # Define burn wires:
         self._relayA = digitalio.DigitalInOut(board.RELAY_A)
         self._relayA.switch_to_output(drive_mode=digitalio.DriveMode.OPEN_DRAIN)
@@ -186,6 +186,8 @@ class Satellite:
         except Exception as e:
             if self.debug: print('[ERROR][RADIO 1]',e)
 
+        self.power_mode = 'normal'
+
     def reinit(self,dev):
         dev=dev.lower()
         if   dev=='gps':
@@ -202,17 +204,17 @@ class Satellite:
     @property
     def acceleration(self):
         if self.hardware['IMU']:
-            return self.IMU.accel
+            return self.IMU.accel # m/s^2
 
     @property
     def magnetic(self):
         if self.hardware['IMU']:
-            return self.IMU.mag
+            return self.IMU.mag # uT
 
     @property
     def gyro(self):
         if self.hardware['IMU']:
-            return self.IMU.gyro
+            return self.IMU.gyro # deg/s
 
     @property
     def temperature(self):
@@ -338,6 +340,36 @@ class Satellite:
             self.micro.reset()
         else:
             self.micro.nvm[_TOUTS] += 1
+
+    def powermode(self,mode):
+        if 'minimum' in mode:
+            self.RGB = (0,0,0,0)
+            self.neopixel.brightness=0
+            if self.hardware['Radio1']:
+                self.radio1.sleep()
+            if self.hardware['Radio2']:
+                self.radio2.sleep()
+            self.enable_rf.value = False
+            if self.hardware['IMU']:
+                self.IMU.gyro_powermode  = 0x14 # suspend mode
+                self.IMU.accel_powermode = 0x10 # suspend mode
+                self.IMU.mag_powermode   = 0x18 # suspend mode
+            if self.hardware['GPS']:
+                self.en_gps.value = False
+            self.power_mode = 'minimum'
+
+        elif 'normal' in mode:
+            self.enable_rf.value = True
+            if self.hardware['IMU']:
+                self.reinit('IMU')
+            if self.hardware['GPS']:
+                self.en_gps.value = True
+            self.power_mode = 'normal'
+            # don't forget to reconfigure radios, gps, etc...
+
+
+
+
 
 
 cubesat = Satellite()

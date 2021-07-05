@@ -6,7 +6,7 @@ class task(Task):
     priority = 1
     frequency = 1/30 # once every 30s
     name='beacon'
-    color = 'blue'
+    color = 'teal'
 
     schedule_later=True
 

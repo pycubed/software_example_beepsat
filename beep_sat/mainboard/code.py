@@ -3,6 +3,7 @@
 import os
 from pycubed import cubesat
 
+print('-'*30+'\nBeep-Sat Demo\n'+'-'*30)
 
 # schedule all tasks in directory
 for file in os.listdir('Tasks'):
