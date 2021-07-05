@@ -89,11 +89,7 @@ class ScheduledTask:
         self._stop = False
         self._running = False
         self._scheduled_to_run = False
-        # Added a priority level
         self._priority = priority
-
-    def get_priority(self):
-        return self._priority
 
     async def _run_at_fixed_rate(self):
         self._scheduled_to_run = True
@@ -308,7 +304,6 @@ class Loop:
         self._tasks.sort(key=Task.priority_sort)
 
         for _ in range(len(self._tasks)):
-
             task = self._tasks.pop(0)
             self._run_task(task)
 
@@ -330,8 +325,7 @@ class Loop:
 
         #Run the ready tasks, and simultaneously remove them from the _sleeping and _ready lists
         for i in range(len(self._ready)):
-            ready_task = self._ready[0]
-            self._ready.pop(0)
+            ready_task = self._ready.pop(0)
             self._sleeping.remove(ready_task)
             self._run_task(ready_task.task)
 
@@ -343,7 +337,6 @@ class Loop:
 
             self._sleeping.sort(key=Sleeper.resume_nanos)
             next_sleeper = self._sleeping[0]
-
             sleep_nanos = next_sleeper.resume_nanos() - _monotonic_ns()
 
             if sleep_nanos > 0:
