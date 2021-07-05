@@ -22,7 +22,7 @@ class task(Task):
         # print the readings with some fancy formatting
         self.debug('IMU readings (x,y,z)')
         for imu_type in self.cubesat.data_cache['imu']:
-            print('{}{:>5} {}'.format('\t  └── ',imu_type,self.cubesat.data_cache['imu'][imu_type]))
+            self.debug('{:>5} {}'.format(imu_type,self.cubesat.data_cache['imu'][imu_type]),2)
 
 
 

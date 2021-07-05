@@ -2,21 +2,32 @@
 
 from Tasks.template_task import Task
 
+ANTENNA_ATTACHED = False
+
 class task(Task):
     priority = 1
     frequency = 1/30 # once every 30s
     name='beacon'
     color = 'teal'
 
-    schedule_later=True
+    schedule_later = True
 
     async def main_task(self):
-        # build beacon packet
-
-
-        self.debug("Sending beacon")
-        # only send if there's an antenna attached!
-        self.cubesat.radio1.send("Hello World!",keep_listening=True)
+        """
+        If you've attached a 433MHz antenna,
+        set the above ANTENNA_ATTACHED variable to True
+        to actually send the beacon packet
+        """
+        if ANTENNA_ATTACHED:
+            self.debug("Sending beacon")
+            self.cubesat.radio1.send("Hello World!",keep_listening=True)
+        else:
+            # Fake beacon since we don't know if an antenna is attached
+            print() # blank line
+            self.debug("[WARNING]")
+            self.debug("NOT sending beacon (unknown antenna state)",2)
+            self.debug("If you've attached an antenna, edit '/Tasks/beacon_task.py' to actually beacon", 2)
+            print() # blank line
 
         self.debug("Listening 10s for response (non-blocking)")
         heard_something = await self.cubesat.radio1.await_rx(timeout=10)
