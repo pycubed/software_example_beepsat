@@ -8,9 +8,13 @@ M. Holliday
 print('\n{lines}\n{:^40}\n{lines}\n'.format('Beep-Sat Demo',lines='-'*40))
 
 print('Initializing PyCubed Hardware...')
-import os
+import os, tasko
 from pycubed import cubesat
 
+# create asyncio object
+cubesat.tasko=tasko
+# Dict to store scheduled objects by name
+cubesat.scheduled_tasks={}
 
 print('Loading Tasks...',end='')
 # schedule all tasks in directory

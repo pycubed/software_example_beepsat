@@ -12,7 +12,7 @@ class task(Task):
             self.cubesat.RGB=(0,0,0)
             self.rgb_on=False
         else:
-            self.cubesat.RGB=(255,100,100)
+            self.cubesat.RGB=(0,255,0)
             self.rgb_on=True
 
 

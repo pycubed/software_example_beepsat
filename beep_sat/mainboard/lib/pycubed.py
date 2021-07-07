@@ -17,8 +17,8 @@ import pycubed_rfm9x # Radio
 import bmx160 # IMU
 
 import neopixel # RGB LED
-import bq25883 # USB charger
-import adm1176 # power monitor
+import bq25883 # USB Charger
+import adm1176 # Power Monitor
 from os import listdir,stat,statvfs,mkdir,chdir
 from bitflags import bitFlag,multiBitFlag,multiByte
 from micropython import const
@@ -59,18 +59,11 @@ class Satellite:
         """
         Big init routine as the whole board is brought up.
         """
-        # create asyncio object
-        self.tasko=tasko
-
-        # Dict to store scheduled objects by name
-        self.scheduled_tasks={}
-
+        self.BOOTTIME= const(time.time())
         self.data_cache={
             'imu':{},
             }
         self.vlowbatt=6.0
-
-        self.BOOTTIME= const(time.time())
         self.send_buff = memoryview(SEND_BUFF)
         self.debug=True
         self.micro=microcontroller
@@ -114,7 +107,7 @@ class Satellite:
         _rf_rst1 = digitalio.DigitalInOut(board.RF1_RST)
         self.enable_rf = digitalio.DigitalInOut(board.EN_RF)
         self.radio1_DIO0=digitalio.DigitalInOut(board.RF1_IO0)
-        self.enable_rf.switch_to_output(value=True)
+        self.enable_rf.switch_to_output(value=False)
         _rf_cs1.switch_to_output(value=True)
         _rf_rst1.switch_to_output(value=True)
         self.radio1_DIO0.switch_to_input()
@@ -132,7 +125,7 @@ class Satellite:
 
         # Initialize Neopixel
         try:
-            self.neopixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2, pixel_order=neopixel.GRBW)
+            self.neopixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2, pixel_order=neopixel.GRB)
             self.neopixel[0] = (0,0,0)
             self.hardware['Neopixel'] = True
         except Exception as e:
@@ -154,7 +147,7 @@ class Satellite:
         # Initialize Power Monitor
         try:
             self.pwr = adm1176.ADM1176(self.i2c1)
-            self.pwr.sense_resistor = 0.1
+            self.pwr.sense_resistor = 1
             self.hardware['PWR'] = True
         except Exception as e:
             if self.debug: print('[ERROR][Power Monitor]',e)
@@ -270,25 +263,26 @@ class Satellite:
 
     @property
     def current_draw(self):
+        """
+        current draw from batteries
+        NOT accurate if powered via USB
+        """
         if self.hardware['PWR']:
-            cnt=0
             idraw=0
-            for i in range(50): # average 50 readings
-                # print(i)
-                try:
+            try:
+                for _ in range(50): # average 50 readings
                     idraw+=self.pwr.read()[1]
-                except Exception as e:
-                    print('[WARNING][PWR Monitor]',e)
-                    continue
-            return (idraw/50)*1000 # mA
+                return (idraw/50)*1000 # mA
+            except Exception as e:
+                print('[WARNING][PWR Monitor]',e)
         else:
             print('[WARNING] Power monitor not initialized')
 
-    def charge_current(self,raw=False):
-        _charge = self._ichrg.value * 3.3 / 65536
-        _charge = ((_charge*988)/3010)*1000
-        if raw:
-            return round(_charge/2) % 255
+    def charge_current(self):
+        _charge = 0
+        if self.solar_charging:
+            _charge = self._ichrg.value * 3.3 / 65536
+            _charge = ((_charge*988)/3010)*1000
         return _charge # mA
 
     @property
@@ -298,7 +292,6 @@ class Satellite:
     @property
     def reset_vbus(self):
         self.micro.nvm[_VBUSRST]+=1
-
         # if we've reset vbus 255 times, something is wrong
         if self.micro.nvm[_VBUSRST] < 254:
             try:
@@ -343,7 +336,7 @@ class Satellite:
 
     def powermode(self,mode):
         if 'minimum' in mode:
-            self.RGB = (0,0,0,0)
+            self.RGB = (0,0,0)
             self.neopixel.brightness=0
             if self.hardware['Radio1']:
                 self.radio1.sleep()
@@ -366,10 +359,5 @@ class Satellite:
                 self.en_gps.value = True
             self.power_mode = 'normal'
             # don't forget to reconfigure radios, gps, etc...
-
-
-
-
-
 
 cubesat = Satellite()
