@@ -60,9 +60,7 @@ class Satellite:
         Big init routine as the whole board is brought up.
         """
         self.BOOTTIME= const(time.time())
-        self.data_cache={
-            'imu':{},
-            }
+        self.data_cache={}
         self.vlowbatt=6.0
         self.send_buff = memoryview(SEND_BUFF)
         self.debug=True

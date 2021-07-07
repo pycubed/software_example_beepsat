@@ -19,7 +19,14 @@ class task(Task):
 
     async def main_task(self):
         vbatt=self.cubesat.battery_voltage
-        self.debug('{:.1f}V, threshold: {:.1f}V'.format(vbatt,self.cubesat.vlowbatt))
+        comp_var = ''
+
+        if vbatt > self.cubesat.vlowbatt:
+            comp_var = '>'
+        else:
+            comp_var = '<'
+
+        self.debug('{:.1f}V {} threshold: {:.1f}V'.format(vbatt,comp_var,self.cubesat.vlowbatt))
 
         # TODO this should go in a more advanced beep sat example?
         # if vbatt < self.cubesat.vlowbatt:

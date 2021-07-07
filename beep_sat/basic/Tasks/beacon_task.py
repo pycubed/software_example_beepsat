@@ -1,4 +1,4 @@
-# Task to send "Hello World" on the radio
+# Transmit "Hello World" beacon
 
 from Tasks.template_task import Task
 
@@ -28,19 +28,20 @@ class task(Task):
             self.debug("NOT sending beacon (unknown antenna state)",2)
             self.debug("If you've attached an antenna, edit '/Tasks/beacon_task.py' to actually beacon", 2)
             print() # blank line
+            self.cubesat.radio1.listen()
 
         self.debug("Listening 10s for response (non-blocking)")
         heard_something = await self.cubesat.radio1.await_rx(timeout=10)
 
         if heard_something:
-            response = self.cubesat.radio1.receive(keep_listening=True)
+            response = self.cubesat.radio1.receive(keep_listening=False)
             if response is not None:
                 self.debug("packet received!")
-                print('\t  └──',response)
+                self.debug(response,2)
                 self.cubesat.c_gs_resp+=1
         else:
             self.debug('no messages')
-            self.cubesat.radio1.sleep()
+        self.cubesat.radio1.sleep()
         self.debug('finished')
 
 
