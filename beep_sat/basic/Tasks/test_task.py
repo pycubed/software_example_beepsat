@@ -4,7 +4,7 @@ import time
 class task(Task):
     priority = 4
     frequency = 1/30 # once every 30s
-    name='test'
+    name = 'test'
     color = 'gray'
 
     schedule_later = True
