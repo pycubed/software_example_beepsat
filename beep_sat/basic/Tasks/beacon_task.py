@@ -36,8 +36,8 @@ class task(Task):
         if heard_something:
             response = self.cubesat.radio1.receive(keep_listening=False)
             if response is not None:
-                self.debug("packet received!")
-                self.debug(response,2)
+                self.debug("packet received")
+                self.debug('msg: {}, RSSI: {}'.format(response,self.cubesat.radio1.last_rssi-137),2)
                 self.cubesat.c_gs_resp+=1
         else:
             self.debug('no messages')

@@ -25,27 +25,23 @@ from micropython import const
 
 
 # NVM register numbers
-_BOOTCNT  = const(0)  #0
-_VBUSRST  = const(6)  #1
-_STATECNT = const(7)  #2
-_TOUTS    = const(9)  #4
-_GSRSP    = const(10) #5
-_ICHRG    = const(11) #6
-_FLAG     = const(16) #11 20
-
-BIT_0 = const(0)
-BIT_4 = const(4)
-BIT_8 = const(8)
+_BOOTCNT  = const(0)
+_VBUSRST  = const(6)
+_STATECNT = const(7)
+_TOUTS    = const(9)
+_GSRSP    = const(10)
+_ICHRG    = const(11)
+_FLAG     = const(16)
 
 SEND_BUFF=bytearray(252)
 
 class Satellite:
     # General NVM counters
-    c_boot      = multiBitFlag(register=_BOOTCNT, lowest_bit=BIT_0,num_bits=BIT_8)
-    c_vbusrst   = multiBitFlag(register=_VBUSRST, lowest_bit=BIT_0,num_bits=BIT_8)
-    c_state_err = multiBitFlag(register=_STATECNT,lowest_bit=BIT_0,num_bits=BIT_8)
-    c_gs_resp   = multiBitFlag(register=_GSRSP,   lowest_bit=BIT_0,num_bits=BIT_8)
-    c_ichrg     = multiBitFlag(register=_ICHRG,   lowest_bit=BIT_0,num_bits=BIT_8)
+    c_boot      = multiBitFlag(register=_BOOTCNT, lowest_bit=0,num_bits=8)
+    c_vbusrst   = multiBitFlag(register=_VBUSRST, lowest_bit=0,num_bits=8)
+    c_state_err = multiBitFlag(register=_STATECNT,lowest_bit=0,num_bits=8)
+    c_gs_resp   = multiBitFlag(register=_GSRSP,   lowest_bit=0,num_bits=8)
+    c_ichrg     = multiBitFlag(register=_ICHRG,   lowest_bit=0,num_bits=8)
 
     # Define NVM flags
     f_lowbatt  = bitFlag(register=_FLAG,bit=0)
@@ -112,12 +108,14 @@ class Satellite:
 
         # Initialize sdcard (always init SD before anything else on spi bus)
         try:
+            # Baud rate depends on the card, 4MHz should be safe
             _sd = sdcardio.SDCard(self.spi, board.SD_CS, baudrate=4000000)
             _vfs = VfsFat(_sd)
             mount(_vfs, "/sd")
             self.fs=_vfs
             sys.path.append("/sd")
             self.hardware['SDcard'] = True
+            self.logfile="/sd/log.txt"
         except Exception as e:
             if self.debug: print('[ERROR][SD Card]',e)
 
@@ -135,7 +133,6 @@ class Satellite:
             self.usb.charging = False
             self.usb.wdt = False
             self.usb.led=False
-            # TODO: check ILIM registers
             self.usb.charging_current=8 #400mA
             self.usb_charging=False
             self.hardware['USB'] = True
@@ -169,6 +166,8 @@ class Satellite:
         try:
             self.radio1 = pycubed_rfm9x.RFM9x(self.spi, _rf_cs1, _rf_rst1,
                 433.0,code_rate=8,baudrate=1320000)
+            # Default LoRa Modulation Settings
+            # Frequency: 433 MHz, SF7, BW125kHz, CR4/8, Preamble=8, CRC=True
             self.radio1.dio0=self.radio1_DIO0
             self.radio1.enable_crc=True
             self.radio1.tx_power=13
@@ -177,6 +176,7 @@ class Satellite:
         except Exception as e:
             if self.debug: print('[ERROR][RADIO 1]',e)
 
+        # set PyCubed power mode
         self.power_mode = 'normal'
 
     def reinit(self,dev):
@@ -242,13 +242,6 @@ class Satellite:
         _voltage = (vbat/50)*(316+110)/110 # 316/110 voltage divider
         return _voltage # volts
 
-    def fuel_gauge(self):
-        '''
-        report battery voltage as % full
-        min=7.1 max=8.4 difference=1.3
-        '''
-        return round(100*(self.battery_voltage-7.2)/1.2)
-
     @property
     def system_voltage(self):
         if self.hardware['PWR']:
@@ -289,19 +282,16 @@ class Satellite:
 
     @property
     def reset_vbus(self):
-        self.micro.nvm[_VBUSRST]+=1
-        # if we've reset vbus 255 times, something is wrong
-        if self.micro.nvm[_VBUSRST] < 254:
-            try:
-                umount('/sd')
-                self.spi.deinit()
-                self.enable_rf.value=False
-                time.sleep(3)
-            except Exception as e:
-                print('vbus reset error?', e)
-                pass
-            self._resetReg.drive_mode=digitalio.DriveMode.PUSH_PULL
-            self._resetReg.value=1
+        # unmount SD card to avoid errors
+        try:
+            umount('/sd')
+            self.spi.deinit()
+            time.sleep(3)
+        except Exception as e:
+            print('vbus reset error?', e)
+            pass
+        self._resetReg.drive_mode=digitalio.DriveMode.PUSH_PULL
+        self._resetReg.value=1
 
     def log(self, msg):
         if self.hardware['SDcard']:
@@ -333,7 +323,10 @@ class Satellite:
             self.micro.nvm[_TOUTS] += 1
 
     def powermode(self,mode):
-        if 'minimum' in mode:
+        """
+        Configure the hardware for minimum or normal power consumption
+        """
+        if 'min' in mode:
             self.RGB = (0,0,0)
             self.neopixel.brightness=0
             if self.hardware['Radio1']:
@@ -349,7 +342,7 @@ class Satellite:
                 self.en_gps.value = False
             self.power_mode = 'minimum'
 
-        elif 'normal' in mode:
+        elif 'norm' in mode:
             self.enable_rf.value = True
             if self.hardware['IMU']:
                 self.reinit('IMU')

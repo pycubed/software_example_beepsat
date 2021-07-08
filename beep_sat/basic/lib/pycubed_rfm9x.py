@@ -711,21 +711,21 @@ class RFM9x:
 
     def rx_done(self):
         """Receive status"""
-        # if self.dio0:
-        #     print('RxDIO0: {}, {}'.format(self.dio0.value,hex((self._read_u8(_RH_RF95_REG_12_IRQ_FLAGS) & 0x40) >> 6)))
-        #     return self.dio0.value
-        # else:
-        return (self._read_u8(_RH_RF95_REG_12_IRQ_FLAGS) & 0x40) >> 6
+        if self.dio0:
+            # print('RxDIO0: {}, {}'.format(self.dio0.value,hex((self._read_u8(_RH_RF95_REG_12_IRQ_FLAGS) & 0x40) >> 6)))
+            return self.dio0.value
+        else:
+            return (self._read_u8(_RH_RF95_REG_12_IRQ_FLAGS) & 0x40) >> 6
 
     async def await_rx(self,timeout=60):
-        # TODO choose irq source
         _t=time.monotonic()+timeout
-        # while not self.dio0.value:
         while not self.rx_done():
             if time.monotonic() < _t:
                 yield
             else:
+                # Timed out
                 return False
+        # Received something
         return True
 
     def crc_error(self):
