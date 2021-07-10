@@ -25,7 +25,7 @@ def query(self,args):
     self.cubesat.radio1.send(data=str(eval(args)))
 
 def shutdown(self,args):
-    # make shutdown require yet another pass code
+    # make shutdown require yet another pass-code
     if args == b'\x0b\xfdI\xec':
         self.debug('valid shutdown command received')
 
