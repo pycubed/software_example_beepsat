@@ -59,11 +59,14 @@ class task(Task):
                 self.debug('msg: {}, RSSI: {}'.format(response,self.cubesat.radio1.last_rssi-137),2)
                 self.cubesat.c_gs_resp+=1
 
+                """
                 ########### ADVANCED ###########
-                # over-the-air commands
+                Over-the-air commands
+                See beep-sat guide for more details
+                """
                 if len(response) >= 6:
                     if not ANTENNA_ATTACHED:
-                        self.debug('Antenna not attached. Skipping over-the-air commands')
+                        self.debug('Antenna not attached. Skipping over-the-air command handling')
                     else:
                         if response[:4]==self.super_secret_code:
                             cmd=bytes(response[4:6]) # [pass-code(4 bytes)] [cmd 2 bytes] [args]
@@ -85,7 +88,7 @@ class task(Task):
                                         self.cmd_dispatch[cdh.commands[cmd]](self,cmd_args)
                                 except Exception as e:
                                     self.debug('something went wrong: {}'.format(e))
-                                    self.cubesat.radio1.send(str(e).encode()+cmd+cmd_args)
+                                    self.cubesat.radio1.send(str(e).encode())
                             else:
                                 self.debug('invalid command!')
                                 self.cubesat.radio1.send(b'invalid cmd'+response[4:])

@@ -46,23 +46,22 @@ for file in os.listdir('Tasks'):
 print(len(cubesat.scheduled_tasks),'total')
 
 print('Running...')
-cubesat.tasko.run()
-# try:
-#     # should run forever
-#     cubesat.tasko.run()
-# except Exception as e:
-#     print('FATAL ERROR: {}'.format(e))
-#     try:
-#         # increment our NVM error counter
-#         cubesat.c_state_err+=1
-#         # try to log everything
-#         cubesat.log('{},{},{}'.format(e,cubesat.c_state_err,cubesat.c_boot))
-#     except:
-#         pass
+try:
+    # should run forever
+    cubesat.tasko.run()
+except Exception as e:
+    print('FATAL ERROR: {}'.format(e))
+    try:
+        # increment our NVM error counter
+        cubesat.c_state_err+=1
+        # try to log everything
+        cubesat.log('{},{},{}'.format(e,cubesat.c_state_err,cubesat.c_boot))
+    except:
+        pass
 
-# # we shouldn't be here!
-# print('Engaging fail safe: hard reset')
-# from time import sleep
-# sleep(10)
-# cubesat.micro.on_next_reset(cubesat.micro.RunMode.NORMAL)
-# cubesat.micro.reset()
+# we shouldn't be here!
+print('Engaging fail safe: hard reset')
+from time import sleep
+sleep(10)
+cubesat.micro.on_next_reset(cubesat.micro.RunMode.NORMAL)
+cubesat.micro.reset()
