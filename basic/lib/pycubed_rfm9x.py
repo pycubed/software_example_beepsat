@@ -1,7 +1,14 @@
+# SPDX-FileCopyrightText: 2017 Tony DiCola for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
 """
-MODIFIED VERSION of adafruit_rfm9x CircuitPython Library
+MODIFIED VERSION of adafruit_rfm9x CircuitPython Library for PyCubed Use
+See https://github.com/adafruit/Adafruit_CircuitPython_RFM9x
 
-
+CircuitPython Version: 7.0.0 alpha
+Library Repo: https://github.com/pycubed/library_pycubed.py
+* Edits by: Max Holliday
 """
 import time
 from random import random

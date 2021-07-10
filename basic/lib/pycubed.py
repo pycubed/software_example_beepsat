@@ -1,24 +1,26 @@
 """
-CircuitPython driver for PyCubed satellite board
-
-PyCubed mainboard-v5
-CircuitPython version 7.0 alpha
+CircuitPython driver for PyCubed satellite board.
+PyCubed Hardware Version: mainboard-v05
+CircuitPython Version: 7.0.0 alpha
+Library Repo: https://github.com/pycubed/library_pycubed.py
 
 * Author(s): Max Holliday
-
 """
+# Common CircuitPython Libs
 import board, microcontroller
 import busio, time, sys
 from storage import mount,umount,VfsFat
 from analogio import AnalogIn
 import digitalio, sdcardio, tasko
 
+# Hardware Specific Libs
 import pycubed_rfm9x # Radio
 import bmx160 # IMU
-
 import neopixel # RGB LED
 import bq25883 # USB Charger
 import adm1176 # Power Monitor
+
+# Common CircuitPython Libs
 from os import listdir,stat,statvfs,mkdir,chdir
 from bitflags import bitFlag,multiBitFlag,multiByte
 from micropython import const
@@ -106,7 +108,7 @@ class Satellite:
         _rf_rst1.switch_to_output(value=True)
         self.radio1_DIO0.switch_to_input()
 
-        # Initialize sdcard (always init SD before anything else on spi bus)
+        # Initialize SD card (always init SD before anything else on spi bus)
         try:
             # Baud rate depends on the card, 4MHz should be safe
             _sd = sdcardio.SDCard(self.spi, board.SD_CS, baudrate=4000000)
@@ -236,10 +238,10 @@ class Satellite:
 
     @property
     def battery_voltage(self):
-        vbat=0
+        _vbat=0
         for _ in range(50):
-            vbat+=self._vbatt.value * 3.3 / 65536
-        _voltage = (vbat/50)*(316+110)/110 # 316/110 voltage divider
+            _vbat+=self._vbatt.value * 3.3 / 65536
+        _voltage = (_vbat/50)*(316+110)/110 # 316/110 voltage divider
         return _voltage # volts
 
     @property
@@ -270,6 +272,10 @@ class Satellite:
             print('[WARNING] Power monitor not initialized')
 
     def charge_current(self):
+        """
+        LTC4121 solar charging IC with charge current monitoring
+        See Programming the Charge Current section
+        """
         _charge = 0
         if self.solar_charging:
             _charge = self._ichrg.value * 3.3 / 65536
@@ -325,6 +331,7 @@ class Satellite:
     def powermode(self,mode):
         """
         Configure the hardware for minimum or normal power consumption
+        Add custom modes for mission-specific control
         """
         if 'min' in mode:
             self.RGB = (0,0,0)
