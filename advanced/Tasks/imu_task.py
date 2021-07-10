@@ -13,7 +13,7 @@ class task(Task):
     data_file = None
 
     # we want to initialize the data file only once upon boot
-    # so we put it in our task init
+    # so perform our task init and use that as a chance to init the data files
     def __init__(self,satellite):
         super().__init__(satellite)
         self.data_file=self.cubesat.new_file('/data/imu')
