@@ -173,7 +173,7 @@ class Satellite:
             # Frequency: 433 MHz, SF7, BW125kHz, CR4/8, Preamble=8, CRC=True
             self.radio1.dio0=self.radio1_DIO0
             self.radio1.enable_crc=True
-            self.radio1.tx_power=13
+            self.radio1.tx_power=5
             self.radio1.sleep()
             self.hardware['Radio1'] = True
         except Exception as e:
