@@ -3,8 +3,9 @@ import time
 commands = {
     b'\x8eb': 'no-op',
     b'\xd4\x9f': 'hreset',
-    b'8\x93': 'query',
     b'\x12\x06': 'shutdown',
+    b'8\x93': 'query',
+    b'\x96\xa2': 'exec_cmd',
 }
 
 ########### commands without arguments ###########
@@ -16,13 +17,12 @@ def hreset(self):
     self.debug('Resetting')
     try:
         self.cubesat.radio1.send(data=b'resetting')
+        self.cubesat.micro.on_next_reset(cubesat.micro.RunMode.NORMAL)
+        self.cubesat.micro.reset()
     except:
         pass
 
 ########### commands with arguments ###########
-def query(self,args):
-    self.debug('query: {}'.format(args))
-    self.cubesat.radio1.send(data=str(eval(args)))
 
 def shutdown(self,args):
     # make shutdown require yet another pass-code
@@ -44,6 +44,13 @@ def shutdown(self,args):
         while True:
             time.sleep(100000)
 
+def query(self,args):
+    self.debug('query: {}'.format(args))
+    self.cubesat.radio1.send(data=str(eval(args)))
+
+def exec_cmd(self,args):
+    self.debug('exec: {}'.format(args))
+    exec(args)
 
 
 

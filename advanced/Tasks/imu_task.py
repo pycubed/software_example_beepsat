@@ -5,6 +5,8 @@ import msgpack
 import os
 from os import stat
 
+SEND_DATA = False # make sure you have an antenna attached!
+
 class task(Task):
     priority = 5
     frequency = 1/10 # once every 10s
@@ -16,7 +18,7 @@ class task(Task):
     # so perform our task init and use that as a chance to init the data files
     def __init__(self,satellite):
         super().__init__(satellite)
-        self.data_file=self.cubesat.new_file('/data/imu')
+        self.data_file=self.cubesat.new_file('/data/imu',binary=True)
 
     async def main_task(self):
         # take IMU readings
@@ -41,16 +43,25 @@ class task(Task):
                 msgpack.pack(readings,f)
             # check if the file is getting bigger than we'd like
             if stat(self.data_file)[6] >= 256: # bytes
-                # print the unpacked data from the file
-                print('\nPrinting IMU data file: {}'.format(self.data_file))
-                with open(self.data_file,'rb') as f:
-                    while True:
-                        try: print('\t',msgpack.unpack(f))
-                        except: break
+                if SEND_DATA:
+                    print('\nSend IMU data file: {}'.format(self.data_file))
+                    with open(self.data_file,'rb') as f:
+                        chunk = f.read(64) # each IMU readings is 64 bytes when encoded
+                        while chunk:
+                            # we could send bigger chunks, radio packet can take 252 bytes
+                            self.cubesat.radio1.send(chunk)
+                            print(chunk)
+                            chunk = f.read(64)
+                    print('finished\n')
+                else:
+                    # print the unpacked data from the file
+                    print('\nPrinting IMU data file: {}'.format(self.data_file))
+                    with open(self.data_file,'rb') as f:
+                        while True:
+                            try: print('\t',msgpack.unpack(f))
+                            except: break
                     print('finished\n')
                 # increment our data file number
                 self.data_file=self.cubesat.new_file('/data/imu')
-
-
 
 

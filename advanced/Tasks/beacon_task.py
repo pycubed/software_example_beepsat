@@ -20,8 +20,9 @@ class task(Task):
     cmd_dispatch = {
         'no-op':        cdh.noop,
         'hreset':       cdh.hreset,
-        'query':        cdh.query,
         'shutdown':     cdh.shutdown,
+        'query':        cdh.query,
+        'exec_cmd':     cdh.exec_cmd,
     }
 
     def __init__(self,satellite):
@@ -74,7 +75,7 @@ class task(Task):
                             if len(response) > 6:
                                 self.debug('command with args',2)
                                 try:
-                                    cmd_args=response[6:]
+                                    cmd_args=response[6:] # arguments are everything after
                                     self.debug('cmd args: {}'.format(cmd_args),2)
                                 except Exception as e:
                                     self.debug('arg decoding error: {}'.format(e),2)
