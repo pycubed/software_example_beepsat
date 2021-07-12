@@ -3,7 +3,7 @@
 from Tasks.template_task import Task
 import cdh
 
-ANTENNA_ATTACHED = True
+ANTENNA_ATTACHED = False
 
 class task(Task):
     priority = 1
@@ -11,7 +11,7 @@ class task(Task):
     name='beacon'
     color = 'teal'
 
-    # schedule_later = True
+    schedule_later = True
 
     # our 4 byte code to authorize commands
     # pass-code for DEMO PURPOSES ONLY
