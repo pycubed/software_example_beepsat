@@ -2,7 +2,7 @@
 
 Beep-Sat is a series of complete PyCubed software examples demonstrating a simple beaconing satellite that performs a handful of routine tasks.
 
-Both examples have **very** detailed write-ups:
+Both examples have **EXTREMELY** detailed write-ups:
 
 | Beep-Sat           	| Code<br>Status 	| Documentation<br>Status 	|
 |:-----------------:	|:--------------:	|:-----------------------:	|
