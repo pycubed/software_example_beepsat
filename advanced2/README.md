@@ -9,9 +9,9 @@ Advanced-2 introduces:
 2. default cubesat "config" concept with on-chip or SD card loading. still deciding if I like this config approach. could change
 3. multi-message OTA command mode. this allows you to chain OTA commands together by setting a flag
    <details>
-   <summary>arduino code</summary>
+   <summary>example "ground station" code for multi-msg demo</summary>
    <p>
-
+   
    ```python
    import board
    import busio
@@ -63,26 +63,25 @@ Advanced-2 introduces:
        cmd += b'a=1\nprint(a)'
 
 
-
-   # uncomment for multi msg
-   # response=rfm9x.receive(timeout=1000,with_header=True)
-   # if response is not None:
-   #     print('Beacon Packet:',response)
-   #     rfm9x.flags=8
-   #     rfm9x.send_with_ack(b'p\xba\xb8C'+b'8\x93'+b'cubesat.c_gs_resp')
-   #     response=rfm9x.receive(timeout=10)
-   #     print(response)
-   #     time.sleep(1)
-   #     rfm9x.flags=8
-   #     rfm9x.send_with_ack(b'p\xba\xb8C'+b'8\x93'+b'cubesat.c_gs_resp')
-   #     response=rfm9x.receive(timeout=10)
-   #     print(response)
-   #     rfm9x.flags=0
-   #     time.sleep(1)
-   #     rfm9x.send_with_ack(b'p\xba\xb8C'+b'8\x93'+b'cubesat.c_gs_resp')
-   #     response=rfm9x.receive(timeout=10)
-   #     print(response)
-   # print('done')
+   # comment out if not demoing multi msg
+   response=rfm9x.receive(timeout=1000,with_header=True)
+   if response is not None:
+       print('Beacon Packet:',response)
+       rfm9x.flags=8
+       rfm9x.send_with_ack(b'p\xba\xb8C'+b'8\x93'+b'cubesat.c_gs_resp')
+       response=rfm9x.receive(timeout=10)
+       print(response)
+       time.sleep(1)
+       rfm9x.flags=8
+       rfm9x.send_with_ack(b'p\xba\xb8C'+b'8\x93'+b'cubesat.c_gs_resp')
+       response=rfm9x.receive(timeout=10)
+       print(response)
+       rfm9x.flags=0
+       time.sleep(1)
+       rfm9x.send_with_ack(b'p\xba\xb8C'+b'8\x93'+b'cubesat.c_gs_resp')
+       response=rfm9x.receive(timeout=10)
+       print(response)
+   print('done')
 
    # regular operation
    while True:
