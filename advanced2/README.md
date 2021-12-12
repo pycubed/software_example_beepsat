@@ -83,6 +83,26 @@ Advanced-2 introduces:
        print(response)
    print('done')
 
+   # comment out if not demoing multi msg
+   response=rfm9x.receive(timeout=1000,with_header=True)
+   if response is not None:
+       print('Beacon Packet:',response)
+       rfm9x.flags=8
+       rfm9x.send_with_ack(b'p\xba\xb8C'+b'8\x93'+b'cubesat.c_gs_resp')
+       response=rfm9x.receive(timeout=10)
+       print(response)
+       time.sleep(1)
+       rfm9x.flags=8
+       rfm9x.send_with_ack(b'p\xba\xb8C'+b'8\x93'+b'cubesat.c_gs_resp')
+       response=rfm9x.receive(timeout=10)
+       print(response)
+       rfm9x.flags=0
+       time.sleep(1)
+       rfm9x.send_with_ack(b'p\xba\xb8C'+b'8\x93'+b'cubesat.c_gs_resp')
+       response=rfm9x.receive(timeout=10)
+       print(response)
+   print('done')
+
    # regular operation
    while True:
        response=rfm9x.receive(timeout=10,with_header=True)
