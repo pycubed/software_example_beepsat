@@ -3,7 +3,7 @@
 from Tasks.template_task import Task
 from cdh import message_handler
 
-ANTENNA_ATTACHED = False
+ANTENNA_ATTACHED = True
 
 class task(Task):
     priority = 1
@@ -45,10 +45,10 @@ class task(Task):
 
         if heard_something:
             # retrieve response but don't ACK back unless an antenna is attached
-            response = self.cubesat.radio1.receive(keep_listening=True,with_ack=ANTENNA_ATTACHED)
+            response = self.cubesat.radio1.receive(keep_listening=True,with_ack=ANTENNA_ATTACHED,with_header=True,view=True)
             if response is not None:
                 self.debug("packet received")
-                self.debug('msg: {}, RSSI: {}'.format(response,self.cubesat.radio1.last_rssi-137),2)
+                self.debug('msg: {}, RSSI: {}'.format(bytes(response),self.cubesat.radio1.last_rssi-137),2)
                 self.cubesat.c_gs_resp+=1
 
                 """
@@ -65,5 +65,3 @@ class task(Task):
             self.debug('no messages')
         self.cubesat.radio1.sleep()
         self.debug('finished')
-
-

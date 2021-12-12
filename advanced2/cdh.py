@@ -4,11 +4,12 @@ import time
 # pass-code for DEMO PURPOSES ONLY
 super_secret_code = b'p\xba\xb8C'
 
+# OTA command lookup & dispatch
 commands = {
     b'\x8eb':    'noop',
-    b'\xd4\x9f': 'hreset',
+    b'\xd4\x9f': 'hreset',   # new
     b'\x12\x06': 'shutdown',
-    b'8\x93':    'query',
+    b'8\x93':    'query',    # new
     b'\x96\xa2': 'exec_cmd',
 }
 
@@ -19,24 +20,29 @@ def hotstart_handler(cubesat,msg):
         cubesat.radio1.node = cubesat.cfg['id'] # this sat's radiohead ID
         cubesat.radio1.destination = cubesat.cfg['gs'] # target gs radiohead ID
     except: pass
-
     # check that message is for me
     if msg[0]==cubesat.radio1.node:
-        # TODO config radio
+        # TODO check for optional radio config
 
-        # send ACK
+        # manually send ACK
         cubesat.radio1.send('!',identifier=msg[2],flags=0x80)
         # TODO remove this delay. for testing only!
         time.sleep(0.5)
-        message_handler(cubesat, msg[4:])
+        message_handler(cubesat, msg)
     else:
         print(f'not for me? target id: {hex(msg[0])}, my id: {hex(cubesat.radio1.node)}')
 
 ############### message handler ###############
 def message_handler(cubesat,msg):
-    if len(msg) >= 6:
-        if msg[:4]==super_secret_code:
-            cmd=bytes(msg[4:6]) # [pass-code(4 bytes)] [cmd 2 bytes] [args]
+    multi_msg=False
+    if len(msg) >= 10: # [RH header 4 bytes] [pass-code(4 bytes)] [cmd 2 bytes]
+        if bytes(msg[4:8])==super_secret_code:
+            # check if multi-message flag is set
+            if msg[3] & 0x08:
+                multi_msg=True
+            # strip off RH header
+            msg=bytes(msg[4:])
+            cmd=msg[4:6] # [pass-code(4 bytes)] [cmd 2 bytes] [args]
             cmd_args=None
             if len(msg) > 6:
                 print('command with args')
@@ -60,6 +66,14 @@ def message_handler(cubesat,msg):
             else:
                 print('invalid command!')
                 cubesat.radio1.send(b'invalid cmd'+msg[4:])
+            # check for multi-message mode
+            if multi_msg:
+                # TODO check for optional radio config
+                print('multi-message mode enabled')
+                response = cubesat.radio1.receive(keep_listening=True,with_ack=True,with_header=True,view=True,timeout=10)
+                if response is not None:
+                    cubesat.c_gs_resp+=1
+                    message_handler(cubesat,response)
         else:
             print('bad code?')
 
