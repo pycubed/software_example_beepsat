@@ -8,3 +8,6 @@ Both examples have **EXTREMELY** detailed write-ups. See links below:
 |:-----------------:	|:--------------:	|:-----------------------:	|
 |             basic 	|    [Complete ✅](./basic/)    	|      [Complete ✅](https://www.notion.so/Beep-Sat-basic-a3074e1925d74835bd3e2e3543819981)       	|
 |          advanced 	|    [Complete ✅](./advanced/)    |      [Complete ✅](https://www.notion.so/Beep-Sat-advanced-2d93fbe63d1a42cc8ce084b6f19535ba)      	|
+
+## License
+- Software/firmware in this repository is licensed under MIT unless otherwise indicated.
