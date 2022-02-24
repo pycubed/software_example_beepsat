@@ -27,7 +27,7 @@ for file in os.listdir('Tasks'):
     file=file[:-3]
 
     # ignore these files
-    if file in ("template_task","test_task","listen_task"):
+    if file in ("template_task","test_task","listen_task") or file.startswith('._'):
         continue
 
     # auto-magically import the task file
