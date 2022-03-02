@@ -17,7 +17,7 @@ def hreset(self):
     self.debug('Resetting')
     try:
         self.cubesat.radio1.send(data=b'resetting')
-        self.cubesat.micro.on_next_reset(cubesat.micro.RunMode.NORMAL)
+        self.cubesat.micro.on_next_reset(self.cubesat.micro.RunMode.NORMAL)
         self.cubesat.micro.reset()
     except:
         pass
