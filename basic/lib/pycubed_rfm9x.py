@@ -1,20 +1,49 @@
-# SPDX-FileCopyrightText: 2017 Tony DiCola for Adafruit Industries
+# The MIT License (MIT)
 #
-# SPDX-License-Identifier: MIT
-
+# Copyright (c) 2017 Tony DiCola for Adafruit Industries
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
 """
-MODIFIED VERSION of adafruit_rfm9x CircuitPython Library for PyCubed Use
-See https://github.com/adafruit/Adafruit_CircuitPython_RFM9x
+`pycubed_rfm9x`
+====================================================
 
-CircuitPython Version: 7.0.0 alpha
-Library Repo: https://github.com/pycubed/library_pycubed.py
-* Edits by: Max Holliday
+CircuitPython module for the RFM95/6/7/8 LoRa 433/915mhz radio modules.  This is
+adapted from the Radiohead library RF95 code from:
+http: www.airspayce.com/mikem/arduino/RadioHead/
+
+* Author(s): Tony DiCola, Jerry Needell
+
+** MODIFIED FOR VR3X MISSION ** https://vr3x.space
 """
 import time
-from random import random
+import random
 import digitalio
 from micropython import const
+# from adafruit_itertools.adafruit_itertools import permutations
+
+
 import adafruit_bus_device.spi_device as spidev
+
+
+__version__ = "2.0.1"
+__repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_RFM9x.git"
+
 
 # pylint: disable=bad-whitespace
 # Internal constants:
@@ -73,8 +102,11 @@ _RH_RF95_DETECTION_THRESHOLD = const(0x37)
 _RH_RF95_PA_DAC_DISABLE = const(0x04)
 _RH_RF95_PA_DAC_ENABLE = const(0x07)
 
+# The crystal oscillator frequency of the module
+_RH_RF95_FXOSC = 32000000.0
+
 # The Frequency Synthesizer step = RH_RF95_FXOSC / 2^^19
-_RH_RF95_FSTEP = 32000000 / 524288
+_RH_RF95_FSTEP = _RH_RF95_FXOSC / 524288
 
 # RadioHead specific compatibility constants.
 _RH_BROADCAST_ADDRESS = const(0xFF)
@@ -86,24 +118,13 @@ _RH_FLAGS_ACK = const(0x80)
 _RH_FLAGS_RETRY = const(0x40)
 
 # User facing constants:
-SLEEP_MODE  = const(0)#0b000
-STANDBY_MODE= const(1)#0b001
-FS_TX_MODE  = const(2)#0b010
-TX_MODE     = const(3)#0b011
-FS_RX_MODE  = const(4)#0b100
-RX_MODE     = const(5)#0b101
+SLEEP_MODE = 0b000
+STANDBY_MODE = 0b001
+FS_TX_MODE = 0b010
+TX_MODE = 0b011
+FS_RX_MODE = 0b100
+RX_MODE = 0b101
 # pylint: enable=bad-whitespace
-
-# gap =bytes([0xFF])
-# sgap=bytes([0xFF,0xFF,0xFF])
-# dot =bytes([0])
-# dash=bytes([0,0,0])
-# # ...- .-. ...-- -..-
-# VR3X = (gap+(dot+gap)*3)+dash+sgap+\
-# (dot+gap)+dash+gap+dot+sgap+\
-# ((dot+gap)*3)+dash+gap+dash+sgap+\
-# dash+gap+((dot+gap)*2)+dash+gap
-VR3X=b'\xff\x00\xff\x00\xff\x00\xff\x00\x00\x00\xff\xff\xff\x00\xff\x00\x00\x00\xff\x00\xff\xff\xff\x00\xff\x00\xff\x00\xff\x00\x00\x00\xff\x00\x00\x00\xff\xff\xff\x00\x00\x00\xff\x00\xff\x00\xff\x00\x00\x00\xff'
 
 
 # Disable the too many instance members warning.  Pylint has no knowledge
@@ -112,8 +133,7 @@ VR3X=b'\xff\x00\xff\x00\xff\x00\xff\x00\x00\x00\xff\xff\xff\x00\xff\x00\x00\x00\
 # the warning to work around the error.
 # pylint: disable=too-many-instance-attributes
 
-_bigbuffer=bytearray(256)
-bw_bins = (7800, 10400, 15600, 20800, 31250, 41700, 62500, 125000, 250000)
+
 class RFM9x:
     """Interface to a RFM95/6/7/8 LoRa radio module.  Allows sending and
     receivng bytes of data in long range LoRa mode at a support board frequency
@@ -150,7 +170,9 @@ class RFM9x:
     # Global buffer for SPI commands
     _BUFFER = bytearray(4)
     DEBUG_HEADER=False
-    valid_ids  = (58,59,60,255)
+    _bigbuffer=bytearray(256)
+    _bigbuf=bytes(bytearray(256))
+    vr3x_permutations=[(60, 58), (60, 59), (60, 255), (58, 60), (58, 59), (58, 255), (59, 60), (59, 58), (59, 255), (255, 60), (255, 58), (255, 59)]
     class _RegisterBits:
         # Class to simplify access to the many configuration bits avaialable
         # on the chip's registers.  This is a subclass here instead of using
@@ -197,21 +219,12 @@ class RFM9x:
 
     low_frequency_mode = _RegisterBits(_RH_RF95_REG_01_OP_MODE, offset=3, bits=1)
 
-    osc_calibration   = _RegisterBits(_RH_RF95_REG_24_HOP_PERIOD, offset=3, bits=1)
-
     modulation_type = _RegisterBits(_RH_RF95_REG_01_OP_MODE, offset=5, bits=2)
 
     # Long range/LoRa mode can only be set in sleep mode!
     long_range_mode = _RegisterBits(_RH_RF95_REG_01_OP_MODE, offset=7, bits=1)
 
-
-    lna_boost = _RegisterBits(_RH_RF95_REG_0C_LNA, bits=2)
-
     output_power = _RegisterBits(_RH_RF95_REG_09_PA_CONFIG, bits=4)
-
-    modulation_shaping = _RegisterBits(_RH_RF95_REG_0A_PA_RAMP, bits=2)
-
-    pa_ramp = _RegisterBits(_RH_RF95_REG_0A_PA_RAMP, bits=4)
 
     max_power = _RegisterBits(_RH_RF95_REG_09_PA_CONFIG, offset=4, bits=3)
 
@@ -221,11 +234,8 @@ class RFM9x:
 
     dio0_mapping = _RegisterBits(_RH_RF95_REG_40_DIO_MAPPING1, offset=6, bits=2)
 
-    low_datarate_optimize = _RegisterBits(_RH_RF95_REG_26_MODEM_CONFIG3, offset=3, bits=1)
-    auto_agc  = _RegisterBits(_RH_RF95_REG_26_MODEM_CONFIG3, offset=2, bits=1)
+    bw_bins = (7800, 10400, 15600, 20800, 31250, 41700, 62500, 125000, 250000)
 
-    debug=False
-    buffview = memoryview(_bigbuffer)
     def __init__(
         self,
         spi,
@@ -234,13 +244,12 @@ class RFM9x:
         frequency,
         *,
         preamble_length=8,
-        code_rate=5,
         high_power=True,
         baudrate=5000000,
-        max_output=False
+        rfm95pw=False
     ):
         self.high_power = high_power
-        self.max_output=max_output
+        self.RFM95PW=rfm95pw
         self.dio0=False
         # Device support SPI mode 0 (polarity & phase = 0) up to a max of 10mhz.
         # Set Default Baudrate to 5MHz to avoid problems
@@ -260,13 +269,8 @@ class RFM9x:
                 "Failed to find rfm9x with expected version -- check wiring"
             )
 
-        # Set sleep mode, wait 10ms and confirm in sleep mode (basic device check).
+        # Set sleep mode, wait 10s and confirm in sleep mode (basic device check).
         # Also set long range mode (LoRa mode) as it can only be done in sleep.
-        self.idle()
-        time.sleep(0.01)
-        self.osc_calibration=True
-        time.sleep(1)
-
         self.sleep()
         time.sleep(0.01)
         self.long_range_mode = True
@@ -278,24 +282,20 @@ class RFM9x:
         # Setup entire 256 byte FIFO
         self._write_u8(_RH_RF95_REG_0E_FIFO_TX_BASE_ADDR, 0x00)
         self._write_u8(_RH_RF95_REG_0F_FIFO_RX_BASE_ADDR, 0x00)
-        # Disable Freq Hop
-        self._write_u8(_RH_RF95_REG_24_HOP_PERIOD, 0x00)
         # Set mode idle
         self.idle()
-
-
         # Set frequency
         self.frequency_mhz = frequency
         # Set preamble length (default 8 bytes to match radiohead).
         self.preamble_length = preamble_length
         # Defaults set modem config to RadioHead compatible Bw125Cr45Sf128 mode.
         self.signal_bandwidth = 125000
-        self.coding_rate = code_rate
+        self.coding_rate = 5
         self.spreading_factor = 7
         # Default to disable CRC checking on incoming packets.
         self.enable_crc = False
         # Note no sync word is set for LoRa mode either!
-        self._write_u8(_RH_RF95_REG_26_MODEM_CONFIG3, 0x00)
+        self._write_u8(_RH_RF95_REG_26_MODEM_CONFIG3, 0x00)  # Preamble lsb?
         # Set transmit power to 13 dBm, a safe value any module supports.
         self.tx_power = 13
         # initialize last RSSI reading
@@ -350,70 +350,6 @@ class RFM9x:
            Fourth byte of the RadioHead header.
         """
         self.crc_error_count = 0
-
-        self.auto_agc=True
-        self.pa_ramp=0   # mode agnostic
-        self.lna_boost=3 # mode agnostic
-
-    def cw(self,msg=None):
-        success=False
-        if msg is None:
-            msg = VR3X
-
-        cache=[]
-        if self.long_range_mode:
-            # cache LoRa params
-            cache = [self.spreading_factor,
-                    self.signal_bandwidth,
-                    self.coding_rate,
-                    self.preamble_length,
-                    self.enable_crc]
-
-        self.operation_mode = SLEEP_MODE
-        time.sleep(0.01)
-        self.long_range_mode=False # FSK/OOK Mode
-        self.modulation_type=1 # OOK
-        self.modulation_shaping = 2
-        self._write_u8(0x25,0x00) # no preamble
-        self._write_u8(0x26,0x00) # no preamble
-        self._write_u8(0x27,0x00) # no sync word
-        self._write_u8(0x3f,10)   # clear FIFO
-        self._write_u8(0x02,0xFF) # BitRate(15:8)
-        self._write_u8(0x03,0xFF) # BitRate(15:8)
-        self._write_u8(0x05,11)   # Freq deviation Lsb 600 Hz
-        self.idle()
-        # Set payload length VR3X Morse length = 51
-        self._write_u8(0x35,len(msg)-1)
-        self._write_from(_RH_RF95_REG_00_FIFO, bytearray(msg))
-
-        _t=time.monotonic() + 10
-        self.operation_mode = TX_MODE
-        while time.monotonic() < _t:
-            a=self._read_u8(0x3f)
-            # print(a,end=' ')
-            if (a>>6)&1:
-                time.sleep(0.01)
-                success=True
-                break
-        if not (a>>6)&1:
-            print('cw timeout')
-        self.idle()
-        if cache:
-            self.operation_mode = SLEEP_MODE
-            time.sleep(0.01)
-            self.long_range_mode = True
-            self._write_u8(_RH_RF95_REG_0E_FIFO_TX_BASE_ADDR, 0x00)
-            self._write_u8(_RH_RF95_REG_0F_FIFO_RX_BASE_ADDR, 0x00)
-            self._write_u8(_RH_RF95_REG_24_HOP_PERIOD, 0x00)
-            self.idle()
-            self.spreading_factor = cache[0]
-            self.signal_bandwidth = cache[1]
-            self.coding_rate      = cache[2]
-            self.preamble_length  = cache[3]
-            self.enable_crc       = cache[4]
-            self.auto_agc = True
-            self.low_datarate_optimize = True
-        return success
 
     # pylint: disable=no-member
     # Reconsider pylint: disable when this can be tested
@@ -546,14 +482,15 @@ class RFM9x:
     @tx_power.setter
     def tx_power(self, val):
         val = int(val)
-        if self.max_output is True:
-            print('RFM9X Max Output Power Enabled')
+        if self.RFM95PW is True:
             self._write_u8(_RH_RF95_REG_0B_OCP,0x3F) # set Ocp to 240mA
             self.pa_dac = _RH_RF95_PA_DAC_ENABLE
             self.pa_select = True
             self.max_power = 0b111
             self.output_power=0x0F
             return
+        else:
+            print('Set RFM95PW=True for max power')
 
         if self.high_power:
             if val < 5 or val > 23:
@@ -579,15 +516,10 @@ class RFM9x:
         return (self.rssi,self._read_u8(_RH_RF95_REG_19_PKT_SNR_VALUE)/4)
 
     @property
-    def pll_timeout(self):
-        return (self._read_u8(_RH_RF95_REG_1C_HOP_CHANNEL))
-
-    def rssi(self,raw=False):
+    def rssi(self):
         """The received strength indicator (in dBm) of the last received message."""
         # Read RSSI register and convert to value using formula in datasheet.
         # Remember in LoRa mode the payload register changes function to RSSI!
-        if raw:
-            return self._read_u8(_RH_RF95_REG_1A_PKT_RSSI_VALUE)
         return self._read_u8(_RH_RF95_REG_1A_PKT_RSSI_VALUE) - 137
 
     @property
@@ -597,37 +529,24 @@ class RFM9x:
         likelihood of successfully received payloads).  Valid values are
         listed in RFM9x.bw_bins."""
         bw_id = (self._read_u8(_RH_RF95_REG_1D_MODEM_CONFIG1) & 0xF0) >> 4
-        if bw_id >= len(bw_bins):
+        if bw_id >= len(self.bw_bins):
             current_bandwidth = 500000
         else:
-            current_bandwidth = bw_bins[bw_id]
+            current_bandwidth = self.bw_bins[bw_id]
         return current_bandwidth
 
     @signal_bandwidth.setter
     def signal_bandwidth(self, val):
         # Set signal bandwidth (set to 125000 to match RadioHead Bw125).
-        for bw_id, cutoff in enumerate(bw_bins):
+        for bw_id, cutoff in enumerate(self.bw_bins):
             if val <= cutoff:
                 break
         else:
             bw_id = 9
         self._write_u8(
             _RH_RF95_REG_1D_MODEM_CONFIG1,
-            (self._read_u8(_RH_RF95_REG_1D_MODEM_CONFIG1) & 0x0F) | (bw_id << 4))
-        if val >= 500000:
-            # see Semtech SX1276 errata note 2.1
-            self._write_u8(0x36,0x02)
-            self._write_u8(0x3a,0x64)
-        else:
-            if val == 7800:
-                self._write_u8(0x2F,0x48)
-            elif val >= 62500:
-                # see Semtech SX1276 errata note 2.3
-                self._write_u8(0x2F,0x40)
-            else:
-                self._write_u8(0x2F,0x44)
-            self._write_u8(0x30,0)
-
+            (self._read_u8(_RH_RF95_REG_1D_MODEM_CONFIG1) & 0x0F) | (bw_id << 4),
+        )
 
     @property
     def coding_rate(self):
@@ -663,13 +582,6 @@ class RFM9x:
         # Set spreading factor (set to 7 to match RadioHead Sf128).
         val = min(max(val, 6), 12)
         self._write_u8(_RH_RF95_DETECTION_OPTIMIZE, 0xC5 if val == 6 else 0xC3)
-
-        if self.signal_bandwidth >= 5000000:
-            self._write_u8(_RH_RF95_DETECTION_OPTIMIZE, 0xC5 if val == 6 else 0xC3)
-        else:
-            # see Semtech SX1276 errata note 2.3
-            self._write_u8(_RH_RF95_DETECTION_OPTIMIZE, 0x45 if val == 6 else 0x43)
-
         self._write_u8(_RH_RF95_DETECTION_THRESHOLD, 0x0C if val == 6 else 0x0A)
         self._write_u8(
             _RH_RF95_REG_1E_MODEM_CONFIG2,
@@ -678,7 +590,6 @@ class RFM9x:
                 | ((val << 4) & 0xF0)
             ),
         )
-
 
     @property
     def enable_crc(self):
@@ -710,22 +621,11 @@ class RFM9x:
 
     def rx_done(self):
         """Receive status"""
-        if self.dio0:
-            # print('RxDIO0: {}, {}'.format(self.dio0.value,hex((self._read_u8(_RH_RF95_REG_12_IRQ_FLAGS) & 0x40) >> 6)))
-            return self.dio0.value
-        else:
-            return (self._read_u8(_RH_RF95_REG_12_IRQ_FLAGS) & 0x40) >> 6
-
-    async def await_rx(self,timeout=60):
-        _t=time.monotonic()+timeout
-        while not self.rx_done():
-            if time.monotonic() < _t:
-                yield
-            else:
-                # Timed out
-                return False
-        # Received something
-        return True
+        # if self.dio0:
+        #     print('RxDIO0: {}, {}'.format(self.dio0.value,hex((self._read_u8(_RH_RF95_REG_12_IRQ_FLAGS) & 0x40) >> 6)))
+        #     return self.dio0.value
+        # else:
+        return (self._read_u8(_RH_RF95_REG_12_IRQ_FLAGS) & 0x40) >> 6
 
     def crc_error(self):
         """crc status"""
@@ -759,25 +659,13 @@ class RFM9x:
         # efficient and proper way to ensure a precondition that the provided
         # buffer be within an expected range of bounds. Disable this check.
         # pylint: disable=len-as-condition
-
-        if hasattr(self,'txrx'):  # TX
-            self.txrx[0].value=True
-            self.txrx[1].value=False
-
-        l=len(data)
-        assert 0 < l <= 252
+        assert 0 < len(data) <= 252
         # pylint: enable=len-as-condition
         self.idle()  # Stop receiving to clear FIFO and keep it clear.
-        l+=4
         # Fill the FIFO with a packet to send.
         self._write_u8(_RH_RF95_REG_0D_FIFO_ADDR_PTR, 0x00)  # FIFO starts at 0.
-
         # Combine header and data to form payload
-        if data == b'!':
-            payload = bytearray(5)
-        else:
-            payload = self.buffview[:l]
-
+        payload = bytearray(4)
         if destination is None:  # use attribute
             payload[0] = self.destination
         else:  # use kwarg
@@ -795,20 +683,11 @@ class RFM9x:
         else:  # use kwarg
             payload[3] = flags
         if self.DEBUG_HEADER: print('[header] - {}'.format([hex(i) for i in payload]))
-        # payload = payload + data
-        try:
-            if isinstance(data,(bytes,bytearray,memoryview)):
-                payload[4:]=data[:]
-            else:
-                payload[4:]=data.encode()
-        except Exception as e:
-            print('payload encoding error:',e)
-            payload = bytearray(payload[:4])+data
-
+        payload = payload + data
         # Write payload.
         self._write_from(_RH_RF95_REG_00_FIFO, payload)
         # Write payload and header length.
-        self._write_u8(_RH_RF95_REG_22_PAYLOAD_LENGTH, l)
+        self._write_u8(_RH_RF95_REG_22_PAYLOAD_LENGTH, len(payload))
         # Turn on transmit mode to send out the packet.
         self.transmit()
         # Wait for tx done interrupt with explicit polling (not ideal but
@@ -818,11 +697,6 @@ class RFM9x:
         while not timed_out and not self.tx_done():
             if (time.monotonic() - start) >= self.xmit_timeout:
                 timed_out = True
-
-        if hasattr(self,'txrx'): # RX
-            self.txrx[0].value=False
-            self.txrx[1].value=True
-
         # Listen again if necessary and return the result packet.
         if keep_listening:
             self.listen()
@@ -867,7 +741,7 @@ class RFM9x:
                 self.retry_counter+=1 # ADDED FOR PYCUBED
                 print('no uhf ack, sending again...')
                 # delay by random amount before next try
-                time.sleep(self.ack_wait + self.ack_wait * random())
+                time.sleep(self.ack_wait + self.ack_wait * random.random())
             retries_remaining = retries_remaining - 1
             # set retry flag in packet header
             self.flags |= _RH_FLAGS_RETRY
@@ -876,7 +750,8 @@ class RFM9x:
 
     # pylint: disable=too-many-branches
     def receive(
-        self, *, keep_listening=True, with_header=False, with_ack=False, timeout=None, debug=False, view=False):
+        self, *, keep_listening=True, with_header=False, with_ack=False, timeout=None, debug=False
+    ):
         """Wait to receive a packet from the receiver. If a packet is found the payload bytes
            are returned, otherwise None is returned (which indicates the timeout elapsed with no
            reception).
@@ -891,10 +766,6 @@ class RFM9x:
            The payload then begins at packet[4].
            If with_ack is True, send an ACK after receipt (Reliable Datagram mode)
         """
-        if hasattr(self,'txrx'): # RX
-            self.txrx[0].value=False
-            self.txrx[1].value=True
-
         timed_out = False
         if timeout is None:
             timeout = self.receive_timeout
@@ -913,15 +784,12 @@ class RFM9x:
         # Payload ready is set, a packet is in the FIFO.
         packet = None
         # save last RSSI reading
-        self.last_rssi = self.rssi(raw=True)
+        self.last_rssi = self.rssi
         # Enter idle mode to stop receiving other packets.
         self.idle()
         if not timed_out:
             if self.enable_crc and self.crc_error():
                 self.crc_error_count += 1
-                print('crc error')
-                if hasattr(self,'crc_errs'):
-                    self.crc_errs+=1
             else:
                 # Read the data from the FIFO.
                 # Read the length of the FIFO.
@@ -931,14 +799,12 @@ class RFM9x:
                 if fifo_length > 0:  # read and clear the FIFO if anything in it
                     current_addr = self._read_u8(_RH_RF95_REG_10_FIFO_RX_CURRENT_ADDR)
                     self._write_u8(_RH_RF95_REG_0D_FIFO_ADDR_PTR, current_addr)
-                    # packet = bytearray(fifo_length)
-                    packet = self.buffview[:fifo_length]
+                    packet = bytearray(fifo_length)
                     # Read the packet.
                     self._read_into(_RH_RF95_REG_00_FIFO, packet)
                 # Clear interrupt.
                 self._write_u8(_RH_RF95_REG_12_IRQ_FLAGS, 0xFF)
                 if fifo_length < 5:
-                    print('missing pckt header')
                     packet = None
                 else:
                     if (
@@ -966,25 +832,17 @@ class RFM9x:
                             flags=(packet[3] | _RH_FLAGS_ACK),
                         )
                         if debug: print('Sent Ack to {}'.format(packet[1]))
-                        if debug: print('\t{}'.format(packet))
-
-                        # # reject Retries if we have seen this idetifier from this source before
-                        # if (self.seen_ids[packet[1]] == packet[2]) and (
-                        #     packet[3] & _RH_FLAGS_RETRY
-                        # ):
-                        #     print('duplicate identifier from this source. rejecting...')
-                        #     packet = None
-                        # else:  # save the packet identifier for this source
-                        self.seen_ids[packet[1]] = packet[2]
+                        # reject Retries if we have seen this idetifier from this source before
+                        if (self.seen_ids[packet[1]] == packet[2]) and (
+                            packet[3] & _RH_FLAGS_RETRY
+                        ):
+                            packet = None
+                        else:  # save the packet identifier for this source
+                            self.seen_ids[packet[1]] = packet[2]
                     if (
                         not with_header and packet is not None
                     ):  # skip the header if not wanted
                         packet = packet[4:]
-
-        if hasattr(self,'txrx'): # RX
-            self.txrx[0].value=False
-            self.txrx[1].value=True
-
         # Listen again if necessary and return the result packet.
         if keep_listening:
             self.listen()
@@ -993,86 +851,63 @@ class RFM9x:
             self.idle()
         # Clear interrupt.
         self._write_u8(_RH_RF95_REG_12_IRQ_FLAGS, 0xFF)
-        if view:
-            return packet
-        elif packet is not None:
-            return bytes(packet)
         return packet
 
-    def receive_all(self, only_for_me=True,debug=False):
-        # msg=[]
-        l=0
-        fifo_length=0
-        self.idle()
-        if self.enable_crc and self.crc_error():
-            self.crc_error_count += 1
-            print('crc error')
-            if hasattr(self,'crc_errs'):
-                self.crc_errs+=1
-        else:
-            fifo_length = self._read_u8(_RH_RF95_REG_13_RX_NB_BYTES)
+    def valid_headers(self):
+        _msb=self._read_u8(_RH_RF95_REG_14_RX_HEADER_CNT_VALUE_MSB)
+        _lsb=self._read_u8(_RH_RF95_REG_15_RX_HEADER_CNT_VALUE_LSB)
+        return _msb|_lsb
 
+    def update(self,d,u):
+        for k, v in u.items():
+            if isinstance(v, dict):
+                d[k] = update(d.get(k, {}), v)
+            else:
+                d[k] = v
+        yield d
+
+    def findall(self,p, s):
+        '''Yields all the positions of
+        the pattern p in the string s.'''
+        i = s.find(p)
+        while i != -1:
+            yield i
+            i = s.find(p, i+1)
+
+    def receive_all(self, only_for_me=True,debug=False):
+        msg=[]
+        self.idle()
+        fifo_length = self._read_u8(_RH_RF95_REG_13_RX_NB_BYTES)
         if fifo_length > 0:
             current_addr = self._read_u8(_RH_RF95_REG_10_FIFO_RX_CURRENT_ADDR)
             self._write_u8(_RH_RF95_REG_0D_FIFO_ADDR_PTR, _RH_RF95_REG_00_FIFO)
-            self._read_into(_RH_RF95_REG_00_FIFO,_bigbuffer)
-            for i in range(4):
-                self._write_from(_RH_RF95_REG_00_FIFO, bytes(64))
+            self._read_into(_RH_RF95_REG_00_FIFO,self._bigbuffer)
+            self._write_from(_RH_RF95_REG_00_FIFO, bytearray(256))
             self._write_u8(_RH_RF95_REG_0D_FIFO_ADDR_PTR,_RH_RF95_REG_00_FIFO)
             self.listen()
             # Clear interrupt.
             self._write_u8(_RH_RF95_REG_12_IRQ_FLAGS, 0xFF)
+
+            self._bigbuf=bytes(self._bigbuffer)
+            if debug: print(self._bigbuf)
+
             packetindex=[]
-            i=0
-            while i < 253: # 256-4 = 252
-                # check first
-                if self.buffview[i] in self.valid_ids:
-                    # check second
-                    if self.buffview[i+1] in self.valid_ids:
-                        # make sure not the same
-                        if self.buffview[i]!=self.buffview[i+1]:
-                            # append first
-                            packetindex.append(i)
-                            i=i+4
-                            l+=1
-                            continue
-                i+=1
-            for i in range(l-1):
-                # assume packets are back-to-back (read till index of next one)
-                # if (packetindex[i+1]-packetindex[i]) <= 10:
-                    # msg.append(bytes(self.buffview[packetindex[i]:packetindex[i+1]]))
-                yield self.buffview[packetindex[i]:packetindex[i+1]]
-            # last packet so read until the end of our fifo_length
-            if packetindex:
-                # if (packetindex[-1]-(current_addr+fifo_length)) <= 10:
-                    # print('{},{},{}'.format(packetindex[-1],current_addr,fifo_length))
-                    # msg.append(bytes(self.buffview[packetindex[-1]:current_addr+fifo_length]))
-                yield self.buffview[packetindex[-1]:current_addr+fifo_length]
+            for l in self.vr3x_permutations:
+                for f in self.findall(bytes(l),self._bigbuf):
+                    packetindex.append((bytes(l),f))
+            if debug: print(packetindex)
+            packetindex.sort(key=lambda x: x[1])
+
+            for i,j in enumerate(packetindex):
+                if i < len(packetindex)-1:
+                    msg.append(self._bigbuf[j[1]:packetindex[i+1][1]])
+                else:
+                    msg.append(self._bigbuf[j[1]:current_addr+fifo_length])
         else:
             self.listen()
             # Clear interrupt.
             self._write_u8(_RH_RF95_REG_12_IRQ_FLAGS, 0xFF)
-
-        # if only_for_me:
-        #     return [i for i in msg if msg[0] is self.node]
-        # else:
-        #     return msg
-
-    def send_fast(self,data,l):
-        self.idle()
-        self._write_u8(_RH_RF95_REG_0D_FIFO_ADDR_PTR, 0x00) # set fifo position
-        # Write payload.
-        self._write_from(_RH_RF95_REG_00_FIFO, data)
-        # Write payload and header length.
-        self._write_u8(_RH_RF95_REG_22_PAYLOAD_LENGTH, l)
-        # Turn on transmit mode to send out the packet.
-        self.transmit()
-        # Wait for tx done interrupt with explicit polling (not ideal but
-        # best that can be done right now without interrupts).
-        _t = time.monotonic() + 5
-        while time.monotonic() < _t and not self.tx_done():
-            pass
-        self.idle()
-        # Clear interrupt.
-        self._write_u8(_RH_RF95_REG_12_IRQ_FLAGS, 0xFF)
-        return
+        if only_for_me:
+            return [i for i in msg if msg[0] is self.node]
+        else:
+            return msg

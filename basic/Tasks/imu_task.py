@@ -11,9 +11,10 @@ class task(Task):
     async def main_task(self):
         # take IMU readings
         readings = {
-            'accel':self.cubesat.acceleration,
-            'mag':  self.cubesat.magnetic,
-            'gyro': self.cubesat.gyro,
+            'accel': self.cubesat.acceleration,
+            'mag':   self.cubesat.magnetic,
+            'gyro':  self.cubesat.gyro,
+            'temp':  self.cubesat.temperature,
         }
 
         # store them in our cubesat data_cache object
