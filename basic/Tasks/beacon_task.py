@@ -20,7 +20,7 @@ class task(Task):
         """
         if ANTENNA_ATTACHED:
             self.debug("Sending beacon")
-            self.cubesat.radio1.send("Hello World!",keep_listening=True)
+            self.cubesat.radio.send("Hello World!",keep_listening=True)
         else:
             # Fake beacon since we don't know if an antenna is attached
             print() # blank line
@@ -28,20 +28,20 @@ class task(Task):
             self.debug("NOT sending beacon (unknown antenna state)",2)
             self.debug("If you've attached an antenna, edit '/Tasks/beacon_task.py' to actually beacon", 2)
             print() # blank line
-            self.cubesat.radio1.listen()
+            self.cubesat.radio.listen()
 
         self.debug("Listening 10s for response (non-blocking)")
-        heard_something = await self.cubesat.radio1.await_rx(timeout=10)
+        heard_something = await self.cubesat.radio.await_rx(timeout=10)
 
         if heard_something:
-            response = self.cubesat.radio1.receive(keep_listening=False)
+            response = self.cubesat.radio.receive(keep_listening=False)
             if response is not None:
                 self.debug("packet received")
-                self.debug('msg: {}, RSSI: {}'.format(response,self.cubesat.radio1.last_rssi-137),2)
+                self.debug('msg: {}, RSSI: {}'.format(response,self.cubesat.radio.last_rssi-137),2)
                 self.cubesat.c_gs_resp+=1
         else:
             self.debug('no messages')
-        self.cubesat.radio1.sleep()
+        self.cubesat.radio.sleep()
         self.debug('finished')
 
 
