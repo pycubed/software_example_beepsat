@@ -64,9 +64,6 @@ class Satellite:
         Big init routine as the whole board is brought up.
         """
         self._stat={}
-        self.data_cache={}
-        self.filenumbers={}
-        self.vlowbatt=6.0
         self.BOOTTIME= const(self.timeon)
         self.hardware = {
                        'IMU':    False,
@@ -78,6 +75,11 @@ class Satellite:
                        'Coils':  False
                        }
         self.micro=microcontroller
+
+        self.data_cache = {}
+        self.filenumbers = {}
+        self.vlowbatt = 6.0
+        self.debug = True
 
         # Define battery voltage
         self._vbatt = analogio.AnalogIn(board.BATTERY)
@@ -137,7 +139,7 @@ class Satellite:
             self.IMU = bmx160.BMX160_I2C(self.i2c1,address=0x68)
             self.hardware['IMU'] = True
         except Exception as e:
-            print(f'[ERROR][IMU] {e}\n\tMaybe try address=0x69?')
+            print(f'[ERROR][IMU] {e}\n\tMaybe try address=0x68?')
 
         # Initialize Sun Sensors
         try:
