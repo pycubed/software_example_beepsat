@@ -6,7 +6,7 @@ ANTENNA_ATTACHED = False
 
 class task(Task):
     priority = 1
-    frequency = 1/10 # once every 10s
+    frequency = 1/30 # once every 30s
     name='beacon'
     color = 'teal'
 
