@@ -42,6 +42,7 @@ _DWNLINK  = const(4)
 _DCOUNT   = const(3)
 _RSTERRS  = const(2)
 _BOOTCNT  = const(0)
+_GSRSP    = const(10)
 
 class Satellite:
     # Define NVM flags
@@ -56,8 +57,9 @@ class Satellite:
     c_vbus_rst   = multiBitFlag(register=_RSTERRS,lowest_bit=0,num_bits=4)
     c_deploy     = multiBitFlag(register=_DCOUNT,lowest_bit=0,num_bits=8)
     c_downlink   = multiBitFlag(register=_DWNLINK,lowest_bit=0,num_bits=8)
+    c_gs_resp   = multiBitFlag(register=_GSRSP,   lowest_bit=0,num_bits=8)
 
-    UHF_FREQ = 915.6
+    UHF_FREQ = 433.0
 
     def __init__(self):
         """
