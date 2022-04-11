@@ -65,4 +65,3 @@ class multiByte:
         if value >= self.maxval:
             value=self.maxval
         obj.micro.nvm[self.start:self.stop] = value.to_bytes(self.num_bytes,'big')
-

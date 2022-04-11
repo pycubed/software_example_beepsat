@@ -13,7 +13,7 @@ print('\n{lines}\n{:^40}\n{lines}\n'.format('Beep-Sat Demo',lines='-'*40))
 
 print('Initializing PyCubed Hardware...')
 import os, tasko
-from pycubed import cubesat
+from pycubedmini import pocketqube as cubesat
 
 # create asyncio object
 cubesat.tasko=tasko
@@ -61,7 +61,7 @@ except Exception as e:
 
 # we shouldn't be here!
 print('Engaging fail safe: hard reset')
-from time import sleep
-sleep(10)
-cubesat.micro.on_next_reset(cubesat.micro.RunMode.NORMAL)
-cubesat.micro.reset()
+# from time import sleep
+# sleep(10)
+# cubesat.micro.on_next_reset(cubesat.micro.RunMode.NORMAL)
+# cubesat.micro.reset()
