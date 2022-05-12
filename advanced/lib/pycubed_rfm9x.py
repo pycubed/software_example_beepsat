@@ -19,7 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-"""
+""">
 `pycubed_rfm9x`
 ====================================================
 
@@ -45,7 +45,6 @@ __version__ = "2.0.1"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_RFM9x.git"
 
 
-# pylint: disable=bad-whitespace
 # Internal constants:
 # Register names (FSK Mode even though we use LoRa instead, from table 85)
 _RH_RF95_REG_00_FIFO = const(0x00)
@@ -489,8 +488,8 @@ class RFM9x:
             self.max_power = 0b111
             self.output_power=0x0F
             return
-        else:
-            print('Set RFM95PW=True for max power')
+
+        print('Set RFM95PW=True for max power')
 
         if self.high_power:
             if val < 5 or val > 23:
@@ -628,6 +627,7 @@ class RFM9x:
         return (self._read_u8(_RH_RF95_REG_12_IRQ_FLAGS) & 0x40) >> 6
 
     async def await_rx(self, timeout=60):
+        """Wait timeout seconds to until you recieve a message, return true if message received false otherwise"""
         _t = time.monotonic()+timeout
         while not self.rx_done():
             if time.monotonic() < _t:
@@ -665,13 +665,7 @@ class RFM9x:
 
            Returns: True if success or False if the send timed out.
         """
-        # Disable pylint warning to not use length as a check for zero.
-        # This is a puzzling warning as the below code is clearly the most
-        # efficient and proper way to ensure a precondition that the provided
-        # buffer be within an expected range of bounds. Disable this check.
-        # pylint: disable=len-as-condition
         assert 0 < len(data) <= 252
-        # pylint: enable=len-as-condition
         self.idle()  # Stop receiving to clear FIFO and keep it clear.
         # Fill the FIFO with a packet to send.
         self._write_u8(_RH_RF95_REG_0D_FIFO_ADDR_PTR, 0x00)  # FIFO starts at 0.
