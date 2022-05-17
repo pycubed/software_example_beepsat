@@ -43,7 +43,6 @@ class Sattelite:
         self.radio = Radio()
         self.data_cache = {}
         self.c_gs_resp = 1
-        self.state = 'normal'
 
     def new_file(self, substring, binary=False):
         print(

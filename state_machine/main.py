@@ -2,8 +2,6 @@ import os
 from fakecubesat import pocketqube as cubesat
 import state_machine
 
-_ = state_machine.start_state_machine(cubesat)
-
 
 # print('Loading Tasks...', end='')
 # # schedule all tasks in directory
@@ -40,7 +38,8 @@ _ = state_machine.start_state_machine(cubesat)
 print('Running...')
 try:
     # should run forever
-    cubesat.tasko.run()
+    _ = state_machine.StateMachine(cubesat, 'Normal', 'statemachine.yaml')
+    # cubesat.tasko.run()
 except Exception as e:
     print(f"FATAL ERROR: {e}")
     try:

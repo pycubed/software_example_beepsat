@@ -24,22 +24,18 @@ Normal:
       Interval: 3
       Priority: 1
       ScheduleLater: No
-  StepsTo: [ LowPowerMode, DeTubmle ]
+  StepsTo: [LowPower, DeTubmle]
 LowPower:
   Tasks:
-    BatteryCheck:
+    Battery:
       Interval: 15.0
       Priority: 1
       ScheduleLater: No
-  StepsTo: [ NormalMode ]
+  StepsTo: [Normal]
 DeTumble:
   Tasks:
-    BatteryCheck:
+    Battery:
       Interval: 15.0
       Priority: 3
       ScheduleLater: No
-    Torque:
-      Interval: 60.0
-      Priority: 1
-      ScheduleLater: No
-  StepsTo: [ NormalMode ]
+  StepsTo: [Normal]

@@ -17,38 +17,77 @@ TaskMap = {
     "Test": test,
 }
 
-start_state = 'Normal'
 
-def load_state_machine():
-    config_file = open("statemachine.yaml", "r")
+def load_state_machine(file):
+    """Loads the state machine from the yaml file passed"""
+    config_file = open(file, "r")
     config = config_file.read()
     config_file.close()
-    return yaml.safe_load(config)
+    config = yaml.safe_load(config)
+    # check that everything is defined
+    # for state_name, state in config.items():
+    #     for task_name, props in state['Tasks'].items():
+    #         if not task_name in TaskMap:
+    #             raise ValueError(
+    #                 f'{task_name} defined in the {state_name} state, but {task_name} is not defined')
+    #         if not 'Interval' in props:
+    #             raise ValueError(f'Interval value not defined in {state_name}')
+    #         if not 'Priority' in props:
+    #             raise ValueError(f'Priority value not defined in {state_name}')
+    #         if not 'ScheduleLater' in props:
+    #             props['ScheduleLater'] = False #default to false
 
-def start_state_machine(cubesat):
+    return config
 
-    state_machine = load_state_machine()
 
-    # create asyncio object
-    cubesat.tasko = tasko
+class StateMachine:
+    """Singleton State Machine Class"""
 
-    # init task objects
-    Tasks = {key: task(cubesat) for key, task in TaskMap.items()}
+    def __init__(self, cubesat, start_state, config_file_path):
+        self.config = load_state_machine(config_file_path)
+        self.state = start_state
 
-    # set current state
-    state = state_machine[start_state]
+        # create shared asyncio object
+        self.tasko = tasko
+        # left to support legacy code, only the state machine should interact with tasko if possible
+        cubesat.tasko = tasko
 
-    Tasks = {key: task(cubesat) for key, task in TaskMap.items()}
+        # init task objects
+        self.tasks = {key: task(cubesat) for key, task in TaskMap.items()}
 
-    for task_name, props in state['Tasks'].items():
-        if props['ScheduleLater']:
-            schedule = cubesat.tasko.schedule_later
-        else:
-            schedule = cubesat.tasko.schedule
+        # set scheduled tasks to none
+        self.scheduled_tasks = {}
 
-        frequency = 1 / props['Interval']
-        priority = props['Priority']
-        task_fn = Tasks[task_name].main_task
+        # Make state machine accesible to cubesat
+        cubesat.state_machine = self
 
-        cubesat.scheduled_tasks[task_name] = schedule(
-            frequency, task_fn, priority)
+        # switch to start state
+        self.switch_to(start_state)
+
+    def kill_all(self):
+        """Kills all running tasko processes"""
+        for _, task in self.scheduled_tasks.items():
+            task.stop()
+
+    def switch_to(self, state_name):
+        """Switches the state of the cubesat to the new state"""
+        self.kill_all()
+        self.scheduled_tasks = {}
+        self.state = state_name
+
+        state_config = self.config[state_name]
+
+        for task_name, props in state_config['Tasks'].items():
+            if props['ScheduleLater']:
+                schedule = self.tasko.schedule_later
+            else:
+                schedule = self.tasko.schedule
+
+            frequency = 1 / props['Interval']
+            priority = props['Priority']
+            task_fn = self.tasks[task_name].main_task
+
+            self.scheduled_tasks[task_name] = schedule(
+                frequency, task_fn, priority)
+
+        self.tasko.run()
