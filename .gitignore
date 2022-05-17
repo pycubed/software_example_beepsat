@@ -37,3 +37,6 @@ sha.py
 *secrets*
 
 *.xlsx
+
+# pyc files
+*.pyc
