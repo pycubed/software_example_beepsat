@@ -32,7 +32,7 @@ for file in os.listdir('Tasks'):
     task_obj=eval('Tasks.'+file).task(cubesat)
 
     # determine if the task wishes to be scheduled later
-    if hasattr(task_obj,'schedule_later'):
+    if hasattr(task_obj, 'schedule_later') and getattr(task_obj, 'schedule_later'):
         schedule=cubesat.tasko.schedule_later
     else:
         schedule=cubesat.tasko.schedule
