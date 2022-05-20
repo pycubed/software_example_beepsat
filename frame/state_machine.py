@@ -3,13 +3,8 @@ import lib.yaml as yaml
 
 from TaskMap import TaskMap
 
-def load_state_machine(file):
-    """Loads the state machine from the yaml file passed"""
-    config_file = open(file, "r")
-    config = config_file.read()
-    config_file.close()
-    config = yaml.safe_load(config)
-    # check that everything is defined
+def validate_config(config):
+    """Validates that the config file is well formed"""
     for state_name, state in config.items():
         for task_name, props in state['Tasks'].items():
             if not task_name in TaskMap:
@@ -20,8 +15,17 @@ def load_state_machine(file):
             if not 'Priority' in props:
                 raise ValueError(f'Priority value not defined in {state_name}')
             if not 'ScheduleLater' in props:
-                props['ScheduleLater'] = False  # default to false
+                props['ScheduleLater'] = False # default to false
+        if not 'StepsTo' in state:
+            raise ValueError(f'The state {state_name} does not have StepsTo defined')
 
+def load_state_machine(file):
+    """Loads the state machine from the yaml file passed"""
+    config_file = open(file, "r")
+    config = config_file.read()
+    config_file.close()
+    config = yaml.safe_load(config)
+    validate_config(config)
     return config
 
 
@@ -46,18 +50,20 @@ class StateMachine:
         # Make state machine accesible to cubesat
         cubesat.state_machine = self
 
-        # switch to start state
+        # switch to start state, and start event loop
         self.switch_to(start_state, force=True)
         self.tasko.run()
-
+        if state_name == self.state:
+            return
     def stop_all(self):
-        """Kills all running tasko processes"""
+        """Stops all running tasko processes"""
         for _, task in self.scheduled_tasks.items():
             task.stop()
 
     def switch_to(self, state_name, force=False):
         """Switches the state of the cubesat to the new state"""
 
+        # prevent (or force) illegal transitions
         if not(state_name in self.config[self.state]['StepsTo'] or force):
             raise ValueError(
                 f'You cannot transition from {self.state} to {state_name}')
