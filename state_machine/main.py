@@ -7,10 +7,11 @@ print('Running...')
 try:
     # should run forever
     _ = state_machine.StateMachine(cubesat, 'Normal', 'statemachine.yaml')
-    # cubesat.tasko.run()
 except Exception as e:
     formated_exception = traceback.format_exception(e, e, e.__traceback__)
-    print(formated_exception)
+    for line in formated_exception:
+        print(line, end='')
+    # print(formated_exception)
     try:
         # increment our NVM error counter
         cubesat.c_state_err += 1

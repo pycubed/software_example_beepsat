@@ -65,7 +65,7 @@ class Sattelite:
     
     def log(self, str):
         """Logs to sd card"""
-        print(f'log not implemented meant to log {str}')
+        print(f'log not implemented')
 
 
 pocketqube = Sattelite()
