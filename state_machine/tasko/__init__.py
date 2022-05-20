@@ -24,6 +24,8 @@ def get_loop(debug=tasko_logging):
         __global_event_loop = Loop(debug=debug)
     return __global_event_loop
 
+dbg = get_loop().dbg
+
 
 add_task = get_loop().add_task
 run_later = get_loop().run_later

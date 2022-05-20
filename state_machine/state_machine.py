@@ -7,6 +7,8 @@ from Tasks.blink_task import task as blink
 from Tasks.imu_task import task as imu
 from Tasks.time_task import task as time
 from Tasks.test_task import task as test
+from Tasks.lowpower5 import task as lowpower5
+from Tasks.lowpower5later import task as lowpower5later
 
 TaskMap = {
     "Battery": battery,
@@ -15,6 +17,8 @@ TaskMap = {
     "IMU": imu,
     "Time": time,
     "Test": test,
+    "LowPower5": lowpower5,
+    "LowPower5Later": lowpower5later,
 }
 
 
@@ -25,17 +29,17 @@ def load_state_machine(file):
     config_file.close()
     config = yaml.safe_load(config)
     # check that everything is defined
-    # for state_name, state in config.items():
-    #     for task_name, props in state['Tasks'].items():
-    #         if not task_name in TaskMap:
-    #             raise ValueError(
-    #                 f'{task_name} defined in the {state_name} state, but {task_name} is not defined')
-    #         if not 'Interval' in props:
-    #             raise ValueError(f'Interval value not defined in {state_name}')
-    #         if not 'Priority' in props:
-    #             raise ValueError(f'Priority value not defined in {state_name}')
-    #         if not 'ScheduleLater' in props:
-    #             props['ScheduleLater'] = False #default to false
+    for state_name, state in config.items():
+        for task_name, props in state['Tasks'].items():
+            if not task_name in TaskMap:
+                raise ValueError(
+                    f'{task_name} defined in the {state_name} state, but {task_name} is not defined')
+            if not 'Interval' in props:
+                raise ValueError(f'Interval value not defined in {state_name}')
+            if not 'Priority' in props:
+                raise ValueError(f'Priority value not defined in {state_name}')
+            if not 'ScheduleLater' in props:
+                props['ScheduleLater'] = False  # default to false
 
     return config
 
@@ -63,20 +67,22 @@ class StateMachine:
 
         # switch to start state
         self.switch_to(start_state)
+        self.tasko.run()
 
-    def kill_all(self):
+    def stop_all(self):
         """Kills all running tasko processes"""
         for _, task in self.scheduled_tasks.items():
             task.stop()
 
     def switch_to(self, state_name):
         """Switches the state of the cubesat to the new state"""
-        self.kill_all()
+        self.stop_all()
         self.scheduled_tasks = {}
         self.state = state_name
 
         state_config = self.config[state_name]
 
+        self.tasko.dbg()
         for task_name, props in state_config['Tasks'].items():
             if props['ScheduleLater']:
                 schedule = self.tasko.schedule_later
@@ -89,5 +95,3 @@ class StateMachine:
 
             self.scheduled_tasks[task_name] = schedule(
                 frequency, task_fn, priority)
-
-        self.tasko.run()

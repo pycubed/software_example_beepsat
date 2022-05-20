@@ -31,6 +31,14 @@ LowPower:
       Interval: 15.0
       Priority: 1
       ScheduleLater: No
+    LowPower5: 
+      Interval: 5.0
+      Priority: 2
+      ScheduleLater: No
+    LowPower5Later:
+      Interval: 15.0
+      Priority: 2
+      ScheduleLater: Yes
   StepsTo: [Normal]
 DeTumble:
   Tasks:

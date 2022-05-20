@@ -159,6 +159,12 @@ class Loop:
         else:
             self._debug = lambda *arg, **kwargs: None
 
+    def dbg(self):   
+        print(f"There are {len(self._tasks)} tasks")
+        print(f"There are {len(self._sleeping)} sleeping tasks")
+        print(f"There are {len(self._ready)} ready tasks")
+        print(self._current)
+
     def add_task(self, awaitable_task, priority):
         """
         Add a concurrent task (known as a coroutine, implemented as a generator in CircuitPython)
