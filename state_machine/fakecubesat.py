@@ -43,6 +43,8 @@ class Sattelite:
         self.radio = Radio()
         self.data_cache = {}
         self.c_gs_resp = 1
+        self.c_state_err = 0
+        self.c_boot = None
 
     def new_file(self, substring, binary=False):
         print(
@@ -60,6 +62,10 @@ class Sattelite:
     @property
     def gyro(self):
         return (0.0, 0.0, 0.0)
+    
+    def log(self, str):
+        """Logs to sd card"""
+        print(f'log not implemented meant to log {str}')
 
 
 pocketqube = Sattelite()
