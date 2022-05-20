@@ -40,3 +40,6 @@ sha.py
 
 # pyc files
 *.pyc
+
+# built files
+build/
