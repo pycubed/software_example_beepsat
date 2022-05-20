@@ -1,3 +1,7 @@
+# BeepSat (pycubedmini version)
+
+Test build script: `sh build.sh frame plugs/test`.
+
 # Beep-Sat Demo (Modified for PyCubed-Mini / Work In Progress)
 
 Beep-Sat is a series of complete PyCubed software examples demonstrating a simple beaconing satellite that performs a handful of routine tasks.
