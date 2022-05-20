@@ -66,7 +66,7 @@ class StateMachine:
         cubesat.state_machine = self
 
         # switch to start state
-        self.switch_to(start_state)
+        self.switch_to(start_state, force=True)
         self.tasko.run()
 
     def stop_all(self):
@@ -74,15 +74,18 @@ class StateMachine:
         for _, task in self.scheduled_tasks.items():
             task.stop()
 
-    def switch_to(self, state_name):
+    def switch_to(self, state_name, force=False):
         """Switches the state of the cubesat to the new state"""
+
+        if not(state_name in self.config[self.state]['StepsTo'] or force):
+            raise ValueError(
+                f'You cannot transition from {self.state} to {state_name}')
+
         self.stop_all()
         self.scheduled_tasks = {}
         self.state = state_name
-
         state_config = self.config[state_name]
 
-        self.tasko.dbg()
         for task_name, props in state_config['Tasks'].items():
             if props['ScheduleLater']:
                 schedule = self.tasko.schedule_later
