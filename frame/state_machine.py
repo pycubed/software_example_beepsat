@@ -3,6 +3,27 @@ import lib.yaml as yaml
 
 from TaskMap import TaskMap
 
+
+def typecheck_props(state_name, task_name, props):
+    # pylint: disable=unidiomatic-typecheck
+    # using isinstance makes bools be considered ints.
+    if type(props['Interval']) == int:
+        props['Interval'] = float(props['Interval'])
+    if type(props['Interval']) != float:
+        raise ValueError(
+            f'{state_name}->{task_name}->Interval should be int or float not {type(props["Interval"])}')
+
+    if type(props['Priority']) == int:
+        props['Priority'] = float(props['Interval'])
+    if type(props['Priority']) != float:
+        raise ValueError(
+            f'{state_name}->{task_name}->Priority should be int or float not {type(props["Priority"])}')
+
+    if type(props['ScheduleLater']) != bool:
+        raise ValueError(
+            f'{state_name}->{task_name}->ScheduleLater should be bool not {type(props["ScheduleLater"])}')
+
+
 def validate_config(config):
     """Validates that the config file is well formed"""
     for state_name, state in config.items():
@@ -15,9 +36,19 @@ def validate_config(config):
             if not 'Priority' in props:
                 raise ValueError(f'Priority value not defined in {state_name}')
             if not 'ScheduleLater' in props:
-                props['ScheduleLater'] = False # default to false
+                props['ScheduleLater'] = False  # default to false
+            typecheck_props(state_name, task_name, props)
         if not 'StepsTo' in state:
-            raise ValueError(f'The state {state_name} does not have StepsTo defined')
+            raise ValueError(
+                f'The state {state_name} does not have StepsTo defined')
+        if not isinstance(state['StepsTo'], list):
+            raise ValueError(
+                f'{state_name}->StepsTo should be bool list not {type(state["StepsTo"])}')
+        for item in state['StepsTo']:
+            if not isinstance(item, str):
+                raise ValueError(
+                    f'{state_name}->StepsTo should be bool list, but it contains an element of the wrong type')
+
 
 def load_state_machine(file):
     """Loads the state machine from the yaml file passed"""
@@ -55,6 +86,7 @@ class StateMachine:
         self.tasko.run()
         if state_name == self.state:
             return
+
     def stop_all(self):
         """Stops all running tasko processes"""
         for _, task in self.scheduled_tasks.items():
