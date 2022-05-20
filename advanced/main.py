@@ -12,8 +12,8 @@ M. Holliday
 print('\n{lines}\n{:^40}\n{lines}\n'.format('Beep-Sat Demo',lines='-'*40))
 
 print('Initializing PyCubed Hardware...')
-import os, tasko
-from pycubedmini import pocketqube as cubesat
+import os, tasko, traceback
+from pycubed import cubesat
 
 # create asyncio object
 cubesat.tasko=tasko
@@ -36,7 +36,7 @@ for file in os.listdir('Tasks'):
     task_obj=eval('Tasks.'+file).task(cubesat)
 
     # determine if the task wishes to be scheduled later
-    if hasattr(task_obj,'schedule_later'):
+    if hasattr(task_obj, 'schedule_later') and getattr(task_obj, 'schedule_later'):
         schedule=cubesat.tasko.schedule_later
     else:
         schedule=cubesat.tasko.schedule
@@ -50,12 +50,13 @@ try:
     # should run forever
     cubesat.tasko.run()
 except Exception as e:
-    print('FATAL ERROR: {}'.format(e))
+    formated_exception = traceback.format_exception(e, e, e.__traceback__)
+    print(formated_exception)
     try:
         # increment our NVM error counter
         cubesat.c_state_err+=1
         # try to log everything
-        cubesat.log('{},{},{}'.format(e,cubesat.c_state_err,cubesat.c_boot))
+        cubesat.log('{},{},{}'.format(formated_exception,cubesat.c_state_err,cubesat.c_boot))
     except:
         pass
 
