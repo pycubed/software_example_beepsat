@@ -1,0 +1,1 @@
+sh build.sh frame plugs/advanced && rm -rf /media/thetazero/CIRCUITPY/* && cp -r build/* /media/thetazero/CIRCUITPY/ 
