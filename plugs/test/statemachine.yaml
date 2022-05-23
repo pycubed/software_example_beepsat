@@ -24,7 +24,7 @@ Normal:
       Interval: 3
       Priority: 1
       ScheduleLater: No
-  StepsTo: [LowPower, DeTubmle]
+  StepsTo: [LowPower, DeTumble]
 LowPower:
   Tasks:
     Battery:

@@ -48,6 +48,10 @@ def validate_config(config):
             if not isinstance(item, str):
                 raise ValueError(
                     f'{state_name}->StepsTo should be bool list, but it contains an element of the wrong type')
+            if not item in config:
+                raise ValueError(
+                    f'{state_name}->StepsTo defines a transition to {item} but {item} state is not defined'
+                )
 
 
 def load_state_machine(file):
