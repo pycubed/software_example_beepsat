@@ -6,7 +6,7 @@ import state_machine
 print('Running...')
 try:
     # should run forever
-    _ = state_machine.StateMachine(cubesat, 'Normal', 'statemachine.yaml')
+    _ = state_machine.StateMachine(cubesat, 'Normal')
 except Exception as e:
     formated_exception = traceback.format_exception(e, e, e.__traceback__)
     for line in formated_exception:

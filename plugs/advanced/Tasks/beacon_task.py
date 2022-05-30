@@ -6,8 +6,6 @@ import cdh
 ANTENNA_ATTACHED = False
 
 class task(Task):
-    priority = 1
-    frequency = 1/30 # once every 30s
     name='beacon'
     color = 'teal'
 

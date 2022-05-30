@@ -4,8 +4,6 @@ from Tasks.template_task import Task
 import time
 
 class task(Task):
-    priority = 4
-    frequency = 1/20 # once every 20s
     name='time'
     color = 'white'
 

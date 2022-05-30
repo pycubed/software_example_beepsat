@@ -1,5 +1,5 @@
 import tasko
-import lib.yaml as yaml
+# import lib.yaml as yaml
 
 from TaskMap import TaskMap
 
@@ -28,17 +28,17 @@ def validate_config(config):
     """Validates that the config file is well formed"""
     for state_name, state in config.items():
         for task_name, props in state['Tasks'].items():
-            if not task_name in TaskMap:
+            if task_name not in TaskMap:
                 raise ValueError(
                     f'{task_name} defined in the {state_name} state, but {task_name} is not defined')
-            if not 'Interval' in props:
+            if 'Interval' not in props:
                 raise ValueError(f'Interval value not defined in {state_name}')
-            if not 'Priority' in props:
+            if 'Priority' not in props:
                 raise ValueError(f'Priority value not defined in {state_name}')
-            if not 'ScheduleLater' in props:
+            if 'ScheduleLater' not in props:
                 props['ScheduleLater'] = False  # default to false
             typecheck_props(state_name, task_name, props)
-        if not 'StepsTo' in state:
+        if 'StepsTo' not in state:
             raise ValueError(
                 f'The state {state_name} does not have StepsTo defined')
         if not isinstance(state['StepsTo'], list):
@@ -54,12 +54,9 @@ def validate_config(config):
                 )
 
 
-def load_state_machine(file):
+def load_state_machine():
     """Loads the state machine from the yaml file passed"""
-    config_file = open(file, "r")
-    config = config_file.read()
-    config_file.close()
-    config = yaml.safe_load(config)
+    from StateMachineConfig import config
     validate_config(config)
     return config
 
@@ -67,13 +64,14 @@ def load_state_machine(file):
 class StateMachine:
     """Singleton State Machine Class"""
 
-    def __init__(self, cubesat, start_state, config_file_path):
-        self.config = load_state_machine(config_file_path)
+    def __init__(self, cubesat, start_state):
+        self.config = load_state_machine()
         self.state = start_state
 
         # create shared asyncio object
         self.tasko = tasko
-        # left to support legacy code, only the state machine should interact with tasko if possible
+
+        # supports legacy code, only the state machine should use tasko
         cubesat.tasko = tasko
 
         # init task objects
@@ -88,8 +86,6 @@ class StateMachine:
         # switch to start state, and start event loop
         self.switch_to(start_state, force=True)
         self.tasko.run()
-        if state_name == self.state:
-            return
 
     def stop_all(self):
         """Stops all running tasko processes"""

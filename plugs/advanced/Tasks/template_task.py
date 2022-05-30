@@ -1,4 +1,4 @@
-from debugcolor import co
+from lib.debugcolor import co
 
 class Task:
 
@@ -12,8 +12,6 @@ class Task:
         color:       Debug color for serial terminal
     """
 
-    priority = 10
-    frequency = 1
     name = 'temp'
     color = 'gray'
 
@@ -36,9 +34,9 @@ class Task:
 
         """
         if level==1:
-            print('{:>30} {}'.format('['+co(msg=self.name,color=self.color)+']',msg))
+            print(f"{'['+co(msg=self.name,color=self.color)+'/'+self.cubesat.state_machine.state:>30}] {msg}")
         else:
-            print('{}{}'.format('\t   └── ',msg))
+            print("\t"+f"{'   └── '}{msg}")
 
     async def main_task(self, *args, **kwargs):
         """

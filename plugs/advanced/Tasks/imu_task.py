@@ -8,8 +8,6 @@ from os import stat
 SEND_DATA = False # make sure you have an antenna attached!
 
 class task(Task):
-    priority = 5
-    frequency = 1/10 # once every 10s
     name='imu'
     color = 'green'
     data_file = None
