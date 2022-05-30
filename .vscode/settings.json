@@ -1,0 +1,19 @@
+{
+    "python.linting.enabled": true,
+    "python.languageServer": "Pylance",
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingModuleSource": "none"
+    },
+    "python.analysis.extraPaths": [
+        "/home/thetazero/.vscode/extensions/joedevivo.vscode-circuitpython-0.1.17-linux-x64/boards/0x04D8/0xED94",
+        "/home/thetazero/.vscode/extensions/joedevivo.vscode-circuitpython-0.1.17-linux-x64/stubs",
+        "/home/thetazero/.config/Code/User/globalStorage/joedevivo.vscode-circuitpython/bundle/20220529/adafruit-circuitpython-bundle-py-20220529/lib"
+    ],
+    "circuitpython.board.version": null,
+    "circuitpython.board.vid": "0x04D8",
+    "circuitpython.board.pid": "0xED94",
+    "python.linting.pycodestyleEnabled": true,
+    "python.linting.pycodestyleArgs": [
+        "--max-line-length=120"
+    ]
+}
