@@ -1,7 +1,6 @@
 import tasko
-# import lib.yaml as yaml
 
-from TaskMap import TaskMap
+from StateMachineConfig import config, TaskMap, TransitionFunctionMap
 
 
 def typecheck_props(state_name, task_name, props):
@@ -48,25 +47,38 @@ def validate_config(config):
             if not isinstance(item, str):
                 raise ValueError(
                     f'{state_name}->StepsTo should be bool list, but it contains an element of the wrong type')
-            if not item in config:
+            if item not in config:
                 raise ValueError(
                     f'{state_name}->StepsTo defines a transition to {item} but {item} state is not defined'
                 )
+        if 'EnterFunctions' not in state:
+            state['EnterFunctions'] = []
+        prop = state['EnterFunctions']
+        if not isinstance(prop, list):
+            raise ValueError(f'{state_name}->EnterFunctions should be an array not {type(prop)}')
 
-
-def load_state_machine():
-    """Loads the state machine from the yaml file passed"""
-    from StateMachineConfig import config
-    validate_config(config)
-    return config
+        if 'ExitFunctions' not in state:
+            state['ExitFunctions'] = []
+        prop = state['ExitFunctions']
+        if not isinstance(prop, list):
+            raise ValueError(f'{state_name}->EnterFunctions should be an array not {type(prop)}')
+        valid_keys = {'Tasks', 'StepsTo', 'EnterFunctions', 'ExitFunctions'}
+        for key in state.keys():
+            if key not in valid_keys:
+                raise ValueError(f'{state_name}->{key} should not be defined, choose one of {valid_keys}')
 
 
 class StateMachine:
     """Singleton State Machine Class"""
 
     def __init__(self, cubesat, start_state):
-        self.config = load_state_machine()
+        self.config = config
+        validate_config(config)
+
         self.state = start_state
+
+        # allow access to cubesat object
+        self.cubesat = cubesat
 
         # create shared asyncio object
         self.tasko = tasko
@@ -100,6 +112,16 @@ class StateMachine:
             raise ValueError(
                 f'You cannot transition from {self.state} to {state_name}')
 
+        # execute transition functions
+        for fn in config[self.state]['ExitFunctions']:
+            print('fn', fn)
+            fn = TransitionFunctionMap[fn]
+            fn(self.state, state_name, self.cubesat)
+        for fn in config[state_name]['EnterFunctions']:
+            fn = TransitionFunctionMap[fn]
+            fn(self.state, state_name, self.cubesat)
+
+        # reschedule tasks
         self.stop_all()
         self.scheduled_tasks = {}
         self.state = state_name

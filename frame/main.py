@@ -11,12 +11,12 @@ except Exception as e:
     formated_exception = traceback.format_exception(e, e, e.__traceback__)
     for line in formated_exception:
         print(line, end='')
+
     try:
         # increment our NVM error counter
         cubesat.c_state_err += 1
         # try to log everything
-        cubesat.log('{},{},{}'.format(formated_exception,
-                    cubesat.c_state_err, cubesat.c_boot))
+        cubesat.log(f'{formated_exception},{cubesat.c_state_err},{cubesat.c_boot}')
     except:
         pass
 
