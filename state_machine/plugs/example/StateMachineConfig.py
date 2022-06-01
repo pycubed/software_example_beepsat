@@ -1,19 +1,15 @@
 from Tasks.battery_task import task as battery
-from Tasks.imu_task import task as imu
 from Tasks.time_task import task as time
-from Tasks.test_task import task as test
-from Tasks.lowpower5 import task as lowpower5
-from Tasks.lowpower5later import task as lowpower5later
+from Tasks.every_5_seconds import task as every5
+from Tasks.transition_task import task as transition
 
 from TransitionFunctions import announcer
 
 TaskMap = {
     'Battery': battery,
-    'IMU': imu,
+    'Transition': transition,
     'Time': time,
-    'Test': test,
-    'LowPower5': lowpower5,
-    'LowPower5Later': lowpower5later,
+    'Every5Seconds': every5,
 }
 
 TransitionFunctionMap = {
@@ -23,59 +19,44 @@ TransitionFunctionMap = {
 config = {
     'Normal': {
         'Tasks': {
-            'Battery': {
-                'Interval': 10,
+            'Every5Seconds': {
+                'Interval': 5,
                 'Priority': 3,
                 'ScheduleLater': False
             },
-            'IMU': {
+            'Battery': {
                 'Interval': 10,
                 'Priority': 5,
                 'ScheduleLater': False
             },
             'Time': {
-                'Interval': 20,
+                'Interval': 7,
                 'Priority': 4,
                 'ScheduleLater': False
             },
-            'Test': {
-                'Interval': 3,
+            'Transition': {
+                'Interval': 20,
                 'Priority': 1,
-                'ScheduleLater': False
-            }
-        },
-        'StepsTo': ['LowPower', 'DeTumble'],
-        'EnterFunctions': ['Announcer'],
-        'ExitFunctions': ['Announcer'],
-    },
-    'LowPower': {
-        'Tasks': {
-            'Battery': {
-                'Interval': 15.0,
-                'Priority': 1,
-                'ScheduleLater': False
-            },
-            'LowPower5': {
-                'Interval': 5.0,
-                'Priority': 2,
-                'ScheduleLater': False
-            },
-            'LowPower5Later': {
-                'Interval': 15.0,
-                'Priority': 2,
                 'ScheduleLater': True
             }
         },
-        'StepsTo': ['Normal']
+        'StepsTo': ['Special'],
+        'EnterFunctions': ['Announcer'],
+        'ExitFunctions': ['Announcer'],
     },
-    'DeTumble': {
+    'Special': {
         'Tasks': {
             'Battery': {
-                'Interval': 15.0,
-                'Priority': 3,
+                'Interval': 3.0,
+                'Priority': 1,
                 'ScheduleLater': False
-            }
+            },
+            'Transition': {
+                'Interval': 15,
+                'Priority': 1,
+                'ScheduleLater': True
+            },
         },
         'StepsTo': ['Normal']
-    }
+    },
 }
