@@ -43,3 +43,4 @@ sha.py
 
 # built files
 build/
+state_machine/build/
