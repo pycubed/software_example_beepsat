@@ -37,3 +37,10 @@ sha.py
 *secrets*
 
 *.xlsx
+
+# pyc files
+*.pyc
+
+# built files
+build/
+state_machine/build/
