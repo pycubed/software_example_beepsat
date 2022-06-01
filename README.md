@@ -15,7 +15,7 @@ This requires that you install the `graphviz` tool.
 To build the files run `sh build.sh plugs/test` and to run it run `sh run.sh`. 
 
 ## Building the actual flight software
-build: `sh build.sh frame plugs/test`
+build: `sh build.sh frame plugs/advanced`
 run: copy over files to the CIRCUITPY drive (don't automate with rm -rf *, as this has led to corrupting the file system in the past)
 
 ## Software Architecture Overview
