@@ -7,6 +7,8 @@ from Tasks.test_task import task as test
 from Tasks.lowpower5 import task as lowpower5
 from Tasks.lowpower5later import task as lowpower5later
 
+from TransitionFunctions import announcer
+
 TaskMap = {
     "Battery": battery,
     "Beacon": beacon,
@@ -16,6 +18,10 @@ TaskMap = {
     "Test": test,
     "LowPower5": lowpower5,
     "LowPower5Later": lowpower5later,
+}
+
+TransitionFunctionMap = {
+    'Announcer': announcer
 }
 
 config = {
