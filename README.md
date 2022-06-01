@@ -9,14 +9,24 @@ And the "plugins" where the actual specific hardware dependent parts of the flig
 To build the flight software you run `sh build.sh {plugin}` where `{plugin}` is the part of the code that depends on hardware/purpose.
 
 ## Locally running the test version of the software
-To build the files run `sh build.sh frame plugs/test` and to run it run `sh run.sh`. 
+To build the files run `sh build.sh plugs/test` and to run it run `sh run.sh`. 
 
 ## Building the actual flight software
 build: `sh build.sh frame plugs/test`
 run: copy over files to the CIRCUITPY drive (don't automate with rm -rf *, as this has led to corrupting the file system in the past)
 
+## Software Architecture Overview
 
-# Beep-Sat Demo (Modified for PyCubed-Mini / Work In Progress)
+We have the folder `frame/` which contains the barebones sattelite state machine code, and the main.py. 
+This code is independent of wheter you are using pycubedmini, pycubed, or running your very own test script.
+
+We also have the folders `plugs/{name}` where each `name` represents a certain "plugin" that you attach to the frame using the build script.
+Here is where the platform/implementation specific details go, each {name} represents an entirely different set of flight software, be it 
+flight software targetting pycubedmini, pycubed or an emulator.
+
+In order to see a basic example run `sh build.sh plugs/example` and to run it run `sh run.sh`. 
+This example emulates the pycubed library, so that it can be run locally on your computer. 
+
 
 ## License (same as upstream)
 <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />

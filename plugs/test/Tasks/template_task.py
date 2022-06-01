@@ -1,5 +1,6 @@
 from lib.debugcolor import co
 
+
 class Task:
 
     """
@@ -18,14 +19,14 @@ class Task:
     def __init__(self, satellite):
         """
         Initialize the Task using the PyCubed cubesat object.
-        
+
         :type satellite: Satellite
         :param satellite: The cubesat to be registered
 
         """
         self.cubesat = satellite
 
-    def debug(self,msg,level=1):
+    def debug(self, msg, level=1):
         """
         Print a debug message formatted with the task name and color
 
@@ -33,7 +34,7 @@ class Task:
         :param level: > 1 will print as a sub-level
 
         """
-        if level==1:
+        if level == 1:
             print(f"{'['+co(msg=self.name,color=self.color)+'/'+self.cubesat.state_machine.state:>30}] {msg}")
         else:
             print("\t"+f"{'   └── '}{msg}")
@@ -47,5 +48,3 @@ class Task:
 
         """
         pass
-
-    

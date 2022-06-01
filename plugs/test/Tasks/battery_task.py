@@ -3,14 +3,15 @@
 from Tasks.template_task import Task
 import time
 
+
 class task(Task):
-    name='vbatt'
+    name = 'vbatt'
     color = 'orange'
 
-    timeout=60*60 # 60 min
+    timeout = 60 * 60  # 60 min
 
     async def main_task(self):
-        vbatt=self.cubesat.battery_voltage
+        vbatt = self.cubesat.battery_voltage
         comp_var = ''
 
         if vbatt > self.cubesat.vlowbatt:
@@ -18,18 +19,18 @@ class task(Task):
         else:
             comp_var = '<'
 
-        self.debug('{:.1f}V {} threshold: {:.1f}V'.format(vbatt,comp_var,self.cubesat.vlowbatt))
+        self.debug(f'{vbatt:.1f}V {comp_var} threshold: {self.cubesat.vlowbatt:.1f}V')
 
         ########### ADVANCED ###########
         # respond to a low power condition
         if comp_var == '<':
-            self.cubesat.f_lowbatt=True
+            self.cubesat.f_lowbatt = True
             # if we've timed out, don't do anything
             if self.cubesat.f_lowbtout:
                 self.debug('lowbatt timeout flag set! skipping...')
             else:
-                _timer=time.monotonic()+self.timeout
-                self.debug('low battery detected!',2)
+                _timer = time.monotonic()+self.timeout
+                self.debug('low battery detected!', 2)
                 # stop all tasks
                 for t in self.cubesat.scheduled_tasks:
                     self.cubesat.scheduled_tasks[t].stop()
@@ -38,21 +39,21 @@ class task(Task):
                 while time.monotonic() < _timer:
                     # sleep for half our remaining time
                     _sleeptime = self.timeout/10
-                    self.debug('sleeping for {}s'.format(_sleeptime),2)
+                    self.debug('sleeping for {}s'.format(_sleeptime), 2)
                     time.sleep(_sleeptime)
-                    self.debug('vbatt: {:.1f}V'.format(self.cubesat.battery_voltage),2)
-                    vbatt=self.cubesat.battery_voltage
+                    self.debug('vbatt: {:.1f}V'.format(self.cubesat.battery_voltage), 2)
+                    vbatt = self.cubesat.battery_voltage
                     if vbatt > self.cubesat.vlowbatt:
-                        self.debug('batteries above threshold',2)
-                        self.cubesat.f_lowbatt=False
+                        self.debug('batteries above threshold', 2)
+                        self.cubesat.f_lowbatt = False
                         break
 
                     if time.monotonic() > _timer:
-                        self.debug('low batt timeout!',2)
+                        self.debug('low batt timeout!', 2)
                         # set timeout flag so we know to bypass
                         self.cubesat.f_lowbtout = True
                         # log (if we can)
-                        try: self.cubesat.log('low batt timeout',2)
+                        try: self.cubesat.log('low batt timeout', 2)
                         except: pass
                         break
 
@@ -64,4 +65,3 @@ class task(Task):
                 # restart all tasks
                 for t in self.cubesat.scheduled_tasks:
                     self.cubesat.scheduled_tasks[t].start()
-
