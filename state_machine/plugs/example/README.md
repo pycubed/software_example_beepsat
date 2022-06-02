@@ -5,7 +5,7 @@
 Contains the config which defines the following.
 1. Which states exist
 2. Which tasks run for each state, along with the following properties
-    1. Their frequencies
+    1. The interval at which they are run
     2. Their priority
     3. If they are to be "ScheduledLater" or run immediately when entering the state. 
 3. Which transitions are allowed
@@ -16,7 +16,7 @@ Contains the config which defines the following.
 ## lib/pycubed.py
 
 Bare bones emulation of a sattelite, so that we can get "voltage" readings.
-In a real project this would be a much more complex emulation, or the real pycubed driver.
+In a real plugin this would be a much more complex emulation, or the real pycubed driver.
 
 ## Tasks/battery_task.py
 
