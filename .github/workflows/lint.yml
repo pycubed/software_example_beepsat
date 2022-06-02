@@ -31,4 +31,3 @@ jobs:
         uses: wearerequired/lint-action@v2
         with:
           flake8: true
-          falke8_args: "--max-line-length 120"
