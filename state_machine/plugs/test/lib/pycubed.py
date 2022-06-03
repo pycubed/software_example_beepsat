@@ -54,11 +54,11 @@ class Sattelite:
 
     @property
     def magnetic(self):
-        return (0.0, 0.0, 0.0)
+        return (0.8, 0.3, -0.3)
 
     @property
     def gyro(self):
-        return (0.0, 0.0, 0.0)
+        return (0.3, 0.0, 0.6)
     
     def log(self, str):
         """Logs to sd card"""
