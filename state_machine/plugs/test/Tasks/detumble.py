@@ -1,5 +1,5 @@
 
-from numpy import identity, asarray, linalg, dot, cross, matmul, transpose, atleast_2d
+from numpy import identity, asarray, linalg, cross, matmul, atleast_2d
 
 from Tasks.template_task import Task
 
