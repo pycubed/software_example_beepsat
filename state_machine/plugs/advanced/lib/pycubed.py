@@ -80,7 +80,7 @@ class Satellite:
 
         self.data_cache = {}
         self.filenumbers = {}
-        self.vlowbatt = 5.0
+        self.vlowbatt = 3.5
         self.f_lowbtout = False
         self.debug = True
 
