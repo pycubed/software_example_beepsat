@@ -82,6 +82,7 @@ class Satellite:
         self.filenumbers = {}
         self.vlowbatt = 3.5
         self.f_lowbtout = False
+
         self.debug = True
 
         # Define battery voltage
@@ -221,7 +222,7 @@ class Satellite:
         vbat=0
         for _ in range(50):
             vbat+=self._vbatt.value * 3.3 / 65536
-        _voltage = (vbat/50)*(316+110)/110 # 316/110 voltage divider
+        _voltage = (vbat/50)*(100+100)/100 # 100k/100k voltage divider
         return _voltage # volts
 
     @property
