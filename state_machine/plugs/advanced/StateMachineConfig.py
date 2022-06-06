@@ -9,6 +9,7 @@ from Tasks.lowpower5later import task as lowpower5later
 
 from TransitionFunctions import announcer, low_power_on, low_power_off
 
+
 TaskMap = {
     "Battery": battery,
     "Beacon": beacon,
