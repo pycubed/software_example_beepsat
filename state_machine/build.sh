@@ -10,6 +10,8 @@ cp -r frame/tasko build/
 export PYTHONDONTWRITEBYTECODE=1
 cp buildtools/chart.py build/
 cd build
-python3 chart.py && dot -Tpng graph.dot > state_machine.png
+python3 chart.py
+dot -Tsvg graph.dot > state_machine.svg
+convert -density 600 state_machine.svg state_machine.png
 rm chart.py
 cd - 
