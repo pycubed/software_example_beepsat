@@ -268,10 +268,10 @@ class Satellite:
                           self.micro.nvm[_FLAG],
                           self.micro.nvm[_RSTERRS],
                           self.micro.nvm[_DWNLINK],
-                          self.micro.nvm[_DCOUNT]]) + \
-                          self.BOOTTIME.to_bytes(3, 'big') + \
-                          self._stat['time-on'].to_bytes(4, 'big') + \
-                          int(self._stat['fuel-gauge']).to_bytes(1, 'big')
+                          self.micro.nvm[_DCOUNT]]) +
+            self.BOOTTIME.to_bytes(3, 'big') +
+            self._stat['time-on'].to_bytes(4, 'big') +
+            int(self._stat['fuel-gauge']).to_bytes(1, 'big')
         })
         return self._stat
 
@@ -409,7 +409,9 @@ class Satellite:
         # BURN1=-Y,BURN2=+Y,dutycycle ~0.13%
         dtycycl = int((dutycycle / 100) * (0xFFFF))
         print('----- BURN WIRE CONFIGURATION -----')
-        print(f'\tFrequency of: {freq}Hz\n\tDuty cycle of: {100 * dtycycl / 0xFFFF}% (int:{dtycycl})\n\tDuration of {duration}sec')
+        print(f'\tFrequency of: {freq}Hz')
+        print(f'\tDuty cycle of: {100 * dtycycl / 0xFFFF}% (int:{dtycycl})')
+        print(f'\tDuration of {duration}sec')
         if '1' in burn_num:
             burnwire = pulseio.PWMOut(board.BURN1, frequency=freq, duty_cycle=0)
         elif '2' in burn_num:
