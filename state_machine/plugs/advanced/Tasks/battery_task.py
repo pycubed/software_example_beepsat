@@ -1,6 +1,6 @@
 # check for low battery condition
 
-from Tasks.template_task import Task
+from lib.template_task import Task
 import time
 
 

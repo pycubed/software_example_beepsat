@@ -1,6 +1,6 @@
 # Task to obtain IMU sensor readings
 
-from Tasks.template_task import Task
+from lib.template_task import Task
 import msgpack
 from os import stat
 

@@ -1,6 +1,6 @@
 # Transmit "Hello World" beacon
 
-from Tasks.template_task import Task
+from lib.template_task import Task
 import cdh
 
 ANTENNA_ATTACHED = False
