@@ -9,11 +9,11 @@ To build the flight software you run `sh build.sh {plugin}` where `{plugin}` is 
 The build script automatically generates a graph of the state machine. 
 This requires that you install the `graphviz` tool.
 
-## Locally running the test version of the software
-To build the files run `sh build.sh plugs/test` and to run it run `sh run.sh`. 
+## Locally running the emulation version of the software
+To build the files run `sh build.sh plugs/emulation` and to run it run `sh run.sh`. 
 
 ## Building the actual flight software
-build: `sh build.sh plugs/advanced`
+build: `sh build.sh plugs/flight`
 run: copy over files to the CIRCUITPY drive (don't automate with rm -rf *, as this has led to corrupting the file system in the past)
 
 ## Software Architecture Overview

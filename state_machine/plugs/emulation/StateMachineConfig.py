@@ -6,6 +6,7 @@ from Tasks.time_task import task as time
 from Tasks.test_task import task as test
 from Tasks.lowpower5 import task as lowpower5
 from Tasks.lowpower5later import task as lowpower5later
+from Tasks.detumble import task as detumble
 
 from TransitionFunctions import announcer
 
@@ -18,6 +19,7 @@ TaskMap = {
     'Test': test,
     'LowPower5': lowpower5,
     'LowPower5Later': lowpower5later,
+    'Detumble': detumble,
 }
 
 TransitionFunctionMap = {
@@ -56,6 +58,11 @@ config = {
                 'Interval': 3,
                 'Priority': 1,
                 'ScheduleLater': False
+            },
+            'Detumble': {
+                'Interval': 5.0,
+                'Priority': 3,
+                'ScheduleLater': False
             }
         },
         'StepsTo': ['LowPower', 'DeTumble'],
@@ -86,6 +93,11 @@ config = {
         'Tasks': {
             'Battery': {
                 'Interval': 15.0,
+                'Priority': 3,
+                'ScheduleLater': False
+            },
+            'Detumble': {
+                'Interval': 5.0,
                 'Priority': 3,
                 'ScheduleLater': False
             }
