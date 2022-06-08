@@ -12,9 +12,9 @@ class Radio:
 
     async def await_rx(self, timeout=60.0):
         """Wait timeout seconds to until you recieve a message, return true if message received false otherwise"""
-        if not self.listening:   
+        if not self.listening:
             return False
-        _ = await tasko.sleep(timeout*0.5)
+        _ = await tasko.sleep(timeout * 0.5)
         return True
 
     def receive(self, *, keep_listening=True, with_header=False, with_ack=False, timeout=None, debug=False):
@@ -25,7 +25,7 @@ class Radio:
         return 147
 
     def sleep(self):
-        self.listening=False
+        self.listening = False
 
 
 class Sattelite:
@@ -54,15 +54,15 @@ class Sattelite:
 
     @property
     def magnetic(self):
-        return (0.0, 0.0, 0.0)
+        return (0.8, 0.3, -0.3)
 
     @property
     def gyro(self):
-        return (0.0, 0.0, 0.0)
-    
+        return (0.3, 0.0, 0.6)
+
     def log(self, str):
         """Logs to sd card"""
-        print(f'log not implemented')
+        print(f'log not implemented, tried to log {str}')
 
 
 pocketqube = Sattelite()

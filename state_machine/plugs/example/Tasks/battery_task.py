@@ -10,12 +10,5 @@ class task(Task):
     timeout = 60 * 60  # 60 min
 
     async def main_task(self):
-        vbatt = self.cubesat.battery_voltage
-        comp_var = ''
-
-        if vbatt > self.cubesat.vlowbatt:
-            comp_var = '>'
-        else:
-            comp_var = '<'
-
-        self.debug(f'{vbatt:.1f}V {comp_var} threshold: {self.cubesat.vlowbatt:.1f}V')
+        # Tasks have access to the cubesat object, and can get readings like battery voltage
+        self.debug(f'Current battery voltage: {self.cubesat.battery_voltage}')
