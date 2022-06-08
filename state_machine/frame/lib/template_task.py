@@ -35,7 +35,7 @@ class Task:
         if level == 1:
             print(f"{'['+co(msg=self.name,color=self.color)+'/'+self.cubesat.state_machine.state:>35}] {msg}")
         else:
-            print("\t"+f"{'   └── '}{msg}")
+            print("\t" + f"{'   └── '}{msg}")
 
     async def main_task(self, *args, **kwargs):
         """
