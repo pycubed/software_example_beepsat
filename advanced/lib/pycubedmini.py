@@ -13,7 +13,6 @@ import board
 import microcontroller
 import busio
 import time
-import json
 import digitalio
 import analogio
 import storage
