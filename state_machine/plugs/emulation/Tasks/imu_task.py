@@ -56,8 +56,10 @@ class task(Task):
                     print(f'\nPrinting IMU data file: {self.data_file}')
                     with open(self.data_file, 'rb') as f:
                         while True:
-                            try: print('\t', msgpack.unpack(f))
-                            except: break
+                            try:
+                                print('\t', msgpack.unpack(f))
+                            except:
+                                break
                     print('finished\n')
                 # increment our data file number
                 self.data_file = self.cubesat.new_file('/data/imu')
