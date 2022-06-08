@@ -7,8 +7,7 @@ from Tasks.test_task import task as test
 from Tasks.lowpower5 import task as lowpower5
 from Tasks.lowpower5later import task as lowpower5later
 
-from TransitionFunctions import announcer, low_power_on, low_power_off
-
+from TransitionFunctions import announcer
 
 TaskMap = {
     "Battery": battery,
@@ -22,9 +21,7 @@ TaskMap = {
 }
 
 TransitionFunctionMap = {
-    'Announcer': announcer,
-    'LowPowerOn': low_power_on,
-    'LowPowerOff': low_power_off,
+    'Announcer': announcer
 }
 
 config = {
@@ -81,9 +78,7 @@ config = {
                 'ScheduleLater': True
             }
         },
-        'StepsTo': ['Normal'],
-        'EnterFunctions': ['Announcer', 'LowPowerOn'],
-        'ExitFunctions': ['Announcer', 'LowPowerOff'],
+        'StepsTo': ['Normal']
     },
     'DeTumble': {
         'Tasks': {
