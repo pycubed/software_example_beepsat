@@ -113,13 +113,13 @@ class StateMachine:
                 f'You cannot transition from {self.state} to {state_name}')
 
         # execute transition functions
-        for fn in config[self.state]['ExitFunctions']:
-            print('fn', fn)
-            fn = TransitionFunctionMap[fn]
-            fn(self.state, state_name, self.cubesat)
-        for fn in config[state_name]['EnterFunctions']:
-            fn = TransitionFunctionMap[fn]
-            fn(self.state, state_name, self.cubesat)
+        if self.state != state_name:
+            for fn in config[self.state]['ExitFunctions']:
+                fn = TransitionFunctionMap[fn]
+                fn(self.state, state_name, self.cubesat)
+            for fn in config[state_name]['EnterFunctions']:
+                fn = TransitionFunctionMap[fn]
+                fn(self.state, state_name, self.cubesat)
 
         # reschedule tasks
         self.stop_all()

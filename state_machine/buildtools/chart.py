@@ -13,7 +13,6 @@ def format(v):
 x = map(format, config.items())
 x = '\n'.join(list(x))
 x = 'digraph {\n'+x+'\n}'
-print(x)
 
 fo = open('graph.dot', "w")
 fo.write(x)
