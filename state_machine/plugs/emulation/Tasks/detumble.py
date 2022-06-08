@@ -1,7 +1,7 @@
 
 from numpy import identity, asarray, linalg, cross, matmul, atleast_2d
 
-from Tasks.template_task import Task
+from lib.template_task import Task
 
 
 class task(Task):

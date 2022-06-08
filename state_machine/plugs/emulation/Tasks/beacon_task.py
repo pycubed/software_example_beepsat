@@ -1,6 +1,6 @@
 # Transmit "Hello World" beacon
 
-from Tasks.template_task import Task
+from lib.template_task import Task
 import cdh
 
 ANTENNA_ATTACHED = False
@@ -56,7 +56,7 @@ class task(Task):
             response = self.cubesat.radio.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED)
             if response is not None:
                 self.debug("packet received")
-                self.debug('msg: {}, RSSI: {}'.format(response, self.cubesat.radio.last_rssi-137), 2)
+                self.debug('msg: {}, RSSI: {}'.format(response, self.cubesat.radio.last_rssi - 137), 2)
                 self.cubesat.c_gs_resp += 1
 
                 """
@@ -91,7 +91,7 @@ class task(Task):
                                     self.cubesat.radio.send(str(e).encode())
                             else:
                                 self.debug('invalid command!')
-                                self.cubesat.radio.send(b'invalid cmd'+response[4:])
+                                self.cubesat.radio.send(b'invalid cmd' + response[4:])
         else:
             self.debug('no messages')
         self.cubesat.radio.sleep()

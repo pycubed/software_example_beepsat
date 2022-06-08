@@ -7,8 +7,6 @@ class Task:
     The Task Object.
 
     Attributes:
-        priority:    The priority level assigned to the task.
-        frequency:   Number of times the task must be executed in 1 second (Hz).
         name:        Name of the task object for future reference
         color:       Debug color for serial terminal
     """
@@ -37,14 +35,14 @@ class Task:
         if level == 1:
             print(f"{'['+co(msg=self.name,color=self.color)+'/'+self.cubesat.state_machine.state:>35}] {msg}")
         else:
-            print("\t"+f"{'   └── '}{msg}")
+            print("\t" + f"{'   └── '}{msg}")
 
     async def main_task(self, *args, **kwargs):
         """
-        Contains the code for the user defined task. 
+        Contains the code for the user defined task.
 
         :param `*args`: Variable number of arguments used for task execution.
-        :param `**kwargs`: Variable number of keyword arguments used for task execution. 
+        :param `**kwargs`: Variable number of keyword arguments used for task execution.
 
         """
         pass

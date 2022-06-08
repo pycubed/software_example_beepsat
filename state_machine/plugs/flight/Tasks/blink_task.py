@@ -1,6 +1,6 @@
 # Blink the RGB LED
 
-from Tasks.template_task import Task
+from lib.template_task import Task
 
 
 class task(Task):

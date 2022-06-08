@@ -1,4 +1,6 @@
-from Tasks.template_task import Task
+# print the time in seconds since boot every 20 seconds
+
+from lib.template_task import Task
 import time
 
 
