@@ -51,17 +51,17 @@ _BOOTCNT  = const(0)
 
 class Satellite:
     # Define NVM flags
-    f_deploy = bitFlag(register = _FLAG, bit = 1)
-    f_mdeploy = bitFlag(register = _FLAG, bit = 2)
-    f_burn1 = bitFlag(register = _FLAG, bit = 3)
-    f_burn2 = bitFlag(register = _FLAG, bit = 4)
+    f_deploy = bitFlag(register=_FLAG, bit=1)
+    f_mdeploy = bitFlag(register=_FLAG, bit=2)
+    f_burn1 = bitFlag(register=_FLAG, bit=3)
+    f_burn2 = bitFlag(register=_FLAG, bit=4)
 
     # Define NVM counters
-    c_boot = multiBitFlag(register=_BOOTCNT, lowest_bit = 0, num_bits = 8)
-    c_state_err = multiBitFlag(register=_RSTERRS, lowest_bit = 4, num_bits = 4)
-    c_vbus_rst = multiBitFlag(register=_RSTERRS, lowest_bit = 0, num_bits = 4)
-    c_deploy = multiBitFlag(register=_DCOUNT, lowest_bit = 0, num_bits = 8)
-    c_downlink = multiBitFlag(register=_DWNLINK, lowest_bit = 0, num_bits = 8)
+    c_boot = multiBitFlag(register=_BOOTCNT, lowest_bit=0, num_bits=8)
+    c_state_err = multiBitFlag(register=_RSTERRS, lowest_bit=4, num_bits=4)
+    c_vbus_rst = multiBitFlag(register=_RSTERRS, lowest_bit=0, num_bits=4)
+    c_deploy = multiBitFlag(register=_DCOUNT, lowest_bit=0, num_bits=8)
+    c_downlink = multiBitFlag(register=_DWNLINK, lowest_bit=0, num_bits=8)
 
     # change to 433? 
     UHF_FREQ = 433.0
@@ -132,7 +132,7 @@ class Satellite:
 
         # Initialize radio - UHF
         try:
-            self.radio = pycubed_rfm9x.RFM9x(self.spi, self._rf_cs, self._rf_rst, self.UHF_FREQ,rfm95pw=True)
+            self.radio = pycubed_rfm9x.RFM9x(self.spi, self._rf_cs, self._rf_rst, self.UHF_FREQ, rfm95pw=True)
             self.radio.dio0 = self.radio_DIO0
             self.radio.sleep()
             self.hardware['Radio'] = True
@@ -150,46 +150,46 @@ class Satellite:
         sun_sensors = []
 
         try:
-            sun_yn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x29) # -Y
+            sun_yn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x29)  # -Y
             sun_sensors.append(sun_yn)
         except Exception as e:
             print('[ERROR][Sun Sensor -Y]', e)
-        
+            
         try:
-            sun_zn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x39) # -Z
+            sun_zn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x39)  # -Z
             sun_sensors.append(sun_zn)
         except Exception as e:
             print('[ERROR][Sun Sensor -Z]', e)
-        
+            
         try:
-            sun_xn = adafruit_tsl2561.TSL2561(self.i2c1, address=0x49) # -X
+            sun_xn = adafruit_tsl2561.TSL2561(self.i2c1, address=0x49)  # -X
             sun_sensors.append(sun_xn)
         except Exception as e:
             print('[ERROR][Sun Sensor -X]', e)
-
+            
         try:
-            sun_yp = adafruit_tsl2561.TSL2561(self.i2c1, address=0x29) # +Y
+            sun_yp = adafruit_tsl2561.TSL2561(self.i2c1, address=0x29)  # +Y
             sun_sensors.append(sun_yp)
         except Exception as e:
             print('[ERROR][Sun Sensor +Y]', e)
-
+            
         try:
-            sun_zp = adafruit_tsl2561.TSL2561(self.i2c1, address=0x39) # +Z
+            sun_zp = adafruit_tsl2561.TSL2561(self.i2c1, address=0x39)  # +Z
             sun_sensors.append(sun_zp)
         except Exception as e:
             print('[ERROR][Sun Sensor +Z]', e)
-        
+            
         try:
-            sun_xp = adafruit_tsl2561.TSL2561(self.i2c2, address=0x49) # +X
+            sun_xp = adafruit_tsl2561.TSL2561(self.i2c2, address=0x49)  # +X
             sun_sensors.append(sun_xp)
         except Exception as e:
             print('[ERROR][Sun Sensor +X]', e)
-
+            
         # count the number of sun sensors that we have initialized
         sun_sensor_count = 0
         for i in sun_sensors:
             sun_sensor_count += 1
-            i.enabled = False # set enabled status to False
+            i.enabled = False  # set enabled status to False
 
         # If there is at least one sun sensor, set to True
         if sun_sensor_count >= 1:
@@ -199,23 +199,23 @@ class Satellite:
         coils = []
 
         try:
-            drv_x = drv8830.DRV8830(self.i2c3,0x68) # U6
+            drv_x = drv8830.DRV8830(self.i2c3, 0x68)  # U6
             coils.append(drv_x)
         except Exception as e:
             print('[ERROR][H-Bridge U6]',e)
-
+            
         try:
-            drv_y = drv8830.DRV8830(self.i2c3,0x60) # U8
+            drv_y = drv8830.DRV8830(self.i2c3, 0x60)  # U8
             coils.append(drv_y)
         except Exception as e:
             print('[ERROR][H-Bridge U8]',e)
-        
+            
         try:
-            drv_z = drv8830.DRV8830(self.i2c3,0x62) # U4
+            drv_z = drv8830.DRV8830(self.i2c3, 0x62)  # U4
             coils.append(drv_z)
         except Exception as e:
             print('[ERROR][H-Bridge U4]',e)
-        
+            
         coil_count = 0
         for driver in coils:
             driver.mode = drv8830.COAST
