@@ -63,7 +63,7 @@ class Satellite:
     c_deploy = multiBitFlag(register=_DCOUNT, lowest_bit=0, num_bits=8)
     c_downlink = multiBitFlag(register=_DWNLINK, lowest_bit=0, num_bits=8)
 
-    # change to 433? 
+    # change to 433?
     UHF_FREQ = 433.0
 
     # Big init routine as the whole board is brought up.
@@ -202,19 +202,19 @@ class Satellite:
             drv_x = drv8830.DRV8830(self.i2c3, 0x68)  # U6
             coils.append(drv_x)
         except Exception as e:
-            print('[ERROR][H-Bridge U6]',e)
+            print('[ERROR][H-Bridge U6]', e)
             
         try:
             drv_y = drv8830.DRV8830(self.i2c3, 0x60)  # U8
             coils.append(drv_y)
         except Exception as e:
-            print('[ERROR][H-Bridge U8]',e)
+            print('[ERROR][H-Bridge U8]', e)
             
         try:
             drv_z = drv8830.DRV8830(self.i2c3, 0x62)  # U4
             coils.append(drv_z)
         except Exception as e:
-            print('[ERROR][H-Bridge U4]',e)
+            print('[ERROR][H-Bridge U4]', e)
             
         coil_count = 0
         for driver in coils:
@@ -229,14 +229,14 @@ class Satellite:
         burnwires = []
         try:
             # needed to change pinout from BURN1 to PA15, as BURN1 did not support PWMOut
-            self.burnwire1 = pwmio.PWMOut(microcontroller.pin.PA15, frequency = 1000, duty_cycle = 0)
+            self.burnwire1 = pwmio.PWMOut(microcontroller.pin.PA15, frequency=1000, duty_cycle=0)
             burnwires.append(self.burnwire1)
         except Exception as e:
             print('[ERROR][Burn Wire IC1]', e)
         
         try:
             # needed to change pinout from BURN2 to PA18, as BURN2 did not support PWMOut
-            self.burnwire2 = pwmio.PWMOut(microcontroller.pin.PA18, frequency = 1000, duty_cycle = 0)
+            self.burnwire2 = pwmio.PWMOut(microcontroller.pin.PA18, frequency=1000, duty_cycle=0)
             burnwires.append(self.burnwire2)
         except Exception as e:
             print('[ERROR][Burn Wire IC1]', e)
@@ -248,7 +248,6 @@ class Satellite:
         if burnwire_count >= 1:
             self.hardware['BurnWire'] = True
         
-
 
     # reinit: reinitialize radio, sd, or IMU based upon the contents of string dev
     def reinit(self, dev):
