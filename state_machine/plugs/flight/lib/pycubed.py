@@ -51,17 +51,17 @@ _BOOTCNT  = const(0)
 
 class Satellite:
     # Define NVM flags
-    f_deploy   = bitFlag(register=_FLAG, bit=1)
-    f_mdeploy  = bitFlag(register=_FLAG, bit=2)
-    f_burn1    = bitFlag(register=_FLAG, bit=3)
-    f_burn2    = bitFlag(register=_FLAG, bit=4)
+    f_deploy = bitFlag(register = _FLAG, bit = 1)
+    f_mdeploy = bitFlag(register = _FLAG, bit = 2)
+    f_burn1 = bitFlag(register = _FLAG, bit = 3)
+    f_burn2 = bitFlag(register = _FLAG, bit = 4)
 
     # Define NVM counters
-    c_boot       = multiBitFlag(register=_BOOTCNT, lowest_bit=0, num_bits=8)
-    c_state_err  = multiBitFlag(register=_RSTERRS, lowest_bit=4, num_bits=4)
-    c_vbus_rst   = multiBitFlag(register=_RSTERRS, lowest_bit=0, num_bits=4)
-    c_deploy     = multiBitFlag(register=_DCOUNT, lowest_bit=0, num_bits=8)
-    c_downlink   = multiBitFlag(register=_DWNLINK, lowest_bit=0, num_bits=8)
+    c_boot = multiBitFlag(register=_BOOTCNT, lowest_bit = 0, num_bits = 8)
+    c_state_err = multiBitFlag(register=_RSTERRS, lowest_bit = 4, num_bits = 4)
+    c_vbus_rst = multiBitFlag(register=_RSTERRS, lowest_bit = 0, num_bits = 4)
+    c_deploy = multiBitFlag(register=_DCOUNT, lowest_bit = 0, num_bits = 8)
+    c_downlink = multiBitFlag(register=_DWNLINK, lowest_bit = 0, num_bits = 8)
 
     # change to 433? 
     UHF_FREQ = 433.0
@@ -91,11 +91,11 @@ class Satellite:
         self._vbatt = analogio.AnalogIn(board.BATTERY)
 
         # Define SPI,I2C,UART
-        self.i2c1  = busio.I2C(board.SCL1, board.SDA1)
-        self.i2c2  = busio.I2C(board.SCL2, board.SDA2)
-        self.i2c3  = busio.I2C(board.SCL3, board.SDA3)
+        self.i2c1 = busio.I2C(board.SCL1, board.SDA1)
+        self.i2c2 = busio.I2C(board.SCL2, board.SDA2)
+        self.i2c3 = busio.I2C(board.SCL3, board.SDA3)
         # self.spi   = busio.SPI(board.SCK,MOSI=board.MOSI,MISO=board.MISO)
-        self.spi   = board.SPI()
+        self.spi = board.SPI()
 
         # Define sdcard
         self.filename = "/sd/default.txt"
@@ -133,7 +133,7 @@ class Satellite:
         # Initialize radio - UHF
         try:
             self.radio = pycubed_rfm9x.RFM9x(self.spi, self._rf_cs, self._rf_rst, self.UHF_FREQ,rfm95pw=True)
-            self.radio.dio0=self.radio_DIO0
+            self.radio.dio0 = self.radio_DIO0
             self.radio.sleep()
             self.hardware['Radio'] = True
         except Exception as e:
@@ -195,26 +195,25 @@ class Satellite:
         if sun_sensor_count >= 1:
             self.hardware['Sun'] = True
 
-
         # Initialize H-Bridges
         coils = []
 
         try:
             drv_x = drv8830.DRV8830(self.i2c3,0x68) # U6
             coils.append(drv_x)
-        except:
+        except Exception as e:
             print('[ERROR][H-Bridge U6]',e)
 
         try:
             drv_y = drv8830.DRV8830(self.i2c3,0x60) # U8
             coils.append(drv_y)
-        except:
+        except Exception as e:
             print('[ERROR][H-Bridge U8]',e)
         
         try:
             drv_z = drv8830.DRV8830(self.i2c3,0x62) # U4
             coils.append(drv_z)
-        except:
+        except Exception as e:
             print('[ERROR][H-Bridge U4]',e)
         
         coil_count = 0
@@ -226,19 +225,18 @@ class Satellite:
         if coil_count >= 1:
             self.hardware['Coils'] = True
 
-
         # Initialize burnwires
         burnwires = []
         try:
             # needed to change pinout from BURN1 to PA15, as BURN1 did not support PWMOut
-            self.burnwire1 = pwmio.PWMOut(microcontroller.pin.PA15, frequency=1000, duty_cycle=0)
+            self.burnwire1 = pwmio.PWMOut(microcontroller.pin.PA15, frequency = 1000, duty_cycle = 0)
             burnwires.append(self.burnwire1)
         except Exception as e:
             print('[ERROR][Burn Wire IC1]', e)
         
         try:
             # needed to change pinout from BURN2 to PA18, as BURN2 did not support PWMOut
-            self.burnwire2 = pwmio.PWMOut(microcontroller.pin.PA18, frequency=1000, duty_cycle=0)
+            self.burnwire2 = pwmio.PWMOut(microcontroller.pin.PA18, frequency = 1000, duty_cycle = 0)
             burnwires.append(self.burnwire2)
         except Exception as e:
             print('[ERROR][Burn Wire IC1]', e)
