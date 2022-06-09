@@ -4,7 +4,7 @@ The example "flight" software implments an extremely simple state machine contai
 
 ![State machine diagram going to and from Normal and Special mode](./state_machine.png)
 
-To build execute: `sh build.sh plugs/example` in the state_machine folder
+To build execute: `sh build.sh drivers/example applications/example` in the state_machine folder
 
 To run execute: `sh run.sh`
 
