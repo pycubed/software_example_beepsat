@@ -35,12 +35,12 @@ Build and Run: `sh build.sh drivers/example applications/example && sh run.sh`.
 
 This example emulates the pycubed library, so it can be run locally on your computer (asuming python3 is installed). 
 
-For an explanation of the example code see [this](./example.md)
+For an explanation of the example code see [this](./example.md).
 
-## Emulating the flight software
+## Emulating The Flight Software
 Build and Run: `sh build.sh drivers/emulation/ applications/flight/ && sh run.sh` 
 
-## Running the flight software
+## Running The Flight Software
 build: `sh build.sh drivers/pycubedmini/ applications/flight/`
 
 run: copy over files to the CIRCUITPY drive (don't automate with rm -rf *, as this has led to corrupting the file system in the past)
