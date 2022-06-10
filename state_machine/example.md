@@ -2,7 +2,7 @@
 
 Build and Run: `sh build.sh drivers/example applications/example && sh run.sh`
 
-The example "flight" software implments an extremely simple state machine containing the two states "Normal" and "Special". Both states have their own tasks that run, with a few tasks shared among the two. 
+The example "flight" software contains an extremely simple state machine with two states called "Normal" and "Special". Both states have their own tasks that run, with a few tasks shared among the two. 
 
 ![State machine diagram going to and from Normal and Special mode](./example.png)
 
