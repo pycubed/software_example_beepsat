@@ -10,9 +10,14 @@
     "circuitpython.board.version": null,
     "circuitpython.board.vid": "0x04D8",
     "circuitpython.board.pid": "0xED94",
-    "python.linting.pycodestyleEnabled": true,
-    "python.linting.pycodestyleArgs": [
-        "--max-line-length=120"
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./state_machine/tests",
+        "-p",
+        "test*.py"
     ],
-    "python.linting.pylintEnabled": false
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true,
+    "python.linting.flake8Enabled": true
 }

@@ -1,8 +1,7 @@
 import unittest
 import sys
 
-sys.path.insert(0, '../frame')
-# sys.path.insert(0, '../applications/flight')
+sys.path.insert(0, './state_machine/frame')
 
 from lib.state_machine_utils import validate_config  # noqa: E402
 
