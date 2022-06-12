@@ -23,7 +23,7 @@ def typecheck_props(state_name, task_name, props):
             f'{state_name}->{task_name}->ScheduleLater should be bool not {type(props["ScheduleLater"])}')
 
 
-def validate_config(config):
+def validate_config(config, TaskMap, TransitionFunctionMap):
     """Validates that the config file is well formed"""
     for state_name, state in config.items():
         for task_name, props in state['Tasks'].items():
@@ -73,7 +73,7 @@ class StateMachine:
 
     def __init__(self, cubesat, start_state):
         self.config = config
-        validate_config(config)
+        validate_config(config, TaskMap, TransitionFunctionMap)
 
         self.state = start_state
 
