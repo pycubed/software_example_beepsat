@@ -29,11 +29,11 @@ def validate_config(config, TaskMap, TransitionFunctionMap):
         for task_name, props in state['Tasks'].items():
             if task_name not in TaskMap:
                 raise ValueError(
-                    f'{task_name} defined in the {state_name} state, but {task_name} is not defined')
+                    f'{task_name} defined in the {state_name} state, but the task {task_name} is not defined')
             if 'Interval' not in props:
-                raise ValueError(f'Interval value not defined in {state_name}')
+                raise ValueError(f'Interval value not defined in {state_name}->{task_name}')
             if 'Priority' not in props:
-                raise ValueError(f'Priority value not defined in {state_name}')
+                raise ValueError(f'Priority value not defined in {state_name}->{task_name}')
             if 'ScheduleLater' not in props:
                 props['ScheduleLater'] = False  # default to false
             typecheck_props(state_name, task_name, props)
