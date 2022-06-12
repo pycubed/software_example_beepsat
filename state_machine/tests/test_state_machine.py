@@ -2,9 +2,9 @@ import unittest
 import sys
 
 sys.path.insert(0, '../frame')
-sys.path.insert(0, '../applications/flight')
+# sys.path.insert(0, '../applications/flight')
 
-from state_machine import validate_config  # noqa: E402
+from lib.state_machine_utils import validate_config  # noqa: E402
 
 basicTM = {
     't1': True,
