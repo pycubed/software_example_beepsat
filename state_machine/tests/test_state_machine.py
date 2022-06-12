@@ -6,17 +6,22 @@ sys.path.insert(0, '../applications/flight')
 
 from state_machine import validate_config  # noqa: E402
 
+basicTM = {
+    't1': True,
+    't2': True,
+    't3': True,
+}
+
+basicTFM = {
+    'tf1': True,
+    'tf2': True,
+}
+
 
 tests = [
     {
-        'TaskMap': {
-            't1': True,
-            't2': True,
-            't3': True,
-        }, 'TransitionFunctionMap': {
-            'tf1': True,
-            'tf2': True,
-        },
+        'TaskMap': basicTM,
+        'TransitionFunctionMap': basicTFM,
         'config': {
             'Normal': {
                 'Tasks': {
@@ -48,7 +53,7 @@ tests = [
                         'ScheduleLater': False
                     },
                 },
-                'StepsTo': ['Normal']
+                'StepsTo': ['Normal'],
             },
             'DeTumble': {
                 'Tasks': {
@@ -58,19 +63,14 @@ tests = [
                         'ScheduleLater': False
                     },
                 },
-                'StepsTo': ['Normal']
+                'StepsTo': ['Normal'],
             }
         },
-        'Error': False
+        'Valid': True,
+        'Title': 'Large Correct Config'
     }, {
-        'TaskMap': {
-            't1': True,
-            't2': True,
-            't3': True,
-        }, 'TransitionFunctionMap': {
-            'tf1': True,
-            'tf2': True,
-        },
+        'TaskMap': basicTM,
+        'TransitionFunctionMap': basicTFM,
         'config': {
             'Normal': {
                 'Tasks': {
@@ -112,10 +112,45 @@ tests = [
                         'ScheduleLater': False
                     },
                 },
-                'StepsTo': ['Normal']
+                'StepsTo': ['Normal'],
             }
         },
-        'Error': True
+        'Valid': False,
+        'Title': 'Large Incorrect Config (Normal->t3 Priority mispelled)'
+    }, {
+        'TaskMap': basicTM,
+        'TransitionFunctionMap': basicTFM,
+        'config': {
+            'N': {
+                'Tasks': {
+                    't1': {
+                        'Interval': 10,
+                        'Priority': 3,
+                        'ScheduleLater': False
+                    },
+                },
+                'StepsTo': [],
+            },
+        },
+        'Valid': True,
+        'Title': 'Small Correct Config'
+    }, {
+        'TaskMap': basicTM,
+        'TransitionFunctionMap': basicTFM,
+        'config': {
+            'N': {
+                'Tasks': {
+                    't5': {
+                        'Interval': 10,
+                        'Priority': 3,
+                        'ScheduleLater': False
+                    },
+                },
+                'StepsTo': [],
+            },
+        },
+        'Valid': False,
+        'Title': 'Wrong task name (t5 instead of t1/t2/t3)',
     }
 ]
 
@@ -126,7 +161,12 @@ class TestValidateConfig(unittest.TestCase):
         for v in tests:
             try:
                 validate_config(v['config'], v['TaskMap'], v['TransitionFunctionMap'])
-            except ValueError:
-                self.assertTrue(v['Error'])
+            except ValueError as err:
+                if v['Valid']:
+                    print(err)
+                    print(f'Incorrect result for test named {v["Title"]}')
+                    self.assertTrue(False)
                 continue
-            self.assertTrue(not v['Error'])
+            if not v['Valid']:
+                print(f'Incorrect result for test named {v["Title"]}')
+            self.assertTrue(v['Valid'])
