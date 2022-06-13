@@ -1,10 +1,8 @@
+
 """
 CircuitPython driver for PyCubed satellite board
-
 PyCubed Mini mainboard-v02 for Pocketqube Mission
-
 * Author(s): Max Holliday, Yashika Batra
-
 """
 
 import sdcardio
@@ -254,7 +252,7 @@ class Satellite:
             self.hardware['Coils'] = True
 
         # Initialize burnwires
-        burnwires = __init_burnwires()
+        burnwires = self.__init_burnwires()
         
         if len(burnwires) >= 1:
             self.hardware['BurnWire'] = True
