@@ -65,9 +65,103 @@ class Satellite:
 
     # change to 433?
     UHF_FREQ = 433.0
+    
+    def __init_sun_sensors(self, i2c1, i2c2):
+        
+        sun_sensors = []
 
-    # Big init routine as the whole board is brought up.
+        try:
+            sun_yn = adafruit_tsl2561.TSL2561(i2c2, address=0x29)  # -Y
+            sun_sensors.append(sun_yn)
+        except Exception as e:
+            print('[ERROR][Sun Sensor -Y]', e)
+            
+        try:
+            sun_zn = adafruit_tsl2561.TSL2561(i2c2, address=0x39)  # -Z
+            sun_sensors.append(sun_zn)
+        except Exception as e:
+            print('[ERROR][Sun Sensor -Z]', e)
+            
+        try:
+            sun_xn = adafruit_tsl2561.TSL2561(i2c1, address=0x49)  # -X
+            sun_sensors.append(sun_xn)
+        except Exception as e:
+            print('[ERROR][Sun Sensor -X]', e)
+            
+        try:
+            sun_yp = adafruit_tsl2561.TSL2561(i2c1, address=0x29)  # +Y
+            sun_sensors.append(sun_yp)
+        except Exception as e:
+            print('[ERROR][Sun Sensor +Y]', e)
+            
+        try:
+            sun_zp = adafruit_tsl2561.TSL2561(i2c1, address=0x39)  # +Z
+            sun_sensors.append(sun_zp)
+        except Exception as e:
+            print('[ERROR][Sun Sensor +Z]', e)
+            
+        try:
+            sun_xp = adafruit_tsl2561.TSL2561(i2c2, address=0x49)  # +X
+            sun_sensors.append(sun_xp)
+        except Exception as e:
+            print('[ERROR][Sun Sensor +X]', e)
+            
+        for i in sun_sensors:
+            i.enabled = False  # set enabled status to False
+            
+        return sun_sensors
+    
+    
+    def __init_coil_drivers(self, i2c3):
+        coils = []
+
+        try:
+            drv_x = drv8830.DRV8830(i2c3, 0x68)  # U6
+            coils.append(drv_x)
+        except Exception as e:
+            print('[ERROR][H-Bridge U6]', e)
+            
+        try:
+            drv_y = drv8830.DRV8830(i2c3, 0x60)  # U8
+            coils.append(drv_y)
+        except Exception as e:
+            print('[ERROR][H-Bridge U8]', e)
+            
+        try:
+            drv_z = drv8830.DRV8830(i2c3, 0x62)  # U4
+            coils.append(drv_z)
+        except Exception as e:
+            print('[ERROR][H-Bridge U4]', e)
+            
+        for driver in coils:
+            driver.mode = drv8830.COAST
+            driver.vout = 0
+        
+        return coils
+    
+
+    def __init_burnwires(self):
+        burnwires = []
+        
+        try:
+            # needed to change pinout from BURN1 to PA15, as BURN1 did not support PWMOut
+            self.burnwire1 = pwmio.PWMOut(microcontroller.pin.PA15, frequency=1000, duty_cycle=0)
+            burnwires.append(self.burnwire1)
+        except Exception as e:
+            print('[ERROR][Burn Wire IC1]', e)
+        
+        try:
+            # needed to change pinout from BURN2 to PA18, as BURN2 did not support PWMOut
+            self.burnwire2 = pwmio.PWMOut(microcontroller.pin.PA18, frequency=1000, duty_cycle=0)
+            burnwires.append(self.burnwire2)
+        except Exception as e:
+            print('[ERROR][Burn Wire IC1]', e)
+            
+        return burnwires
+    
+    
     def __init__(self):
+        """ Big init routine as the whole board is brought up. """
         self._stat = {}
         self.BOOTTIME = const(self.timeon)
         self.hardware = {
@@ -78,7 +172,7 @@ class Satellite:
             'WDT':    False,
             'Sun':    False,
             'Coils':  False,
-            'BurnWire': False
+            'BurnWire': False,
         }
         self.micro = microcontroller
 
@@ -147,111 +241,28 @@ class Satellite:
             print(f'[ERROR][IMU] {e}\n\tMaybe try address=0x68?')
 
         # Initialize Sun Sensors
-        sun_sensors = []
-
-        try:
-            sun_yn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x29)  # -Y
-            sun_sensors.append(sun_yn)
-        except Exception as e:
-            print('[ERROR][Sun Sensor -Y]', e)
-            
-        try:
-            sun_zn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x39)  # -Z
-            sun_sensors.append(sun_zn)
-        except Exception as e:
-            print('[ERROR][Sun Sensor -Z]', e)
-            
-        try:
-            sun_xn = adafruit_tsl2561.TSL2561(self.i2c1, address=0x49)  # -X
-            sun_sensors.append(sun_xn)
-        except Exception as e:
-            print('[ERROR][Sun Sensor -X]', e)
-            
-        try:
-            sun_yp = adafruit_tsl2561.TSL2561(self.i2c1, address=0x29)  # +Y
-            sun_sensors.append(sun_yp)
-        except Exception as e:
-            print('[ERROR][Sun Sensor +Y]', e)
-            
-        try:
-            sun_zp = adafruit_tsl2561.TSL2561(self.i2c1, address=0x39)  # +Z
-            sun_sensors.append(sun_zp)
-        except Exception as e:
-            print('[ERROR][Sun Sensor +Z]', e)
-            
-        try:
-            sun_xp = adafruit_tsl2561.TSL2561(self.i2c2, address=0x49)  # +X
-            sun_sensors.append(sun_xp)
-        except Exception as e:
-            print('[ERROR][Sun Sensor +X]', e)
-            
-        # count the number of sun sensors that we have initialized
-        sun_sensor_count = 0
-        for i in sun_sensors:
-            sun_sensor_count += 1
-            i.enabled = False  # set enabled status to False
-
+        sun_sensors = self.__init_sun_sensors(self.i2c1, self.i2c2)
+       
         # If there is at least one sun sensor, set to True
-        if sun_sensor_count >= 1:
+        if len(sun_sensors) >= 1:
             self.hardware['Sun'] = True
 
         # Initialize H-Bridges
-        coils = []
-
-        try:
-            drv_x = drv8830.DRV8830(self.i2c3, 0x68)  # U6
-            coils.append(drv_x)
-        except Exception as e:
-            print('[ERROR][H-Bridge U6]', e)
-            
-        try:
-            drv_y = drv8830.DRV8830(self.i2c3, 0x60)  # U8
-            coils.append(drv_y)
-        except Exception as e:
-            print('[ERROR][H-Bridge U8]', e)
-            
-        try:
-            drv_z = drv8830.DRV8830(self.i2c3, 0x62)  # U4
-            coils.append(drv_z)
-        except Exception as e:
-            print('[ERROR][H-Bridge U4]', e)
-            
-        coil_count = 0
-        for driver in coils:
-            driver.mode = drv8830.COAST
-            driver.vout = 0
-            coil_count += 1
+        coils = self.__init_coil_drivers(self.i2c3)
         
-        if coil_count >= 1:
+        if len(coils) >= 1:
             self.hardware['Coils'] = True
 
         # Initialize burnwires
-        burnwires = []
-        try:
-            # needed to change pinout from BURN1 to PA15, as BURN1 did not support PWMOut
-            self.burnwire1 = pwmio.PWMOut(microcontroller.pin.PA15, frequency=1000, duty_cycle=0)
-            burnwires.append(self.burnwire1)
-        except Exception as e:
-            print('[ERROR][Burn Wire IC1]', e)
+        burnwires = __init_burnwires()
         
-        try:
-            # needed to change pinout from BURN2 to PA18, as BURN2 did not support PWMOut
-            self.burnwire2 = pwmio.PWMOut(microcontroller.pin.PA18, frequency=1000, duty_cycle=0)
-            burnwires.append(self.burnwire2)
-        except Exception as e:
-            print('[ERROR][Burn Wire IC1]', e)
-
-        burnwire_count = 0
-        for burnwire in burnwires:
-            burnwire_count += 1
-        
-        if burnwire_count >= 1:
+        if len(burnwires) >= 1:
             self.hardware['BurnWire'] = True
         
 
-    # reinit: reinitialize radio, sd, or IMU based upon the contents of string dev
     def reinit(self, dev):
-        # dev is a whitespace-stripped string of all lowercase letters
+        """ reinit: reinitialize radio, sd, or IMU based upon the contents of string dev """
+        # dev is a string of all lowercase letters, with whitespace removed from the beginning and end
         dev = dev.strip().lower()
 
         # reinitialize device based on string dev
@@ -267,44 +278,44 @@ class Satellite:
 
 
     @property
-    # return the accelerometer reading from the IMU
     def acceleration(self):
+        """ return the accelerometer reading from the IMU """
         return self.IMU.accel
 
 
     @property
-    # return the magnetometer reading from the IMU
     def magnetic(self):
+        """ return the magnetometer reading from the IMU """
         return self.IMU.mag
 
 
     @property
-    # return the gyroscope reading from the IMU
     def gyro(self):
+        """ return the gyroscope reading from the IMU """
         return self.IMU.gyro
 
 
     @property
-    # return the thermometer reading from the IMU
     def temperature(self):
+        """ return the thermometer reading from the IMU """
         return self.IMU.temperature # Celsius
 
 
     @property
-    # return the temperature reading from the CPU
     def temperature_cpu(self):
+        """ return the temperature reading from the CPU """
         return microcontroller.cpu.temperature # Celsius
 
 
     @property
-    # return the current RBG settings of the neopixel object
     def RGB(self):
+        """ return the current RBG settings of the neopixel object """
         return self.neopixel[0]
 
     
     @RGB.setter
-    # set an RGB value to the neopixel object
     def RGB(self,value):
+        """ set an RGB value to the neopixel object """
         if self.hardware['Neopixel']:
             try:
                 self.neopixel[0] = value
@@ -313,8 +324,8 @@ class Satellite:
 
 
     @property
-    # return the battery voltage
     def battery_voltage(self):
+        """ return the battery voltage """
         # initialize vbat
         vbat=0
 
@@ -322,31 +333,34 @@ class Satellite:
             # 65536 = 2^16, number of increments we can have to voltage
             vbat+=self._vbatt.value * 3.3 / 65536
         
-        # 316/110 voltage divider
-        voltage = (vbat/50)*(316+110)/110
+        # 100k/100k voltage divider
+        voltage = (vbat / 50) * (100 + 100) / 100
 
         # volts
         return voltage
 
 
     @property
-    # report battery voltage as % full
     def fuel_gauge(self):
-        return 100*self.battery_voltage/8.4
+        """ report battery voltage as % full """
+        return 100*self.battery_voltage / 4.2
 
 
     @property
-    # reset boot count in non-volatile memory (nvm)
     def reset_boot_count(self):
+        """ reset boot count in non-volatile memory (nvm) """
         microcontroller.nvm[0]=0
 
 
     @property
-    # return a dictionary with the following:
-    # 1. NVM registers(boot count, flags, counters)
-    # 2. Time (seconds) since boot/hard reset
-    # 3. Battery voltage as % of full
     def status(self):
+        """ 
+        return a dictionary with the following:
+        1. NVM registers(boot count, flags, counters)
+        2. Time (seconds) since boot/hard reset
+        3. Battery voltage as % of full
+        """
+        
         self._stat.update({
             'boot-time':self.BOOTTIME,
             'boot-count':self.c_boot,
@@ -381,13 +395,13 @@ class Satellite:
 
 
     @property
-    # return the time on a monotonic clock
     def timeon(self):
+        """ return the time on a monotonic clock """
         return int(time.monotonic())
 
 
-    # cyclic redundancy check (crc)
     def crc(self,data):
+        """ cyclic redundancy check (crc) """
         crc=0
 
         # hash function: xor each byte with current crc and return
@@ -397,10 +411,12 @@ class Satellite:
         return crc
 
 
-    # create a new file on the SD card
-    # substring example: '/data/DATA_'
-    # int padded with zeroes will be appended to the last found file
     def new_file(self,substring, binary=False):
+        """
+        create a new file on the SD card
+        substring example: '/data/DATA_'
+        int padded with zeroes will be appended to the last found file
+        """
         if self.hardware['SDcard']:
             n = 0
 
@@ -443,12 +459,12 @@ class Satellite:
 
             # print a confirmation that this new file was created
             print('New self.filename:', self.filename)
-            return True
+            return self.filename
 
     
     @property
-    # return the storage statistics about the SD card and mainboard file system
     def storage_stats(self):
+        """ return the storage statistics about the SD card and mainboard file system """
         sd = 0
         if self.hardware['SDcard']:
             # statvfs returns info about SD card (mounted file system)
@@ -463,8 +479,8 @@ class Satellite:
         return (fs, sd)
 
 
-    # create/open file and write logs
     def log(self, msg):
+        """ create/open file and write logs """
         # if size of current open logfile > 100MB, create new log file
         if stat(self.logfile)[6] > 1E8:
             self.new_Log()
@@ -474,9 +490,9 @@ class Satellite:
             with open(self.logfile, "a+") as file:
                 file.write('{:.1f},{}\r\n'.format(time.monotonic(), msg))
 
-
-    # create a new log file
+                
     def new_Log(self):
+        """ create a new log file """
         if self.hardware['SDcard']:
             n = 0
 
@@ -497,8 +513,8 @@ class Satellite:
             print('New log file:', self.logfile)
 
 
-    # print a file given its directory; file directory is by default None
     def print_file(self,filedir = None):
+        """ print a file given its directory; file directory is by default None """
         # if no file directory is passed, use the directory of the log file
         if filedir == None:
             filedir = self.logfile
@@ -511,8 +527,8 @@ class Satellite:
                 print(line.strip())
 
 
-    # send a file given character size, buffer size, and the filename
     def send_file(self,c_size,send_buffer,filename):
+        """ send a file given character size, buffer size, and the filename """
         # number of packets is the size of the filename / character size
         num_packets=int(stat(filename)[6]/c_size)
 
@@ -528,12 +544,13 @@ class Satellite:
                 yield bytes([i,0x45,num_packets])
 
 
-    # save the passed dataset to the passed savefile
-    # dataset should be a set of lists; each line is a list: save(([line1],[line2]))
-    # to save a string, make it an item in a list: save(['This is my string'])
-    # by default, savefile is not passed
     def save(self, dataset, savefile=None):
-
+        """
+        save the passed dataset to the passed savefile
+        dataset should be a set of lists; each line is a list: save(([line1],[line2]))
+        to save a string, make it an item in a list: save(['This is my string'])
+        by default, savefile is not passed
+        """
         # if no savefile is passed, use the current filename attribute by default
         if savefile == None:
             savefile = self.filename
@@ -568,23 +585,27 @@ class Satellite:
             return False
 
 
-    # First-in first-out buffer
-    # Buffer must be a list, size will not change.
-    # preallocation example: data = [bytes([0] * 66)] * 30
     def fifo(self,data,item):
+        """
+        First-in first-out buffer
+        Buffer must be a list, size will not change.
+        preallocation example: data = [bytes([0] * 66)] * 30
+        """
         del data[0]
         data.append(item)
 
 
-    # control the burnwire(s)
     def burn(self, burn_num, dutycycle = 0, freq = 1000, duration = 1):
+        """ control the burnwire(s) """
         # BURN1 = -Z,BURN2 = extra burnwire pin, dutycycle ~0.13%
         dtycycl = int((dutycycle / 100) * (0xFFFF))
 
         # print configuration information
         print('----- BURN WIRE CONFIGURATION -----')
-        print('\tFrequency of: {}Hz\n\tDuty cycle of: {}% (int:{})\n\tDuration of {}sec'.format(freq,(100 * dtycycl / 0xFFFF), dtycycl, duration))
-
+        print(f'\tFrequency of: {freq}Hz')
+        print(f'\tDuty cycle of: {100 * dtycycl / 0xFFFF}% (int:{dtycycl})')
+        print(f'\tDuration of {duration}sec')
+        
         # initialize burnwire based on the burn_num passed to the function
         if '1' in burn_num:
             burnwire = self.burnwire1
