@@ -8,22 +8,24 @@ from Tasks.lowpower5 import task as lowpower5
 from Tasks.lowpower5later import task as lowpower5later
 from Tasks.detumble import task as detumble
 
-from TransitionFunctions import announcer
+from TransitionFunctions import announcer, low_power_on, low_power_off
 
 TaskMap = {
-    'Battery': battery,
-    'Beacon': beacon,
-    'Blink': blink,
-    'IMU': imu,
-    'Time': time,
-    'Test': test,
-    'LowPower5': lowpower5,
-    'LowPower5Later': lowpower5later,
+    "Battery": battery,
+    "Beacon": beacon,
+    "Blink": blink,
+    "IMU": imu,
+    "Time": time,
+    "Test": test,
+    "LowPower5": lowpower5,
+    "LowPower5Later": lowpower5later,
     'Detumble': detumble,
 }
 
 TransitionFunctionMap = {
-    'Announcer': announcer
+    'Announcer': announcer,
+    'LowPowerOn': low_power_on,
+    'LowPowerOff': low_power_off,
 }
 
 config = {
@@ -40,7 +42,7 @@ config = {
                 'ScheduleLater': False
             },
             'Beacon': {
-                'Interval': 20,
+                'Interval': 30,
                 'Priority': 1,
                 'ScheduleLater': True
             },
@@ -63,11 +65,9 @@ config = {
                 'Interval': 5.0,
                 'Priority': 3,
                 'ScheduleLater': False
-            }
+            },
         },
-        'StepsTo': ['LowPower', 'DeTumble'],
-        'EnterFunctions': ['Announcer'],
-        'ExitFunctions': ['Announcer'],
+        'StepsTo': ['LowPower', 'DeTumble']
     },
     'LowPower': {
         'Tasks': {
@@ -87,17 +87,14 @@ config = {
                 'ScheduleLater': True
             }
         },
-        'StepsTo': ['Normal']
+        'StepsTo': ['Normal'],
+        'EnterFunctions': ['Announcer', 'LowPowerOn'],
+        'ExitFunctions': ['Announcer', 'LowPowerOff'],
     },
     'DeTumble': {
         'Tasks': {
             'Battery': {
                 'Interval': 15.0,
-                'Priority': 3,
-                'ScheduleLater': False
-            },
-            'Detumble': {
-                'Interval': 5.0,
                 'Priority': 3,
                 'ScheduleLater': False
             }

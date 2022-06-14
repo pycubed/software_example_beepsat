@@ -1,31 +1,46 @@
 # State Machine
 
-For the state_machine version of the software there are two independent parts: the "frame" where the state_machine implementation resides along with a few other helpful utilities,
-and the "plugins" where the actual specific hardware and task dependent parts of the flight software are.
-
-To build the flight software you run `sh build.sh {plugin}` where `{plugin}` is the path to the plugin code (depends on hardware/purpose).
-
-## Dependencies
-The build script automatically generates a graph of the state machine. 
-This requires that you install the `graphviz` tool.
-
-## Locally running the emulation version of the software
-To build the files run `sh build.sh plugs/emulation` and to run it run `sh run.sh`. 
-
-## Building the actual flight software
-build: `sh build.sh plugs/flight`
-run: copy over files to the CIRCUITPY drive (don't automate with rm -rf *, as this has led to corrupting the file system in the past)
-
 ## Software Architecture Overview
 
-The folder `frame/` contains the barebones sattelite state machine code, and the `main.py`. 
-This code remains unchanged independent of whether you are using pycubedmini, pycubed, or running your own test script.
+The folder `frame/` contains the `main.py` (entry point for our software) and a custom state machine implementation.
+This code is minimal enough that no changes should be required regardless of if you are targeting pycubedmini, pycubed, or emulating hardware.
 
-We also have the folders `plugs/{name}` where each `name` represents a certain "plugin" that you attach to the frame using the build script.
-Each `{name}` represents an entirely different set of flight software, be it flight software targetting pycubedmini, pycubed or an emulator.
-The state machine structure, tasks, and libraries are all defined in the individual `plugs/{name}` directories.
+The `drivers` folder contains libaries allowing one to interface with the target hardware.
+We currently have the example emulator, pycubedmini driver and pycubedmini emulation. 
+We plan to support pycubed in the future.
 
-See [the plugins README](plugs/README.md) for a brief description of each plugin.
+The `applications` folder contains the programs that utilize the drivers to achieve the specific mission objective. It contains the state machine configuration and tasks such as detumbling, beacon transmisions, logging and power management.
 
-In order to see a basic example run `sh build.sh plugs/example` and to run it run `sh run.sh`. 
-This example emulates the pycubed library, so that it can be run locally on your computer. 
+## Development
+
+VSCode is strongly recomended so that the IDE properly resolves imports.
+
+## Dependencies
+In order to run emulated software `python3` is required.
+
+The build script automatically generates a graph of the state machine. 
+Becuase of this `graphviz` and `ImageMagick` are required.
+
+
+## Building Flight Software
+
+To build the flight software you run `sh build.sh {driver} {application}`.
+The `{driver}` is the part of the software that interfaces with the hardware (or emulates it).
+The `{application}` is what the software attempts to achieve the mission objective (by utilizing the driver to communicate with the hardware).
+This allows us to easily test and develop flight software localy by emulating the hardware.
+
+## Simple Example
+
+Build and Run: `sh build.sh drivers/example applications/example && sh run.sh`. 
+
+This example emulates the pycubed library, so it can be run locally on your computer (asuming python3 is installed). 
+
+For an explanation of the example code see [this](./example.md).
+
+## Emulating The Flight Software
+Build and Run: `sh build.sh drivers/emulation/ applications/flight/ && sh run.sh` 
+
+## Running The Flight Software
+build: `sh build.sh drivers/pycubedmini/ applications/flight/`
+
+run: copy over files to the CIRCUITPY drive (don't automate with rm -rf *, as this has led to corrupting the file system in the past)
