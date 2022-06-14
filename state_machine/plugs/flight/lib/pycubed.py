@@ -11,13 +11,11 @@ import board
 import microcontroller
 import busio
 import time
-# import json
 import digitalio
 import analogio
 import storage
 import sys
 import neopixel
-# import pulseio
 import pwmio
 import bmx160
 import drv8830
@@ -63,99 +61,6 @@ class Satellite:
 
     # change to 433?
     UHF_FREQ = 433.0
-    
-    def __init_sun_sensors(self, i2c1, i2c2):
-        
-        sun_sensors = []
-
-        try:
-            sun_yn = adafruit_tsl2561.TSL2561(i2c2, address=0x29)  # -Y
-            sun_sensors.append(sun_yn)
-        except Exception as e:
-            print('[ERROR][Sun Sensor -Y]', e)
-            
-        try:
-            sun_zn = adafruit_tsl2561.TSL2561(i2c2, address=0x39)  # -Z
-            sun_sensors.append(sun_zn)
-        except Exception as e:
-            print('[ERROR][Sun Sensor -Z]', e)
-            
-        try:
-            sun_xn = adafruit_tsl2561.TSL2561(i2c1, address=0x49)  # -X
-            sun_sensors.append(sun_xn)
-        except Exception as e:
-            print('[ERROR][Sun Sensor -X]', e)
-            
-        try:
-            sun_yp = adafruit_tsl2561.TSL2561(i2c1, address=0x29)  # +Y
-            sun_sensors.append(sun_yp)
-        except Exception as e:
-            print('[ERROR][Sun Sensor +Y]', e)
-            
-        try:
-            sun_zp = adafruit_tsl2561.TSL2561(i2c1, address=0x39)  # +Z
-            sun_sensors.append(sun_zp)
-        except Exception as e:
-            print('[ERROR][Sun Sensor +Z]', e)
-            
-        try:
-            sun_xp = adafruit_tsl2561.TSL2561(i2c2, address=0x49)  # +X
-            sun_sensors.append(sun_xp)
-        except Exception as e:
-            print('[ERROR][Sun Sensor +X]', e)
-            
-        for i in sun_sensors:
-            i.enabled = False  # set enabled status to False
-            
-        return sun_sensors
-    
-    
-    def __init_coil_drivers(self, i2c3):
-        coils = []
-
-        try:
-            drv_x = drv8830.DRV8830(i2c3, 0x68)  # U6
-            coils.append(drv_x)
-        except Exception as e:
-            print('[ERROR][H-Bridge U6]', e)
-            
-        try:
-            drv_y = drv8830.DRV8830(i2c3, 0x60)  # U8
-            coils.append(drv_y)
-        except Exception as e:
-            print('[ERROR][H-Bridge U8]', e)
-            
-        try:
-            drv_z = drv8830.DRV8830(i2c3, 0x62)  # U4
-            coils.append(drv_z)
-        except Exception as e:
-            print('[ERROR][H-Bridge U4]', e)
-            
-        for driver in coils:
-            driver.mode = drv8830.COAST
-            driver.vout = 0
-        
-        return coils
-    
-
-    def __init_burnwires(self):
-        burnwires = []
-        
-        try:
-            # needed to change pinout from BURN1 to PA15, as BURN1 did not support PWMOut
-            self.burnwire1 = pwmio.PWMOut(microcontroller.pin.PA15, frequency=1000, duty_cycle=0)
-            burnwires.append(self.burnwire1)
-        except Exception as e:
-            print('[ERROR][Burn Wire IC1]', e)
-        
-        try:
-            # needed to change pinout from BURN2 to PA18, as BURN2 did not support PWMOut
-            self.burnwire2 = pwmio.PWMOut(microcontroller.pin.PA18, frequency=1000, duty_cycle=0)
-            burnwires.append(self.burnwire2)
-        except Exception as e:
-            print('[ERROR][Burn Wire IC1]', e)
-            
-        return burnwires
     
     
     def __init__(self):
@@ -239,14 +144,14 @@ class Satellite:
             print(f'[ERROR][IMU] {e}\n\tMaybe try address=0x68?')
 
         # Initialize Sun Sensors
-        sun_sensors = self.__init_sun_sensors(self.i2c1, self.i2c2)
+        sun_sensors = self.__init_sun_sensors()
        
         # If there is at least one sun sensor, set to True
         if len(sun_sensors) >= 1:
             self.hardware['Sun'] = True
 
         # Initialize H-Bridges
-        coils = self.__init_coil_drivers(self.i2c3)
+        coils = self.__init_coil_drivers()
         
         if len(coils) >= 1:
             self.hardware['Coils'] = True
@@ -256,6 +161,100 @@ class Satellite:
         
         if len(burnwires) >= 1:
             self.hardware['BurnWire'] = True
+
+
+    def __init_sun_sensors(self):
+        
+        sun_sensors = []
+
+        try:
+            sun_yn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x29)  # -Y
+            sun_sensors.append(sun_yn)
+        except Exception as e:
+            print('[ERROR][Sun Sensor -Y]', e)
+            
+        try:
+            sun_zn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x39)  # -Z
+            sun_sensors.append(sun_zn)
+        except Exception as e:
+            print('[ERROR][Sun Sensor -Z]', e)
+            
+        try:
+            sun_xn = adafruit_tsl2561.TSL2561(self.i2c1, address=0x49)  # -X
+            sun_sensors.append(sun_xn)
+        except Exception as e:
+            print('[ERROR][Sun Sensor -X]', e)
+            
+        try:
+            sun_yp = adafruit_tsl2561.TSL2561(self.i2c1, address=0x29)  # +Y
+            sun_sensors.append(sun_yp)
+        except Exception as e:
+            print('[ERROR][Sun Sensor +Y]', e)
+            
+        try:
+            sun_zp = adafruit_tsl2561.TSL2561(self.i2c1, address=0x39)  # +Z
+            sun_sensors.append(sun_zp)
+        except Exception as e:
+            print('[ERROR][Sun Sensor +Z]', e)
+            
+        try:
+            sun_xp = adafruit_tsl2561.TSL2561(self.i2c2, address=0x49)  # +X
+            sun_sensors.append(sun_xp)
+        except Exception as e:
+            print('[ERROR][Sun Sensor +X]', e)
+            
+        for i in sun_sensors:
+            i.enabled = False  # set enabled status to False
+            
+        return sun_sensors
+    
+    
+    def __init_coil_drivers(self):
+        coils = []
+
+        try:
+            drv_x = drv8830.DRV8830(self.i2c3, 0x68)  # U6
+            coils.append(drv_x)
+        except Exception as e:
+            print('[ERROR][H-Bridge U6]', e)
+            
+        try:
+            drv_y = drv8830.DRV8830(self.i2c3, 0x60)  # U8
+            coils.append(drv_y)
+        except Exception as e:
+            print('[ERROR][H-Bridge U8]', e)
+            
+        try:
+            drv_z = drv8830.DRV8830(self.i2c3, 0x62)  # U4
+            coils.append(drv_z)
+        except Exception as e:
+            print('[ERROR][H-Bridge U4]', e)
+            
+        for driver in coils:
+            driver.mode = drv8830.COAST
+            driver.vout = 0
+        
+        return coils
+    
+
+    def __init_burnwires(self):
+        burnwires = []
+        
+        try:
+            # needed to change pinout from BURN1 to PA15, as BURN1 did not support PWMOut
+            self.burnwire1 = pwmio.PWMOut(microcontroller.pin.PA15, frequency=1000, duty_cycle=0)
+            burnwires.append(self.burnwire1)
+        except Exception as e:
+            print('[ERROR][Burn Wire IC1]', e)
+        
+        try:
+            # needed to change pinout from BURN2 to PA18, as BURN2 did not support PWMOut
+            self.burnwire2 = pwmio.PWMOut(microcontroller.pin.PA18, frequency=1000, duty_cycle=0)
+            burnwires.append(self.burnwire2)
+        except Exception as e:
+            print('[ERROR][Burn Wire IC1]', e)
+            
+        return burnwires
         
 
     def reinit(self, dev):
