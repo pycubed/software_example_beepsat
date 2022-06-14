@@ -262,8 +262,7 @@ class Satellite:
         reinit: reinitialize radio, sd, or IMU based upon contents of dev
         """
         # dev is a string of all lowercase letters,
-        # with whitespace removed from the beginning and end
-        dev = dev.strip().lower()
+        dev = dev.lower()
 
         # reinitialize device based on string dev
         if dev == 'radio':
