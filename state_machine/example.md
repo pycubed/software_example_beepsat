@@ -1,14 +1,17 @@
 # Example Explanation
 
-The example "flight" software implments an extremely simple state machine containing the two states "Normal" and "Special". Both states have their own tasks that run, with a few tasks shared among the two. 
+Build and Run: `sh build.sh drivers/example applications/example && sh run.sh`
 
-![State machine diagram going to and from Normal and Special mode](./state_machine.png)
+The example "flight" software contains an extremely simple state machine with two states called "Normal" and "Special". Both states have their own tasks that run, with a few tasks shared among the two. 
 
-To build execute: `sh build.sh plugs/example` in the state_machine folder
+![State machine diagram going to and from Normal and Special mode](./example.png)
 
-To run execute: `sh run.sh`
+## drivers/example/lib/pycubed.py
 
-## StateMachineConfig.py
+Bare bones emulation of a sattelite, so that we can get "voltage" readings.
+In a real driver this would be much more complex emulation, or the real pycubed driver.
+
+## applications/example/StateMachineConfig.py
 
 Contains the config which defines the following.
 1. Which states exist
@@ -21,28 +24,23 @@ Contains the config which defines the following.
 5. The TaskMap which maps task names (strings) to their coresponding objects
 6. The TransitionFunctionMap which maps names (strings) to their coresponding functions
 
-## lib/pycubed.py
+## applications/example/TransitionFunctions.py
 
-Bare bones emulation of a sattelite, so that we can get "voltage" readings.
-In a real plugin this would be a much more complex emulation, or the real pycubed driver.
+Contains the transition functions which take the origin, destination and a reference to the cubesat object. In the case of the example, it just anounces the transition.
 
-## Tasks/battery_task.py
+## applications/example/Tasks/battery_task.py
 
 This reads the "battery_voltage" and prints it to the console.
 
-## Tasks/every_5_seconds.py
+## applications/example/Tasks/every_5_seconds.py
 
 This task runs every 5 seconds, and prints to the console.
 
-## Tasks/template_task.py
-
-This is the template task that all tasks inherit from, in most cases you can leave it unmodified.
-
-## Tasks/time_task.py
+## applications/example/Tasks/time_task.py
 
 This task gets and prints the current uptime
 
-## Tasks/transition_task.py
+## applications/example/Tasks/transition_task.py
 
 This task switches the state between Normal and Special mode.
 In the state machine config, we set it to run later so that it runs in 20 or 15 seconds depending on the state.
