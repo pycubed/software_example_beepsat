@@ -8,7 +8,7 @@ def typecheck_props(state_name, task_name, props):
             f'{state_name}->{task_name}->Interval should be int or float not {type(props["Interval"])}')
 
     if type(props['Priority']) == int:
-        props['Priority'] = float(props['Interval'])
+        props['Priority'] = float(props['Priority'])
     if type(props['Priority']) != float:
         raise ValueError(
             f'{state_name}->{task_name}->Priority should be int or float not {type(props["Priority"])}')
@@ -56,7 +56,7 @@ def validate_config(config, TaskMap, TransitionFunctionMap):
             state['ExitFunctions'] = []
         prop = state['ExitFunctions']
         if not isinstance(prop, list):
-            raise ValueError(f'{state_name}->EnterFunctions should be an array not {type(prop)}')
+            raise ValueError(f'{state_name}->ExitFunctions should be an array not {type(prop)}')
         valid_keys = {'Tasks', 'StepsTo', 'EnterFunctions', 'ExitFunctions'}
         for key in state.keys():
             if key not in valid_keys:
