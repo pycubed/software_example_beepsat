@@ -23,19 +23,6 @@ from bitflags import bitFlag, multiBitFlag
 from micropython import const
 import adafruit_tsl2561
 
-'''
-TODO: implement backup import
-------------------------------
-imports = ['sys', 'os', 'miconctroller']
-modules = []
-for x in imports:
-    try:
-        modules.append(__import__(x))
-        print("Successfully imported ", x)
-    except ImportError:
-        print("Error importing ", x)
-'''
-
 # NVM register numbers
 # TODO: confirm registers start in MRAM partition & update board build file
 _FLAG = const(20)
