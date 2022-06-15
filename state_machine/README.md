@@ -9,7 +9,7 @@ The `drivers` folder contains libaries allowing one to interface with the target
 We currently have the example emulator, pycubedmini driver and pycubedmini emulation. 
 We plan to support pycubed in the future.
 
-The `applications` folder contains the programs that utilize the drivers to achieve the specific mission objective. Such as detumbling, beacon transmisions, logging, power management, etc...
+The `applications` folder contains the programs that utilize the drivers to achieve the specific mission objective. It contains the state machine configuration and tasks such as detumbling, beacon transmisions, logging and power management.
 
 ## Development
 
@@ -25,8 +25,8 @@ Becuase of this `graphviz` and `ImageMagick` are required.
 ## Building Flight Software
 
 To build the flight software you run `sh build.sh {driver} {application}`.
-The {driver} is the part of the software that interfaces with the hardware (or emulates it).
-The {application} is what the software attempts to achieve the mission objective (by utilizing the driver to communicate with the hardware).
+The `{driver}` is the part of the software that interfaces with the hardware (or emulates it).
+The `{application}` is what the software attempts to achieve the mission objective (by utilizing the driver to communicate with the hardware).
 This allows us to easily test and develop flight software localy by emulating the hardware.
 
 ## Simple Example
