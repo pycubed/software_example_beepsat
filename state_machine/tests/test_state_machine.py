@@ -66,7 +66,7 @@ tests = [
             }
         },
         'Valid': True,
-        'Title': 'Large Correct Config'
+        'Title': 'Large Correct Config',
     }, {
         'TaskMap': basicTM,
         'TransitionFunctionMap': basicTFM,
@@ -115,7 +115,7 @@ tests = [
             }
         },
         'Valid': False,
-        'Title': 'Large Incorrect Config (Normal->t3 Priority mispelled)'
+        'Title': 'Large Incorrect Config (Normal->t3 Priority mispelled)',
     }, {
         'TaskMap': basicTM,
         'TransitionFunctionMap': basicTFM,
@@ -132,7 +132,7 @@ tests = [
             },
         },
         'Valid': True,
-        'Title': 'Small Correct Config'
+        'Title': 'Small Correct Config',
     }, {
         'TaskMap': basicTM,
         'TransitionFunctionMap': basicTFM,
