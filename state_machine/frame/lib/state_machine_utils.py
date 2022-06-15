@@ -1,5 +1,4 @@
 def typecheck_props(state_name, task_name, props):
-    # pylint: disable=unidiomatic-typecheck
     # using isinstance makes bools be considered ints.
     if type(props['Interval']) == int:
         props['Interval'] = float(props['Interval'])
