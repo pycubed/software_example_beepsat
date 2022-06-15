@@ -110,7 +110,7 @@ class Satellite:
             storage.mount(self._vfs, "/sd")
             sys.path.append("/sd")
             self.hardware['SDcard'] = True
-            # self.new_Log() # create new log file
+            # self.new_log() # create new log file
         except Exception as e:
             print('[ERROR][SD Card]', e)
 
@@ -492,14 +492,14 @@ class Satellite:
 
         # if size of current open logfile > 100MB, create new log file
         if stat(self.logfile)[6] > 1E8:
-            self.new_Log()
+            self.new_log()
 
         # open the current logfile and write message msg with a timestamp
         if self.hardware['SDcard']:
             with open(self.logfile, "a+") as file:
                 file.write('{:.1f},{}\r\n'.format(time.monotonic(), msg))
 
-    def new_Log(self):
+    def new_log(self):
         """
         create a new log file
         """
