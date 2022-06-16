@@ -588,9 +588,9 @@ class Satellite:
                             # format based on whether i is a float or not
                             try:
                                 if isinstance(i, float):
-                                    file.write('{:.9G},'.format(i))
+                                    file.write('{:.9g},'.format(i))
                                 else:
-                                    file.write('{G},'.format(i))
+                                    file.write('{:G},'.format(i))
                             except Exception:
                                 file.write('{},'.format(i))
                     # if the item is not a list or tuple, format
