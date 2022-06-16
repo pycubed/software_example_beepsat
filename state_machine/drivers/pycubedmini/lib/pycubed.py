@@ -366,13 +366,13 @@ class Satellite:
                 'mid-deploy': self.f_mdeploy,
                 'burn1': self.f_burn1,
                 'burn2': self.f_burn2
-                },
+            },
             'counters': {
                 'state-errors': self.c_state_err,
                 'vbus-resets': self.c_vbus_rst,
                 'deploy': self.c_deploy,
                 'downlink': self.c_downlink,
-                },
+            },
         })
 
         self._stat.update({
