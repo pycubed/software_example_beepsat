@@ -338,7 +338,7 @@ class Satellite:
         """
         report battery voltage as % full
         """
-        return 100*self.battery_voltage / 4.2
+        return 100 * self.battery_voltage / 4.2
 
     @property
     def reset_boot_count(self):
@@ -362,17 +362,17 @@ class Satellite:
             'time-on': self.timeon,
             'fuel-gauge': self.fuel_gauge,
             'flags': {
-                    'deploy': self.f_deploy,
-                    'mid-deploy': self.f_mdeploy,
-                    'burn1': self.f_burn1,
-                    'burn2': self.f_burn2
-                    },
+                'deploy': self.f_deploy,
+                'mid-deploy': self.f_mdeploy,
+                'burn1': self.f_burn1,
+                'burn2': self.f_burn2
+                },
             'counters': {
-                    'state-errors': self.c_state_err,
-                    'vbus-resets': self.c_vbus_rst,
-                    'deploy': self.c_deploy,
-                    'downlink': self.c_downlink,
-                    },
+                'state-errors': self.c_state_err,
+                'vbus-resets': self.c_vbus_rst,
+                'deploy': self.c_deploy,
+                'downlink': self.c_downlink,
+                },
         })
 
         self._stat.update({
@@ -383,10 +383,10 @@ class Satellite:
                 self.micro.nvm[_RSTERRS],
                 self.micro.nvm[_DWNLINK],
                 self.micro.nvm[_DCOUNT]
-            ])
-            + self.BOOTTIME.to_bytes(3, 'big')
-            + self._stat['time-on'].to_bytes(4, 'big')
-            + int(self._stat['fuel-gauge']).to_bytes(1, 'big')
+            ]) +
+            self.BOOTTIME.to_bytes(3, 'big') +
+            self._stat['time-on'].to_bytes(4, 'big') +
+            int(self._stat['fuel-gauge']).to_bytes(1, 'big')
         })
 
         return self._stat
@@ -548,15 +548,15 @@ class Satellite:
         """
 
         # number of packets is the size of the filename / character size
-        num_packets = int(stat(filename)[6]/c_size)
+        num_packets = int(stat(filename)[6] / c_size)
 
         # open the file
         with open(filename, "rb") as f:
             # for each packet
-            for i in range(num_packets+1):
+            for i in range(num_packets + 1):
                 # move the cursor to the end of i * character size,
                 # add to buffer
-                f.seek(i*c_size)
+                f.seek(i * c_size)
                 f.readinto(send_buffer)
 
                 # return bytes; yield keyword returns without destroying
