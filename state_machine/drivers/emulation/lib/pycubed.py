@@ -1,6 +1,8 @@
 import time
 import tasko
 
+from lib.readertask import task as reader_task
+
 
 class Radio:
     def __init__(self):
@@ -43,9 +45,16 @@ class Sattelite:
         self.c_state_err = 0
         self.c_boot = None
 
+        self.init_reader()
+
+    def init_reader(self):
+        schedule = tasko.schedule
+        rt = reader_task(self)
+        self.reader = schedule(1, rt.main_task, 10)
+
     def new_file(self, substring, binary=False):
         print(
-            f"new file not implemented, {substring} not written with binary={binary}")
+            f"new file not implemented, string not written with binary={binary}")
         return None
 
     @property
@@ -62,7 +71,7 @@ class Sattelite:
 
     def log(self, str):
         """Logs to sd card"""
-        print(f'log not implemented, tried to log {str}')
+        print('log not implemented')
 
 
 pocketqube = Sattelite()
