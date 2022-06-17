@@ -49,10 +49,19 @@ class Satellite:
     # change to 433?
     UHF_FREQ = 433.0
 
-    def __init__(self):
+    def __init__(self, test_mode=False):
         """ Big init routine as the whole board is brought up. """
+
+        # Initialize test_mode variable. If true, print extra information
+        self.test_mode = test_mode
+
+        if self.test_mode:
+            print("Initializing PyCubedMini Hardware...")
+
         self._stat = {}
         self.BOOTTIME = const(self.timeon)
+
+        # Initialize hardware dictionary
         self.hardware = {
             'IMU':    False,
             'Radio':  False,
@@ -63,6 +72,11 @@ class Satellite:
             'Coils':  False,
             'BurnWire': False,
         }
+
+        # Print the initial state of this hardware dictionary
+        if self.test_mode:
+            print("Hardware:", str(self.hardware))
+
         self.micro = microcontroller
 
         self.data_cache = {}
@@ -77,12 +91,18 @@ class Satellite:
         self.i2c1 = busio.I2C(board.SCL1, board.SDA1)
         self.i2c2 = busio.I2C(board.SCL2, board.SDA2)
         self.i2c3 = busio.I2C(board.SCL3, board.SDA3)
-        # self.spi   = busio.SPI(board.SCK,MOSI=board.MOSI,MISO=board.MISO)
-        self.spi = board.SPI()
+        self.spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
+        # self.spi = board.SPI()
+
+        if self.test_mode:
+            print("Initialized I2C1, I2C2, I2C3, SPI")
 
         # Define sdcard
         self.filename = "/sd/default.txt"
         self.logfile = "/sd/logs/log000.txt"
+        # self.current_logfilenum = 0
+        if self.test_mode:
+            print("Defined initial SD Card filenames and logfiles")
 
         # Define radio
         self._rf_cs = digitalio.DigitalInOut(board.RF_CS)
@@ -93,6 +113,8 @@ class Satellite:
         self.radio_DIO1.switch_to_input()
         self._rf_cs.switch_to_output(value=True)
         self._rf_rst.switch_to_output(value=True)
+        if self.test_mode:
+            print("Defined radio")
 
         # Initialize Neopixel
         try:
@@ -100,6 +122,8 @@ class Satellite:
                 board.NEOPIXEL, 1, brightness=0.2, pixel_order=neopixel.GRB)
             self.neopixel[0] = (0, 0, 0)
             self.hardware['Neopixel'] = True
+            if self.test_mode:
+                print("Initialized Neopixel")
         except Exception as e:
             print('[WARNING][Neopixel]', e)
 
@@ -110,6 +134,8 @@ class Satellite:
             storage.mount(self._vfs, "/sd")
             sys.path.append("/sd")
             self.hardware['SDcard'] = True
+            if self.test_mode:
+                print("Initialized SD Card SPI and Virtual File System (VFS)")
             # self.new_log() # create new log file
         except Exception as e:
             print('[ERROR][SD Card]', e)
@@ -122,6 +148,8 @@ class Satellite:
             self.radio.dio0 = self.radio_DIO0
             self.radio.sleep()
             self.hardware['Radio'] = True
+            if self.test_mode:
+                print("Initialized Radio")
         except Exception as e:
             print('[ERROR][RADIO]', e)
 
@@ -129,25 +157,26 @@ class Satellite:
         try:
             self.IMU = bmx160.BMX160_I2C(self.i2c1, address=0x68)
             self.hardware['IMU'] = True
+            if self.test_mode:
+                print("Initialized IMU")
         except Exception as e:
             print(f'[ERROR][IMU] {e}\n\tMaybe try address=0x68?')
 
         # Initialize Sun Sensors
         sun_sensors = self.__init_sun_sensors()
-
         # If there is at least one sun sensor, set to True
         if len(sun_sensors) >= 1:
             self.hardware['Sun'] = True
 
         # Initialize H-Bridges
         coils = self.__init_coil_drivers()
-
+        # If there is at least one coil, set to True
         if len(coils) >= 1:
             self.hardware['Coils'] = True
 
         # Initialize burnwires
         burnwires = self.__init_burnwires()
-
+        # If there is at least one burnwire, set to True
         if len(burnwires) >= 1:
             self.hardware['BurnWire'] = True
 
@@ -157,41 +186,55 @@ class Satellite:
         try:
             sun_yn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x29)  # -Y
             sun_sensors.append(sun_yn)
+            if self.test_mode:
+                print("Initialized -Y Sensor")
         except Exception as e:
             print('[ERROR][Sun Sensor -Y]', e)
 
         try:
             sun_zn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x39)  # -Z
             sun_sensors.append(sun_zn)
+            if self.test_mode:
+                print("Initialized -Z Sensor")
         except Exception as e:
             print('[ERROR][Sun Sensor -Z]', e)
 
         try:
             sun_xn = adafruit_tsl2561.TSL2561(self.i2c1, address=0x49)  # -X
             sun_sensors.append(sun_xn)
+            if self.test_mode:
+                print("Initialized -X Sensor")
         except Exception as e:
             print('[ERROR][Sun Sensor -X]', e)
 
         try:
             sun_yp = adafruit_tsl2561.TSL2561(self.i2c1, address=0x29)  # +Y
             sun_sensors.append(sun_yp)
+            if self.test_mode:
+                print("Initialized +Y Sensor")
         except Exception as e:
             print('[ERROR][Sun Sensor +Y]', e)
 
         try:
             sun_zp = adafruit_tsl2561.TSL2561(self.i2c1, address=0x39)  # +Z
             sun_sensors.append(sun_zp)
+            if self.test_mode:
+                print("Initialized +Z Sensor")
         except Exception as e:
             print('[ERROR][Sun Sensor +Z]', e)
 
         try:
             sun_xp = adafruit_tsl2561.TSL2561(self.i2c2, address=0x49)  # +X
             sun_sensors.append(sun_xp)
+            if self.test_mode:
+                print("Initialized +X Sensor")
         except Exception as e:
             print('[ERROR][Sun Sensor +X]', e)
 
         for i in sun_sensors:
             i.enabled = False  # set enabled status to False
+            if self.test_mode:
+                print("Sensor", i, "enabled status is", i.enabled)
 
         return sun_sensors
 
@@ -201,24 +244,40 @@ class Satellite:
         try:
             drv_x = drv8830.DRV8830(self.i2c3, 0x68)  # U6
             coils.append(drv_x)
+            if self.test_mode:
+                print("Initialized Driver X")
         except Exception as e:
             print('[ERROR][H-Bridge U6]', e)
 
         try:
             drv_y = drv8830.DRV8830(self.i2c3, 0x60)  # U8
             coils.append(drv_y)
+            if self.test_mode:
+                print("Initialized Driver Y")
         except Exception as e:
             print('[ERROR][H-Bridge U8]', e)
 
         try:
             drv_z = drv8830.DRV8830(self.i2c3, 0x62)  # U4
             coils.append(drv_z)
+            if self.test_mode:
+                print("Initialized Driver Z")
         except Exception as e:
             print('[ERROR][H-Bridge U4]', e)
 
+        driver_count = 0
         for driver in coils:
             driver.mode = drv8830.COAST
             driver.vout = 0
+            if self.test_mode:
+                driver_count += 1
+                if driver_count == 1:
+                    driver_str = "Driver X"
+                elif driver_count == 2:
+                    driver_str = "Driver Y"
+                elif driver_count == 3:
+                    driver_str = "Driver Z"
+                print(driver_str, "mode: COAST, voltage out: ", driver.vout)
 
         return coils
 
@@ -230,6 +289,8 @@ class Satellite:
             self.burnwire1 = pwmio.PWMOut(
                 microcontroller.pin.PA15, frequency=1000, duty_cycle=0)
             burnwires.append(self.burnwire1)
+            if self.test_mode:
+                print("Initialized Burnwire Pin 1")
         except Exception as e:
             print('[ERROR][Burn Wire IC1]', e)
 
@@ -238,6 +299,8 @@ class Satellite:
             self.burnwire2 = pwmio.PWMOut(
                 microcontroller.pin.PA18, frequency=1000, duty_cycle=0)
             burnwires.append(self.burnwire2)
+            if self.test_mode:
+                print("Initialized Burnwire Pin 2")
         except Exception as e:
             print('[ERROR][Burn Wire IC1]', e)
 
@@ -435,11 +498,15 @@ class Satellite:
             # if the folder name is currently in the sd directory
             else:
                 # find the current maximum file number, n
+                # loop through every file in the given sd card folder
                 for f in listdir('/sd/' + folder):
+                    # if the filename we're looking for is in the current file
                     if filen in f:
+                        # split string filen into list, use filen as delimeter
                         for i in f.rsplit(filen):
                             # search .txt files specifically
                             if '.txt' in i and len(i) == 7:
+                                # index 7-7 to 7-4 -- index 0 to 3
                                 c = i[-7: -4]
                                 try:
                                     if int(c) > n:
@@ -652,4 +719,4 @@ class Satellite:
 
 
 # initialize Satellite as pocketqube
-pocketqube = Satellite()
+# pocketqube = Satellite()
