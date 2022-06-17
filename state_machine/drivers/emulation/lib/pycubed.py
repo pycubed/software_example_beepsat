@@ -45,12 +45,13 @@ class Sattelite:
         self.c_state_err = 0
         self.c_boot = None
 
-        self.init_reader()
-
-    def init_reader(self):
         schedule = tasko.schedule
         rt = reader_task(self)
-        self.reader = schedule(1, rt.main_task, 10)
+        self.reader_task = schedule(5, rt.main_task, 10)  # try to read from stdin at 5Hz
+
+        self._accel = (0.0, 0.0, 0.0)
+        self._mag = (0.0, 0.0, 0.0)
+        self._gyro = (0.0, 0.0, 0.0)
 
     def new_file(self, substring, binary=False):
         print(
@@ -59,15 +60,15 @@ class Sattelite:
 
     @property
     def acceleration(self):
-        return (0.0, 0.0, 0.0)
+        return self._accel
 
     @property
     def magnetic(self):
-        return (0.8, 0.3, -0.3)
+        return self._mag
 
     @property
     def gyro(self):
-        return (0.3, 0.0, 0.6)
+        return self._gyro
 
     def log(self, str):
         """Logs to sd card"""
