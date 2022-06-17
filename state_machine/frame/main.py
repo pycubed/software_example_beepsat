@@ -1,7 +1,8 @@
 import traceback
-from lib.pycubed import pocketqube as cubesat
+import lib.pycubed
 import state_machine
 
+cubesat = lib.pycubed.Satellite()
 
 print('Running...')
 try:
