@@ -150,7 +150,209 @@ tests = [
         },
         'Valid': False,
         'Title': 'Wrong task name (t5 instead of t1/t2/t3)',
-    }
+    }, {
+        'TaskMap': basicTM,
+        'TransitionFunctionMap': basicTFM,
+        'config': {
+            'N': {
+                'Task': {
+                    't1': {
+                        'Interval': 10,
+                        'Priority': 3,
+                        'ScheduleLater': False
+                    },
+                },
+                'StepsTo': [],
+            },
+        },
+        'Valid': False,
+        'Title': 'Task instead of Tasks',
+    }, {
+        'TaskMap': basicTM,
+        'TransitionFunctionMap': basicTFM,
+        'config': {
+            'N': {
+                'Tasks': {
+                    't1': {
+                        'Interval': 10,
+                        'Priority': 3,
+                        'ScheduleLater': False
+                    },
+                },
+                'StepTo': [],
+            },
+        },
+        'Valid': False,
+        'Title': 'StepTo instead of StepsTo',
+    }, {
+        'TaskMap': basicTM,
+        'TransitionFunctionMap': basicTFM,
+        'config': {
+            'N': {
+                'Tasks': {
+                    't1': {
+                        'Interval': 10,
+                        'Priority': 3,
+                        'ScheduleLater': False
+                    },
+                },
+                'StepsTo': [],
+                'ExitFunction': [],
+            },
+        },
+        'Valid': False,
+        'Title': 'N->ExitFunction instead of N->ExitFunctions',
+    }, {
+        'TaskMap': basicTM,
+        'TransitionFunctionMap': basicTFM,
+        'config': {
+            'N': {
+                'Tasks': {
+                    't1': {
+                        'Interval': 10,
+                        'Priority': 3,
+                        'ScheduleLater': False
+                    },
+                },
+                'StepsTo': [],
+                'EnterFunction': [],
+            },
+        },
+        'Valid': False,
+        'Title': 'N->EnterFunction instead of N->EnterFunctions',
+    }, {
+        'TaskMap': basicTM,
+        'TransitionFunctionMap': basicTFM,
+        'config': {
+            'N': {
+                'Tasks': {},
+                'StepsTo': [],
+                'EnterFunctions': [],
+                'ExitFunctions': [],
+            },
+        },
+        'Valid': True,
+        'Title': 'Valid Taskless Config',
+    }, {
+        'TaskMap': basicTM,
+        'TransitionFunctionMap': basicTFM,
+        'config': {
+            'N': {
+                'Tasks': {
+                    't1': {
+                        'Interva': 10,
+                        'Priority': 3,
+                        'ScheduleLater': False
+                    },
+                },
+                'StepsTo': [],
+            },
+        },
+        'Valid': False,
+        'Title': 'N->Tasks->t1->Interva instead of N->Tasks->t1->Interval',
+    }, {
+        'TaskMap': basicTM,
+        'TransitionFunctionMap': basicTFM,
+        'config': {
+            'N': {
+                'Tasks': {
+                    't1': {
+                        'Interval': 10,
+                        'Priorit': 3,
+                        'ScheduleLater': False
+                    },
+                },
+                'StepsTo': [],
+            },
+        },
+        'Valid': False,
+        'Title': 'N->Tasks->t1->Priorit instead of N->Tasks->t1->Priority',
+    }, {
+        'TaskMap': basicTM,
+        'TransitionFunctionMap': basicTFM,
+        'config': {
+            'N': {
+                'Tasks': {
+                    't1': {
+                        'Interval': 10,
+                        'Priority': 3,
+                        'ScheduleLater': False
+                    },
+                },
+                'StepsTo': ['ThisStateDoesNotExist'],
+            },
+        },
+        'Valid': False,
+        'Title': 'Invalid Transition Defined',
+    }, {
+        'TaskMap': basicTM,
+        'TransitionFunctionMap': basicTFM,
+        'config': {
+            'N': {
+                'Tasks': {
+                    't1': {
+                        'Interval': 10,
+                        'Priority': 3,
+                        'ScheduleLater': False
+                    },
+                },
+                'StepsTo': "N",
+            },
+        },
+        'Valid': False,
+        'Title': 'Wrong type for N->StepsTo',
+    }, {
+        'TaskMap': basicTM,
+        'TransitionFunctionMap': basicTFM,
+        'config': {
+            'N': {
+                'Tasks': {
+                    't1': {
+                        'Interval': "10",
+                        'Priority': 3,
+                        'ScheduleLater': False
+                    },
+                },
+                'StepsTo': [],
+            },
+        },
+        'Valid': False,
+        'Title': 'Wrong Type For N->Tasks->t1->Interval',
+    }, {
+        'TaskMap': basicTM,
+        'TransitionFunctionMap': basicTFM,
+        'config': {
+            'N': {
+                'Tasks': {
+                    't1': {
+                        'Interval': 10,
+                        'Priority': "3",
+                        'ScheduleLater': False
+                    },
+                },
+                'StepsTo': [],
+            },
+        },
+        'Valid': False,
+        'Title': 'Wrong Type For N->Tasks->t1->Priority',
+    }, {
+        'TaskMap': basicTM,
+        'TransitionFunctionMap': basicTFM,
+        'config': {
+            'N': {
+                'Tasks': {
+                    't1': {
+                        'Interval': 10,
+                        'Priority': 3,
+                        'ScheduleLater': "Yes"
+                    },
+                },
+                'StepsTo': [],
+            },
+        },
+        'Valid': False,
+        'Title': 'Wrong Type For N->Tasks->t1->ScheduleLater',
+    },
 ]
 
 
@@ -161,11 +363,6 @@ class TestValidateConfig(unittest.TestCase):
             try:
                 validate_config(v['config'], v['TaskMap'], v['TransitionFunctionMap'])
             except ValueError as err:
-                if v['Valid']:
-                    print(err)
-                    print(f'Incorrect result for test named {v["Title"]}')
-                    self.assertTrue(False)
+                self.assertTrue(not v['Valid'], msg=f'{v["Title"]} should have no error, but it raised error: {err}')
                 continue
-            if not v['Valid']:
-                print(f'Incorrect result for test named {v["Title"]}')
-            self.assertTrue(v['Valid'])
+            self.assertTrue(v['Valid'], msg=f'{v["Title"]} should have raised an error')
