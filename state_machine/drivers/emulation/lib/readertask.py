@@ -3,6 +3,8 @@ import sys
 import select
 import json
 
+from numpy import identity, asarray, linalg, cross, matmul, atleast_2d, ndarray
+
 class task(Task):
     name = 'reader'
     color = 'blue'
@@ -21,4 +23,11 @@ class task(Task):
                     # print(data[4:])
                     self.cubesat._mag = json.loads(data[4:])
                 if data[3] == '?':
+                    b = (asarray(self.cubesat.magnetic))
+                    ω = (asarray(self.cubesat.gyro))
+                    k = 7e-4
+                    b_hat = b / linalg.norm(b)
+                    bbt = matmul(atleast_2d(b_hat).T, atleast_2d(b_hat))
+                    M = - k * matmul(identity(3) - bbt, ω)
+                    self.cubesat._torque = ndarray.tolist(M)
                     print(f'>>>M{json.dumps(self.cubesat._torque)}')

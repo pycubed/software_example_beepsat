@@ -1,5 +1,5 @@
 
-from numpy import identity, asarray, linalg, cross, matmul, atleast_2d
+from numpy import identity, asarray, linalg, cross, matmul, atleast_2d, ndarray
 
 from lib.template_task import Task
 
@@ -22,6 +22,7 @@ class task(Task):
         M = - k * matmul(identity(3) - bbt, ω)
         # control
         m = 1 / (linalg.norm(b)) * (cross(b_hat, M))
+        self.cubesat._torque = ndarray.tolist(M)
         self.debug(f'Detumble with magnetorquer set to {toStr(m)}')
         # print(f'>>>m{toStr(m)}]')
         # print(f'>>>M[{toStr(M)}]')

@@ -49,8 +49,8 @@ class Satellite:
         rt = reader_task(self)
         self.reader_task = schedule(100, rt.main_task, 10)  # try to read from stdin at 100Hz
 
-        self._accel = (0.0, 0.0, 0.0)
-        self._mag = (0.0, 0.0, 0.0)
+        self._accel = (1.0, 2.0, 3.0)
+        self._mag = (4.0, 3.0, 1.0)
         self._gyro = (0.0, 0.0, 0.0)
         self._torque = [0, 0, 0]
 
