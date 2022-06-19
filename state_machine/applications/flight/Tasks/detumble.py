@@ -4,6 +4,9 @@ from numpy import identity, asarray, linalg, cross, matmul, atleast_2d
 from lib.template_task import Task
 
 
+def toStr(arr):
+    return f'[{", ".join(map(str, arr))}]'
+
 class task(Task):
     name = 'detubmle'
     color = 'pink'
@@ -19,6 +22,7 @@ class task(Task):
         M = - k * matmul(identity(3) - bbt, ω)
         # control
         m = 1 / (linalg.norm(b)) * (cross(b_hat, M))
-        print(f'detumbling with magnetorquer set to {m}')
-        print(f'{M} = M = m x b = {cross(m,b)}')
+        self.debug(f'Detumble with magnetorquer set to {toStr(m)}')
+        # print(f'>>>m{toStr(m)}]')
+        # print(f'>>>M[{toStr(M)}]')
         # print(f'{identity(3)}')

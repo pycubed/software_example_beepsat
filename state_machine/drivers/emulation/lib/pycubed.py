@@ -30,7 +30,7 @@ class Radio:
         self.listening = False
 
 
-class Sattelite:
+class Satellite:
     tasko = None
 
     def __init__(self):
@@ -47,11 +47,12 @@ class Sattelite:
 
         schedule = tasko.schedule
         rt = reader_task(self)
-        self.reader_task = schedule(5, rt.main_task, 10)  # try to read from stdin at 5Hz
+        self.reader_task = schedule(100, rt.main_task, 10)  # try to read from stdin at 100Hz
 
         self._accel = (0.0, 0.0, 0.0)
         self._mag = (0.0, 0.0, 0.0)
         self._gyro = (0.0, 0.0, 0.0)
+        self._torque = [0, 0, 0]
 
     def new_file(self, substring, binary=False):
         print(
@@ -75,4 +76,4 @@ class Sattelite:
         print('log not implemented')
 
 
-pocketqube = Sattelite()
+pocketqube = Satellite()
