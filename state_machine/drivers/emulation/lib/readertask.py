@@ -3,7 +3,7 @@ import sys
 import select
 import json
 
-from numpy import identity, asarray, linalg, cross, matmul, atleast_2d, ndarray
+from numpy import identity, asarray, linalg, matmul, atleast_2d, ndarray
 
 class task(Task):
     name = 'reader'
