@@ -17,7 +17,7 @@ except Exception as e:
         cubesat.c_state_err += 1
         # try to log everything
         cubesat.log(f'{formated_exception},{cubesat.c_state_err},{cubesat.c_boot}')
-    except:
+    except Exception:
         pass
 
 # we shouldn't be here!
