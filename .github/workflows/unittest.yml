@@ -22,6 +22,9 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.8
+
+      - name: Install dependencies
+        run: pip install -r state_machine/requirements.txt 
       
       - name: Run Unit Tests
         run: python3 -m unittest discover -v -s state_machine/unit_tests/ -p test*.py

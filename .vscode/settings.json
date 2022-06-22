@@ -13,7 +13,7 @@
     "python.testing.unittestArgs": [
         "-v",
         "-s",
-        "./state_machine/tests",
+        "./state_machine/unit_tests",
         "-p",
         "test*.py"
     ],
