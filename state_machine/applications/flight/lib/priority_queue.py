@@ -36,6 +36,7 @@ def heapify(x):
     n = len(x)
     for i in reversed(range(n // 2)):
         _siftup_max(x, i)
+    return x
 
 def _siftdown_max(heap, startpos, pos):
     'Maxheap variant of _siftdown'
