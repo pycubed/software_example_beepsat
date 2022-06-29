@@ -1,6 +1,7 @@
 from numpy import identity, asarray, linalg, cross, matmul, atleast_2d, isnan, any
 
 from lib.template_task import Task
+import time
 
 def bcross(b, ω, k=7e-4):
     b = (asarray(b))
@@ -30,3 +31,7 @@ class task(Task):
 
         self.debug(f'Detumbling with magnetorquer set to {m}')
         self.debug(f'M = m x b = {cross(m, b)}')
+
+        # replace with calls to pycubed lib once it is ready
+        print(f">>>m{m}")
+        print(f">>>t{time.monotonic_ns()}")
