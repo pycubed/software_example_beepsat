@@ -1,12 +1,7 @@
 # Based on CPython's heapq
 # Converted to a max heap, and greatly simplified
 # https://github.com/python/cpython/blob/3.10/Lib/heapq.py
-"""Heap queue algorithm (a.k.a. priority queue).
-
-Heaps are arrays for which a[k] <= a[2*k+1] and a[k] <= a[2*k+2] for
-all k, counting elements from 0.  For the sake of comparison,
-non-existing elements are considered to be infinite.  The interesting
-property of a heap is that a[0] is always its smallest element.
+""" Priority Queue Algorithm
 
 Usage:
 
