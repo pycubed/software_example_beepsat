@@ -4,6 +4,7 @@ import sys
 sys.path.insert(0, 'state_machine/applications/flight/lib')
 
 import priority_queue as pq  # noqa: E402
+from message import Message as msg  # noqa: E402
 
 # https://www.geeksforgeeks.org/how-to-check-if-a-given-array-represents-a-binary-heap/
 def _isHeap(arr, i, n):
@@ -26,8 +27,47 @@ def _isHeap(arr, i, n):
 def isHeap(arr):
     return _isHeap(arr, 0, len(arr))
 
-class Heapify(unittest.TestCase):
+class Tests(unittest.TestCase):
 
-    def test(self):
+    def test_heapify(self):
         h1 = [3, 8, 17, 4]
         self.assertTrue(isHeap(pq.heapify(h1)))
+        self.assertTrue(isHeap(h1))
+        h2 = [3, 8, 17, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16]
+        self.assertTrue(isHeap(pq.heapify(h2)))
+        self.assertTrue(isHeap(h2))
+        h3 = [4, 3, -3, 0, -1, -2, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16]
+        self.assertTrue(isHeap(pq.heapify(h3)))
+        self.assertTrue(isHeap(h3))
+        h4 = []
+        self.assertTrue(isHeap(pq.heapify(h4)))
+        self.assertTrue(isHeap(h4))
+        h5 = [1, 0, -5, 7, 12, 8, -12]
+        self.assertTrue(isHeap(pq.heapify(h5)))
+        self.assertTrue(isHeap(h5))
+        a = msg(3, 'hello')
+        b = msg(3, 'hello')
+        c = msg(3, 'hello')
+        d = msg(3, 'hello')
+        h6 = [a, c, d]
+        self.assertTrue(isHeap(pq.heapify(h6)))
+        self.assertTrue(isHeap(h6))
+        h7 = [a, b, c, d]
+        self.assertTrue(isHeap(pq.heapify(h7)))
+        self.assertTrue(isHeap(h7))
+        h8 = [d, a, b]
+        self.assertTrue(isHeap(pq.heapify(h8)))
+        self.assertTrue(isHeap(h8))
+        h9 = [d]
+        self.assertTrue(isHeap(pq.heapify(h9)))
+        self.assertTrue(isHeap(h9))
+
+    def test_push_and_pop(self):
+        h = []
+        pq.push(h, 3)
+        self.assertEqual(3, h[0])
+        pq.push(h, 8)
+        self.assertEqual(8, h[0])
+        pq.push(h, 0)
+        self.assertEqual(pq.pop(h), 8)
+        self.assertEqual(3, h[0])
