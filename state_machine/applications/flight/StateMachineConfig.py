@@ -44,7 +44,7 @@ config = {
                 'ScheduleLater': False
             },
             'Beacon': {
-                'Interval': 20,
+                'Interval': 30,
                 'Priority': 1,
                 'ScheduleLater': True
             },
