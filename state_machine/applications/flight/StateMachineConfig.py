@@ -12,16 +12,16 @@ from Tasks.radio import task as radio
 from TransitionFunctions import announcer, low_power_on, low_power_off
 
 TaskMap = {
-    "Battery": battery,
-    "Beacon": beacon,
-    "Blink": blink,
-    "IMU": imu,
-    "Time": time,
-    "Test": test,
-    "LowPower5": lowpower5,
-    "LowPower5Later": lowpower5later,
+    'Battery': battery,
+    'Beacon': beacon,
+    'Blink': blink,
+    'IMU': imu,
+    'Time': time,
+    'Test': test,
+    'LowPower5': lowpower5,
+    'LowPower5Later': lowpower5later,
     'Detumble': detumble,
-    "Radio": radio,
+    'Radio': radio,
 }
 
 TransitionFunctionMap = {

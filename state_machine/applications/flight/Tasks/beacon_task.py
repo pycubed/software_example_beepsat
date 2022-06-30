@@ -15,4 +15,3 @@ class task(Task):
         to actually send the beacon packet
         """
         tq.push(Message(10, "Hello World!"))
-        tq.push(Message(11, "Hello World! This is a really really really long message!!!!!!!!!!!!! like omg"))
