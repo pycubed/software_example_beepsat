@@ -20,6 +20,14 @@ class task(Task):
     color = 'teal'
     super_secret_code = b'p\xba\xb8C'
 
+    cmd_dispatch = {
+        'no-op':        cdh.noop,
+        'hreset':       cdh.hreset,
+        'shutdown':     cdh.shutdown,
+        'query':        cdh.query,
+        'exec_cmd':     cdh.exec_cmd,
+    }
+
     def __init__(self, satellite):
         # Copy pasted from beacon_task.py, not sure about the purpose
         # Or if we need it for our protocol.
