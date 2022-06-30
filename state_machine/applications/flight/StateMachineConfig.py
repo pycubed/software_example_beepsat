@@ -7,6 +7,7 @@ from Tasks.test_task import task as test
 from Tasks.lowpower5 import task as lowpower5
 from Tasks.lowpower5later import task as lowpower5later
 from Tasks.detumble import task as detumble
+from Tasks.radio import task as radio
 
 from TransitionFunctions import announcer, low_power_on, low_power_off
 
@@ -20,6 +21,7 @@ TaskMap = {
     "LowPower5": lowpower5,
     "LowPower5Later": lowpower5later,
     'Detumble': detumble,
+    "Radio": radio,
 }
 
 TransitionFunctionMap = {
@@ -42,7 +44,7 @@ config = {
                 'ScheduleLater': False
             },
             'Beacon': {
-                'Interval': 30,
+                'Interval': 20,
                 'Priority': 1,
                 'ScheduleLater': True
             },
@@ -66,6 +68,11 @@ config = {
                 'Priority': 3,
                 'ScheduleLater': False
             },
+            'Radio': {
+                'Interval': 5.0,
+                'Priority': 3,
+                'ScheduleLater': True
+            }
         },
         'StepsTo': ['LowPower', 'DeTumble']
     },

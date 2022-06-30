@@ -18,7 +18,7 @@ class Radio:
         return True
 
     def receive(self, *, keep_listening=True, with_header=False, with_ack=False, timeout=None, debug=False):
-        return "Hello World!"
+        return "something we recieved over radio"
 
     @property
     def last_rssi(self):
@@ -26,6 +26,9 @@ class Radio:
 
     def sleep(self):
         self.listening = False
+
+    def send(self, packet, destination=0x00, keep_listening=True):
+        return None
 
 
 class Sattelite:
@@ -62,7 +65,8 @@ class Sattelite:
 
     def log(self, str):
         """Logs to sd card"""
-        print(f'log not implemented, tried to log {str}')
+        str = (str[:20] + '...') if len(str) > 23 else str
+        print(f'log not implemented, tried to log: {str}')
 
 
 pocketqube = Sattelite()
