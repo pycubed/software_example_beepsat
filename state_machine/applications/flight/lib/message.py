@@ -15,11 +15,11 @@ class Message:
     def __eq__(self, other):
         return self.priority == other.priority
 
-    def __gt__(self, other):
-        return self.priority > other.priority
-
     def __ge__(self, other):
         return self.priority >= other.priority
+
+    def __gt__(self, other):
+        return self.priority > other.priority
 
     def __repr__(self) -> str:
         return self.str[:20] + "..." if len(self.str) > 23 else self.str
