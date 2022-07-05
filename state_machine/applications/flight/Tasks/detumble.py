@@ -33,5 +33,5 @@ class task(Task):
         self.debug(f'M = m x b = {cross(m, b)}')
 
         # replace with calls to pycubed lib once it is ready
-        print(f">>>m{m}")
+        print(f">>>m{toStr(m)}")
         print(f">>>t{time.monotonic_ns()}")
