@@ -1,8 +1,7 @@
 import time
 import tasko
 
-from lib.readertask import task as reader_task
-
+import lib.reader as reader
 
 class Radio:
     def __init__(self):
@@ -45,10 +44,6 @@ class Satellite:
         self.c_state_err = 0
         self.c_boot = None
 
-        schedule = tasko.schedule
-        rt = reader_task(self)
-        self.reader_task = schedule(100, rt.main_task, 10)  # try to read from stdin at 100Hz
-
         self._accel = (1.0, 2.0, 3.0)
         self._mag = (4.0, 3.0, 1.0)
         self._gyro = (0.0, 0.0, 0.0)
@@ -61,14 +56,17 @@ class Satellite:
 
     @property
     def acceleration(self):
+        reader.read(self)
         return self._accel
 
     @property
     def magnetic(self):
+        reader.read(self)
         return self._mag
 
     @property
     def gyro(self):
+        reader.read(self)
         return self._gyro
 
     def log(self, str):
