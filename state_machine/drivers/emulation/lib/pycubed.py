@@ -30,6 +30,9 @@ class Radio:
     def send(self, packet, destination=0x00, keep_listening=True):
         return None
 
+    def send_with_ack(self, packet, destination=0x00, keep_listening=True):
+        return True
+
 
 class Sattelite:
     tasko = None

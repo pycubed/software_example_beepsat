@@ -7,7 +7,7 @@ from lib.template_task import Task
 import lib.transmission_queue as tq
 import cdh
 
-ANTENNA_ATTACHED = False
+ANTENNA_ATTACHED = True
 
 def should_transmit():
     """
@@ -44,7 +44,7 @@ class task(Task):
             if heard_something:
                 response = self.cubesat.radio.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED)
                 if response is not None:
-                    self.debug(f'Recieved msg: {response}, RSSI: {self.cubesat.radio.last_rssi - 137}')
+                    self.debug(f'Recieved msg "{response}", RSSI: {self.cubesat.radio.last_rssi - 137}')
                     # Processing recieved messages goes here
                     #  - Execute commands
                     #  - Mark messages as received (and remove from tq)
@@ -82,11 +82,19 @@ class task(Task):
             else:
                 self.debug('No packets received')
         elif should_transmit():
-            packet, send_once = tq.peek().packet()
+            msg = tq.peek()
+            packet, with_ack = msg.packet()
             self.debug(f'Transmission Queue {tq.queue}')
-            if send_once:
-                tq.pop()
             short_packet = str(packet)[:20] + "...." if len(packet) > 23 else packet
             self.debug(f"Sending packet: {short_packet}")
-            self.cubesat.radio.send(packet, destination=0xFF, keep_listening=True)
+            if with_ack:
+                if self.cubesat.radio.send_with_ack(packet, destination=0xFF, keep_listening=True):
+                    msg.ack()
+                else:
+                    msg.no_ack()
+            else:
+                self.cubesat.radio.send(packet, destination=0xFF, keep_listening=True)
+
+            if tq.peek().done():
+                tq.pop()
         self.cubesat.radio.sleep()
