@@ -7,10 +7,10 @@ class NaiveMessage(Message):
         self.cursor = 0
 
     def packet(self):
-        return self.str[self.cursor:self.cursor + 252], True
+        return self.str[self.cursor:self.cursor + 250], True
 
     def done(self):
         return len(self.str) == self.cursor
 
     def ack(self):
-        self.cursor += 252
+        self.cursor += 250

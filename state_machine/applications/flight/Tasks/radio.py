@@ -33,8 +33,8 @@ class task(Task):
         # Or if we need it for our protocol.
         super().__init__(satellite)
         # set our radiohead node ID so we can get ACKs
-        self.cubesat.radio.node = 0xFA  # our ID
-        self.cubesat.radio.destination = 0xAB  # target's ID
+        self.cubesat.radio.node = 0xAB  # our ID
+        self.cubesat.radio.destination = 0xBA  # target's ID
 
     async def main_task(self):
         if tq.empty():
@@ -88,12 +88,12 @@ class task(Task):
             short_packet = str(packet)[:20] + "...." if len(packet) > 23 else packet
             self.debug(f"Sending packet: {short_packet}")
             if with_ack:
-                if self.cubesat.radio.send_with_ack(packet, destination=0xFF, keep_listening=True):
+                if self.cubesat.radio.send_with_ack(packet):
                     msg.ack()
                 else:
                     msg.no_ack()
             else:
-                self.cubesat.radio.send(packet, destination=0xFF, keep_listening=True)
+                self.cubesat.radio.send(packet, keep_listening=True)
 
             if tq.peek().done():
                 tq.pop()
