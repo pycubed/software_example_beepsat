@@ -7,7 +7,7 @@ from lib.template_task import Task
 import lib.transmission_queue as tq
 import cdh
 
-ANTENNA_ATTACHED = True
+ANTENNA_ATTACHED = False
 
 def should_transmit():
     """
