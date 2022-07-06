@@ -1,9 +1,10 @@
 import time
 
 # voltage level constants; set between 0 and 1
-v1 = 0.25
-v2 = 0.5
-v3 = 0.75
+# get these values from the hex values in doc
+v1 = 0x0A
+v2 = 0x15
+v3 = 0x1F
 
 def user_test(driver, coilidx, coilpin, vlevel):
     """
@@ -15,18 +16,19 @@ def user_test(driver, coilidx, coilpin, vlevel):
     multimeter_wait_time = 30
     driver_time = 30
 
-    # other constants
-    projected_voltage = vlevel * 3.3
+    # formula in drv8830 docs:
+    # https://www.ti.com/lit/ds/symlink/drv8830.pdf?ts=1657017752384&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FDRV8830
+    projected_voltage = 4 * 1.285 * int(vlevel) / 64
 
     # set up the test
     print("Testing Coil", str(coilidx), "for", projected_voltage, "volts.")
     print("Please retrieve a multimeter. Waiting", str(multimeter_wait_time), "seconds.")
     time.sleep(multimeter_wait_time)
 
+    # figure out what pins we need to be reading
     # conduct the test
     print("Please read the voltage between the ground pin (GND) and coil pin (" + coilpin + "). \
         Waiting", str(driver_time), "seconds.")
-    """ CONDUCT TEST """
     time.sleep(driver_time)
 
     # gather input and return results
