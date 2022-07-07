@@ -57,7 +57,6 @@ class task(Task):
             if response is not None:
                 self.debug("packet received")
                 self.debug('msg: {}, RSSI: {}'.format(response, self.cubesat.radio.last_rssi - 137), 2)
-                self.cubesat.c_gs_resp += 1
 
                 """
                 ########### ADVANCED ###########
