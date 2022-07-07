@@ -24,7 +24,7 @@ jobs:
 
       - name: Echo file changes
         run: |
-          echo Changed files: ${{ steps.get_file_changes.outputs.files }}
+          echo Changed files: ${{ steps.get_file_changes.outputs.files_modified steps.get_file_changes.outputs.files_added }}
 
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -41,4 +41,4 @@ jobs:
         uses: wearerequired/lint-action@v2
         with:
           flake8: true
-          flake8_args: ${{ steps.get_file_changes.outputs.files}}
+          flake8_args: ${{ steps.get_file_changes.outputs.files_modified steps.get_file_changes.outputs.files_added }}
