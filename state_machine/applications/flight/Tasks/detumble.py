@@ -28,13 +28,9 @@ class task(Task):
     rgb_on = False
 
     async def main_task(self):
-        b = (array(self.cubesat.magnetic))
-
         m = bcross(self.cubesat.magnetic, self.cubesat.gyro)
 
-        self.debug(f'Detumbling with magnetorquer set to {m}')
-        self.debug(f'M = m x b = {cross(m, b)}')
-
         # replace with calls to pycubed lib once it is ready
-        print(f">>>m{toStr(m)}")
-        print(f">>>t{time.monotonic_ns()}")
+        if hasattr(self.cubesat, 'sim') and self.cubesat.sim:  # detects if we are hooked up to simulator
+            print(f">>>m{toStr(m)}")
+            print(f">>>t{time.monotonic_ns()}")

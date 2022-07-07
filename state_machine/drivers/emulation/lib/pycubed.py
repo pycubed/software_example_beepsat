@@ -48,6 +48,7 @@ class Satellite:
         self._mag = (4.0, 3.0, 1.0)
         self._gyro = (0.0, 0.0, 0.0)
         self._torque = [0, 0, 0]
+        self.sim = False
 
     def new_file(self, substring, binary=False):
         print(
