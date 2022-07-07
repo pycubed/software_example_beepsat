@@ -3,7 +3,6 @@ from Tasks.beacon_task import task as beacon
 from Tasks.blink_task import task as blink
 from Tasks.imu_task import task as imu
 from Tasks.time_task import task as time
-from Tasks.test_task import task as test
 from Tasks.detumble import task as detumble
 
 from TransitionFunctions import announcer, low_power_on, low_power_off
@@ -14,7 +13,6 @@ TaskMap = {
     'Blink': blink,
     'IMU': imu,
     'Time': time,
-    'Test': test,
     'Detumble': detumble,
 }
 
@@ -50,11 +48,6 @@ config = {
             'Time': {
                 'Interval': 20,
                 'Priority': 4,
-                'ScheduleLater': False
-            },
-            'Test': {
-                'Interval': 3,
-                'Priority': 1,
                 'ScheduleLater': False
             },
             'Detumble': {
