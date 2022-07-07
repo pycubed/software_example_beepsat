@@ -11,7 +11,7 @@ class NaiveMessage(Message):
         return self.str[self.cursor:self.cursor + self.packet_len], True
 
     def done(self):
-        return len(self.str) == self.cursor
+        return len(self.str) <= self.cursor
 
     def ack(self):
         self.cursor += self.packet_len

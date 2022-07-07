@@ -118,7 +118,7 @@ class Satellite:
         try:
             self.radio = pycubed_rfm9x.RFM9x(
                 self.spi, self._rf_cs, self._rf_rst,
-                self.UHF_FREQ, rfm95pw=True)
+                self.UHF_FREQ, baudrate=1320000, rfm95pw=True)
             self.radio.dio0 = self.radio_DIO0
             self.radio.sleep()
             self.hardware['Radio'] = True
