@@ -9,12 +9,12 @@ from Tasks.detumble import task as detumble
 from TransitionFunctions import announcer, low_power_on, low_power_off
 
 TaskMap = {
-    "Battery": battery,
-    "Beacon": beacon,
-    "Blink": blink,
-    "IMU": imu,
-    "Time": time,
-    "Test": test,
+    'Battery': battery,
+    'Beacon': beacon,
+    'Blink': blink,
+    'IMU': imu,
+    'Time': time,
+    'Test': test,
     'Detumble': detumble,
 }
 
