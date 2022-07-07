@@ -7,6 +7,7 @@ try:
 except Exception:
     from numpy import norm, normalize
     pass
+from lib.mathutils import hat
 
 q = []  # Quaternion attitude vector
 β = []  # Gyro bias vector
