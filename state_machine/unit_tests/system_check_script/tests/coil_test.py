@@ -1,3 +1,10 @@
+"""
+Python system check script for PyCubed satellite board
+PyCubed Mini mainboard-v02 for Pocketqube Mission
+Torque Driver Test
+* Author(s): Yashika Batra
+"""
+
 import time
 
 # voltage level constants; set between 0 and 1
@@ -6,37 +13,49 @@ v1 = 0x0A
 v2 = 0x15
 v3 = 0x1F
 
-def user_test(driver, coilidx, coilpin, vlevel):
+def user_test(driver, coilidx):
     """
     All user interaction happens in this function
     Set wait times, change print statement and input formatting, etc.
     """
 
     # wait times
-    multimeter_wait_time = 30
-    driver_time = 30
+    wait_time = 30
+    driver_time = 10
 
     # formula in drv8830 docs:
     # https://www.ti.com/lit/ds/symlink/drv8830.pdf?ts=1657017752384&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FDRV8830
-    projected_voltage = 4 * 1.285 * int(vlevel) / 64
+    projected_voltage1 = 4 * 1.285 * int(v1) / 64
+    projected_voltage2 = 4 * 1.285 * int(v2) / 64
+    projected_voltage3 = 4 * 1.285 * int(v3) / 64
 
     # set up the test
-    print("Testing Coil", str(coilidx), "for", projected_voltage, "volts.")
-    print("Please retrieve a multimeter. Waiting", str(multimeter_wait_time), "seconds.")
-    time.sleep(multimeter_wait_time)
+    print("Testing Coil", str(coilidx), "for the following voltage levels: \
+        " + str(projected_voltage1) + ", " + str(projected_voltage2 + ", \
+        " + str(projected_voltage3)))
+    print("Please retrieve a magnetometer. A cellphone app will also work. \
+        Waiting", str(wait_time), "seconds.")
+    time.sleep(wait_time)
 
     # figure out what pins we need to be reading
     # conduct the test
-    print("Please read the voltage between the ground pin (GND) and coil pin (" + coilpin + "). \
-        Waiting", str(driver_time), "seconds.")
+    print("Beginning the test now. Please note the magnetometer readings for \
+        the next", str(driver_time * 3), "seconds.")
+
+    driver.vout(v1)
+    time.sleep(driver_time)
+    driver.vout(v2)
+    time.sleep(driver_time)
+    driver.vout(v3)
     time.sleep(driver_time)
 
-    # gather input and return results
-    actual_voltage = float(input("Please enter the voltage you recorded: "))
-    return projected_voltage, actual_voltage
+    success = input("Did the magnetometer readings increase over the last \
+        " + str(driver_time * 3) + " seconds? (Y/N): ")
+
+    return success
 
 
-def voltage_levelx(cubesat, result_dict, vnum, coilidx):
+def voltage_levelx(cubesat, result_dict, coilidx):
     """
     All automation happens in this function
     Select burnwire and voltage level
@@ -47,44 +66,27 @@ def voltage_levelx(cubesat, result_dict, vnum, coilidx):
     driver = 0
     if coilidx == 'X':
         driver = cubesat.drv_x
-        coilpin = ""
     elif coilidx == 'Y':
         driver = cubesat.drv_y
-        coilpin = ""
     elif coilidx == 'Z':
         driver = cubesat.drv_z
-        coilpin = ""
     else:
         print("Not a valid coil.")
-        exit()
-
-    # choose a voltage level or exit
-    vlevel = 0
-    if vnum == 1:
-        vlevel = v1
-    elif vnum == 2:
-        vlevel = v2
-    elif vnum == 3:
-        vlevel = v3
-    else:
-        print("Not a valid voltage level option.")
-        exit()
+        return result_dict
 
     # set string constant
-    result_key = 'Coil' + str(coilidx) + '_Volt' + str(vlevel)
+    result_key = 'CoilDriver' + str(coilidx) + '_VoltTest'
 
     # get user test result values, process and print results
-    projected_voltage, actual_voltage = user_test(driver, coilidx, coilpin, vlevel)
-    result_val_string = ('Coil ' + str(coilidx) + ' at voltage level ' +
-                         str(vlevel) + 'returns ' + actual_voltage + ' volts')
-    print(result_val_string)
-
-    # update dictionary values based on user test result values
-    if (abs(projected_voltage - actual_voltage) < 0.2):
-        result_dict[result_key] = (result_val_string, True)
+    result = user_test(driver, coilidx)
+    result_val_string = ('Tested Coild Driver ' + str(coilidx) + ' at the following voltage levels: ' +
+                         str(v1) + ', ' + str(v2) + ', ' + str(v3) + '.')
+    if result:
+        result_val_string += 'Magnetometer readings changed as expected with voltage levels.'
     else:
-        result_dict[result_key] = (result_val_string, False)
+        result_val_string += 'Magnetometer readings did not change as expected.'
 
+    result_dict[result_key] = (result_val_string, result)
     return result_dict
 
 
@@ -98,9 +100,9 @@ def run(cubesat, hardware_dict, result_dict):
         result_dict['CoilX_Volt3'] = ('Cannot test Coil \
             X at ' + v3 + '; no Coil X detected', False)
     else:  # Coil X detected, run tests
-        voltage_levelx(cubesat, result_dict, 1, 'X')
-        voltage_levelx(cubesat, result_dict, 2, 'X')
-        voltage_levelx(cubesat, result_dict, 3, 'X')
+        voltage_levelx(cubesat, result_dict, 'X')
+        voltage_levelx(cubesat, result_dict, 'X')
+        voltage_levelx(cubesat, result_dict, 'X')
 
     # if no Coil Y detected, update result dictionary
     if not hardware_dict['Coil Y']:
@@ -111,9 +113,9 @@ def run(cubesat, hardware_dict, result_dict):
         result_dict['CoilY_Volt3'] = ('Cannot test Coil \
             Y at ' + v3 + '; no Coil Y detected', False)
     else:  # Coil X detected, run tests
-        voltage_levelx(cubesat, result_dict, 1, 'Y')
-        voltage_levelx(cubesat, result_dict, 2, 'Y')
-        voltage_levelx(cubesat, result_dict, 3, 'Y')
+        voltage_levelx(cubesat, result_dict, 'Y')
+        voltage_levelx(cubesat, result_dict, 'Y')
+        voltage_levelx(cubesat, result_dict, 'Y')
 
     # if no Coil Z detected, update result dictionary
     if not hardware_dict['Coil Z']:
@@ -124,8 +126,8 @@ def run(cubesat, hardware_dict, result_dict):
         result_dict['CoilZ_Volt3'] = ('Cannot test Coil \
             Z at ' + v3 + '; no Coil Z detected', False)
     else:  # Coil X detected, run tests
-        voltage_levelx(cubesat, result_dict, 1, 'Z')
-        voltage_levelx(cubesat, result_dict, 2, 'Z')
-        voltage_levelx(cubesat, result_dict, 3, 'Z')
+        voltage_levelx(cubesat, result_dict, 'Z')
+        voltage_levelx(cubesat, result_dict, 'Z')
+        voltage_levelx(cubesat, result_dict, 'Z')
 
     return result_dict

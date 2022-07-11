@@ -1,3 +1,10 @@
+"""
+Python system check script for PyCubed satellite board
+PyCubed Mini mainboard-v02 for Pocketqube Mission
+Sun Sensor Test
+* Author(s): Yashika Batra
+"""
+
 import time
 
 def user_test(sun_sensor, sensoridx, light_dark):

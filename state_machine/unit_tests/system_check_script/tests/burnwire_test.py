@@ -1,3 +1,10 @@
+"""
+Python system check script for PyCubed satellite board
+PyCubed Mini mainboard-v02 for Pocketqube Mission
+Burnwire Deployment Test
+* Author(s): Yashika Batra
+"""
+
 import time
 
 # voltage level constants; set between 0 and 1
@@ -5,7 +12,7 @@ v1 = 0.25
 v2 = 0.5
 v3 = 0.75
 
-def user_test(burnnum, burnwire, burnpin, vlevel):
+def user_test(burnnum, burnwire, vlevel):
     """
     All user interaction happens in this function
     Set wait times, change print statement and input formatting, etc.
@@ -25,7 +32,7 @@ def user_test(burnnum, burnwire, burnpin, vlevel):
     time.sleep(multimeter_wait_time)
 
     # conduct the test
-    print("Please read the voltage between the ground pin (GND) and burnwire pin (" + burnpin + "). \
+    print("Please read the voltage between the ground pin (GND) and burnwire pin on the -Z solar board. \
         Waiting", str(burn_time), "seconds.")
     burnwire.duty_cycle = dutycycle
     time.sleep(burn_time)
@@ -47,10 +54,8 @@ def voltage_levelx(cubesat, result_dict, vnum, burnnum):
     burnwire = 0
     if burnnum == 1:
         burnwire = cubesat.burnwire1
-        burnpin = "PA15"
     elif burnnum == 2:
         burnwire = cubesat.burnwire2
-        burnpin = "PA18"
     else:
         print("Not a valid burnwire.")
         exit()
@@ -71,7 +76,7 @@ def voltage_levelx(cubesat, result_dict, vnum, burnnum):
     result_key = 'Burnwire' + str(burnnum) + '_Volt' + str(vlevel)
 
     # get user test result values, process and print results
-    projected_voltage, actual_voltage = user_test(burnnum, burnwire, burnpin, vlevel)
+    projected_voltage, actual_voltage = user_test(burnnum, burnwire, vlevel)
     result_val_string = ('Burnwire ' + str(burnnum) + ' at voltage level ' +
                          str(vlevel) + 'returns ' + actual_voltage + ' volts')
     print(result_val_string)
