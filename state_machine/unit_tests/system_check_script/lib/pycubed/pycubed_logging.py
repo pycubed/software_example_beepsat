@@ -3,72 +3,79 @@ from pycubed_stats import incr_logfail_count
 from os import listdir, stat, mkdir
 import time
 
-if cubesat.hardware['SDcard']:
-    def new_file(substring, binary=False):
-        """
-        create a new file on the SD card
-        substring example: '/data/DATA_'
-        int padded with zeroes will be appended to the last found file
-        """
+def check_sdcard():
+    if cubesat.hardware['SDcard']:
+        return True
+    else:
+        # increment nvm counter; tried to log without sd card being initialized
+        incr_logfail_count()
+        return False
 
-        """
-        TO DO: move new_file function outside of pycubed.py
-        """
-        if cubesat.hardware['SDcard']:
-            n = 0
+def new_file(substring, binary=False):
+    """
+    create a new file on the SD card
+    substring example: '/data/DATA_'
+    int padded with zeroes will be appended to the last found file
+    """
 
-            folder = substring[: substring.rfind('/') + 1]
-            filen = substring[substring.rfind('/') + 1:]
+    """
+    TO DO: move new_file function outside of pycubed.py
+    """
+    if check_sdcard():
+        n = 0
 
-            print('Creating new file in directory: /sd{} \
-                with file prefix: {}'.format(folder, filen))
+        folder = substring[: substring.rfind('/') + 1]
+        filen = substring[substring.rfind('/') + 1:]
 
-            # if the folder name is not currently in the sd directory,
-            # create the directory and filename
-            if folder.strip('/') not in listdir('/sd/'):
-                print('Directory /sd{} not found. Creating...'.format(folder))
-                mkdir('/sd' + folder)
-                cubesat.filename = '/sd' + folder + filen + '000.txt'
+        print('Creating new file in directory: /sd{} \
+            with file prefix: {}'.format(folder, filen))
 
-            # if the folder name is currently in the sd directory
-            else:
-                # find the current maximum file number, n
-                for f in listdir('/sd/' + folder):
-                    if filen in f:
-                        for i in f.rsplit(filen):
-                            # search .txt files specifically
-                            if '.txt' in i and len(i) == 7:
-                                c = i[-7: -4]
-                                try:
-                                    if int(c) > n:
-                                        n = int(c)
-                                except ValueError:
-                                    continue
+        # if the folder name is not currently in the sd directory,
+        # create the directory and filename
+        if folder.strip('/') not in listdir('/sd/'):
+            print('Directory /sd{} not found. Creating...'.format(folder))
+            mkdir('/sd' + folder)
+            cubesat.filename = '/sd' + folder + filen + '000.txt'
 
-                                if int(i.rstrip('.txt')) > n:
-                                    n = int(i.rstrip('.txt'))
-                                    break
+        # if the folder name is currently in the sd directory
+        else:
+            # find the current maximum file number, n
+            for f in listdir('/sd/' + folder):
+                if filen in f:
+                    for i in f.rsplit(filen):
+                        # search .txt files specifically
+                        if '.txt' in i and len(i) == 7:
+                            c = i[-7: -4]
+                            try:
+                                if int(c) > n:
+                                    n = int(c)
+                            except ValueError:
+                                continue
 
-                # create new filepath in sd directory, using given
-                # folder/file names
-                cubesat.filename = (
-                    '/sd' + folder + filen + "{:03}".format(n + 1) + ".txt")
+                            if int(i.rstrip('.txt')) > n:
+                                n = int(i.rstrip('.txt'))
+                                break
 
-            # create new file with open, write timestamp and status
-            with open(cubesat.filename, "a") as f:
-                f.write(
-                    '# Created: {:.0f}\r\n# Status: {}\r\n'.format(
-                        time.monotonic(), cubesat.status))
+            # create new filepath in sd directory, using given
+            # folder/file names
+            cubesat.filename = (
+                '/sd' + folder + filen + "{:03}".format(n + 1) + ".txt")
 
-            # print a confirmation that this new file was created
-            print('New self.filename:', cubesat.filename)
-            return cubesat.filename
+        # create new file with open, write timestamp and status
+        with open(cubesat.filename, "a") as f:
+            f.write(
+                '# Created: {:.0f}\r\n# Status: {}\r\n'.format(
+                    time.monotonic(), cubesat.status))
 
-    def log(msg):
-        """
-        create/open file and write logs
-        """
+        # print a confirmation that this new file was created
+        print('New self.filename:', cubesat.filename)
+        return cubesat.filename
 
+def log(msg):
+    """
+    create/open file and write logs
+    """
+    if check_sdcard():
         # if size of current open logfile > 100MB, create new log file
         if stat(cubesat.logfile)[6] > 1E8:
             cubesat.new_log()
@@ -78,38 +85,38 @@ if cubesat.hardware['SDcard']:
             with open(cubesat.logfile, "a+") as file:
                 file.write('{:.1f},{}\r\n'.format(time.monotonic(), msg))
 
-    def new_log():
-        """
-        create a new log file
-        """
-        if cubesat.hardware['SDcard']:
-            n = 0
+def new_log():
+    """
+    create a new log file
+    """
+    if check_sdcard():
+        n = 0
 
-            # iterate through all files in the logs folder
-            for f in listdir('/sd/logs/'):
-                # if the file number is greater than n, set n to file number
-                if int(f[3: -4]) > n:
-                    n = int(f[3: -4])
+        # iterate through all files in the logs folder
+        for f in listdir('/sd/logs/'):
+            # if the file number is greater than n, set n to file number
+            if int(f[3: -4]) > n:
+                n = int(f[3: -4])
 
-            # the new log file has number n + 1; n is the current
-            # greatest file number
-            cubesat.logfile = "/sd/logs/log" + "{:03}".format(n + 1) + ".txt"
+        # the new log file has number n + 1; n is the current
+        # greatest file number
+        cubesat.logfile = "/sd/logs/log" + "{:03}".format(n + 1) + ".txt"
 
-            # open the new logfile and write the time it was created +
-            # the current status
-            with open(cubesat.logfile, "a") as log:
-                log.write('# Created: {:.0f}\r\n# Status: {}\r\n'.format(
-                    time.monotonic(), cubesat.status))
+        # open the new logfile and write the time it was created +
+        # the current status
+        with open(cubesat.logfile, "a") as log:
+            log.write('# Created: {:.0f}\r\n# Status: {}\r\n'.format(
+                time.monotonic(), cubesat.status))
 
-            # print a confirmation message that a new logfile was created
-            print('New log file:', cubesat.logfile)
+        # print a confirmation message that a new logfile was created
+        print('New log file:', cubesat.logfile)
 
-    def print_file(filedir=None):
-        """
-        DEBUGGING
-        print a file given its directory; file directory is by default None
-        """
-
+def print_file(filedir=None):
+    """
+    DEBUGGING
+    print a file given its directory; file directory is by default None
+    """
+    if check_sdcard():
         # if no file directory is passed, use the directory of the log file
         if filedir is None:
             filedir = cubesat.logfile
@@ -122,15 +129,16 @@ if cubesat.hardware['SDcard']:
             for line in file:
                 print(line.strip())
 
-    def save(dataset, savefile=None):
-        """
-        save the passed dataset to the passed savefile
-        dataset should be a set of lists; each line is a list:
-            save(([line1],[line2]))
-        to save a string, make it an item in a list:
-            save(['This is my string'])
-        by default, savefile is not passed
-        """
+def save(dataset, savefile=None):
+    """
+    save the passed dataset to the passed savefile
+    dataset should be a set of lists; each line is a list:
+        save(([line1],[line2]))
+    to save a string, make it an item in a list:
+        save(['This is my string'])
+    by default, savefile is not passed
+    """
+    if check_sdcard():
         # if no savefile is passed, use the current filename attribute
         # by default
         if savefile is None:
@@ -165,7 +173,3 @@ if cubesat.hardware['SDcard']:
             print('[ERROR] SD Save:', e)
             cubesat.RGB = (255, 0, 0)  # set RGB to red
             return False
-
-else:
-    # increment nvm counter; tried to log without sd card being initialized
-    incr_logfail_count()

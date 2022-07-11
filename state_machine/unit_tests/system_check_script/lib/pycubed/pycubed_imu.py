@@ -7,29 +7,37 @@ from pycubed import pocketqube as cubesat
 from pycubed_logging import log
 
 
-if cubesat.hardware['IMU']:
-    def acceleration():
-        """
-        return the accelerometer reading from the IMU
-        """
+def check_imu():
+    if cubesat.hardware['IMU']:
+        return True
+    else:
+        log("IMU accessed without being initialized")
+        return False
+
+def acceleration():
+    """
+    return the accelerometer reading from the IMU
+    """
+    if check_imu():
         return cubesat.IMU.accel
 
-    def magnetic():
-        """
-        return the magnetometer reading from the IMU
-        """
+def magnetic():
+    """
+    return the magnetometer reading from the IMU
+    """
+    if check_imu():
         return cubesat.IMU.mag
 
-    def gyro():
-        """
-        return the gyroscope reading from the IMU
-        """
+def gyro():
+    """
+    return the gyroscope reading from the IMU
+    """
+    if check_imu():
         return cubesat.IMU.gyro
 
-    def temperature():
-        """
-        return the thermometer reading from the IMU
-        """
+def temperature():
+    """
+    return the thermometer reading from the IMU
+    """
+    if check_imu():
         return cubesat.IMU.temperature  # Celsius
-else:
-    log("IMU accessed without being initialized")

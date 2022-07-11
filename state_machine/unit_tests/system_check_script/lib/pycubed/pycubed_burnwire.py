@@ -8,13 +8,20 @@ from pycubed_logging import log
 import time
 
 
-if cubesat.hardware['Burn Wire 1'] or cubesat.hardware['Burn Wire 2']:
-    def burn(burn_num='1', dutycycle=0, freq=1000, duration=1):
-        """
-        control the burnwire(s)
-        initialize with burn_num = '1' ; burnwire 2 IC is not set up
-        """
+def check_burnwire():
+    if cubesat.hardware['Burn Wire 1'] or cubesat.hardware['Burn Wire 2']:
+        return True
+    else:
+        log("Burnwire accessed without being initialized")
+        return False
 
+
+def burn(burn_num='1', dutycycle=0, freq=1000, duration=1):
+    """
+    control the burnwire(s)
+    initialize with burn_num = '1' ; burnwire 2 IC is not set up
+    """
+    if check_burnwire():
         # BURN1 = -Z,BURN2 = extra burnwire pin, dutycycle ~0.13%
         dtycycl = int((dutycycle / 100) * (0xFFFF))
 
@@ -47,5 +54,3 @@ if cubesat.hardware['Burn Wire 1'] or cubesat.hardware['Burn Wire 2']:
         burnwire.deinit()  # deinitialize burnwire
 
         return cubesat._deployA  # return true
-else:
-    log("Burnwire accessed without being initialized")

@@ -7,15 +7,23 @@ from pycubed import pocketqube as cubesat
 from pycubed_logging import log
 from os import stat
 
+def check_radio():
+    if cubesat.hardware['Radio']:
+        return True
+    else:
+        log("Radio accessed without being initialized")
+        return False
 
-if cubesat.hardware['Radio']:
-    def send(data,
-             *,
-             keep_listening=False,
-             destination=None,
-             node=None,
-             identifier=None,
-             flags=None):
+
+def send(data,
+         *,
+         keep_listening=False,
+         destination=None,
+         node=None,
+         identifier=None,
+         flags=None):
+
+    if check_radio():
         cubesat.radio.send(
             data,
             keep_listening=keep_listening,
@@ -25,15 +33,17 @@ if cubesat.hardware['Radio']:
             flags=flags)
         return 0
 
-    def listen():
+def listen():
+    if check_radio():
         cubesat.radio.listen()
 
-    def receive(*,
-                keep_listening=True,
-                with_header=False,
-                with_ack=False,
-                timeout=None,
-                debug=False):
+def receive(*,
+            keep_listening=True,
+            with_header=False,
+            with_ack=False,
+            timeout=None,
+            debug=False):
+    if check_radio():
         cubesat.radio.receive(
             keep_listening=keep_listening,
             with_header=with_header,
@@ -42,14 +52,16 @@ if cubesat.hardware['Radio']:
             debug=debug
         )
 
-    def sleep():
+def sleep():
+    if check_radio():
         cubesat.radio.sleep()
 
-    def create_packets(c_size, send_buffer, filename):
-        """
-        send a file given packet size, buffer size, and the filename
-        """
+def create_packets(c_size, send_buffer, filename):
+    """
+    send a file given packet size, buffer size, and the filename
+    """
 
+    if check_radio():
         # number of packets is the size of the file / packet size
         num_packets = int(stat(filename)[6] / c_size)
 
@@ -66,14 +78,11 @@ if cubesat.hardware['Radio']:
                 # states of local vars
                 yield bytes([i, 0x45, num_packets])
 
-    def send_file(filename):
+def send_file(filename):
+    if check_radio():
         # define some base case c_size and send_buffer
         c_size = 1
         send_buffer = bytearray()
 
         for packet in create_packets(c_size, send_buffer, filename):
             send(packet)
-
-else:
-    # log that radio was accessed without being initialized
-    log("Radio accessed without being initialized")

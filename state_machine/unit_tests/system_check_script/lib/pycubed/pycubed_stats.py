@@ -67,18 +67,19 @@ def reset_boot_count():
     """
     reset boot count in non-volatile memory (nvm)
     """
-    cubesat.micro.nvm[0] = 0
+    cubesat.c_boot.__set__(0)
 
 
 def incr_logfail_count():
     """
     increment logfail count in non-volatile memory (nvm)
     """
-    cubesat.micro.nvm[5] += 1
+    current_count = cubesat.c_logfail.__get__()
+    cubesat.c_logfail.__set__(current_count + 1)
 
 
 def reset_logfail_count():
     """
     reset logfail count in non-volatile memory (nvm)
     """
-    cubesat.micro.nvm[5] = 0
+    cubesat.c_logfail.__set__(0)
