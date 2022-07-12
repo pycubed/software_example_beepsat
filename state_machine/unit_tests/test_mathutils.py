@@ -37,7 +37,12 @@ class LTests(unittest.TestCase):
                  [0.403,  -0.499,  -0.332,   0.692]]),
             L(q)
         )
-
-
-x = LTests()
-x.test()
+        q = array([[0.5, 0.5, 0.5, 0.5]]).transpose()
+        testing.assert_equal(
+            array(
+                [[0.5,  -0.5,  -0.5,  -0.5],
+                 [0.5,   0.5,  -0.5,   0.5],
+                 [0.5,   0.5,   0.5,  -0.5],
+                 [0.5,  -0.5,   0.5,   0.5]]),
+            L(q)
+        )

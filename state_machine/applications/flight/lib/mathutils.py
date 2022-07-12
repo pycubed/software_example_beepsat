@@ -8,7 +8,6 @@ except Exception:
 
 def hat(v):
     """Converts v to a matrix such that hat(v)w = cross(w, v) = -cross(v, w)"""
-    print(v)
     if not isinstance(v, ndarray):
         v = array(v)
     if v.shape == (3, 1):
@@ -26,8 +25,12 @@ def hat(v):
 
 def L(q):
     """Converts a scalar-first unit quaternion into the left-side matrix for quaternion multiplication"""
-    qs, qv = q[0], array([q[1:4]]).transpose()
-    print("qs: ", qs, "qv: ", qv)
+    if not isinstance(q, ndarray):
+        q = array([q])
+    if q.shape == (4,):
+        qs, qv = q[0], array([q[1:4]]).transpose()
+    elif q.shape == (4, 1):
+        qs, qv = q[0], q[1:4]
 
     dr = qs * identity(3) + hat(qv)
     M = block([

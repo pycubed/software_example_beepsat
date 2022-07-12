@@ -2,12 +2,11 @@
 # Based on Zac Manchester's Formulation
 # Writen by Aleksei Seletskiy
 try:
-    from ulab.numpy import norm, normalize
-    pass
+    from numpy import linalg, block, dot as matmul
 except Exception:
-    from numpy import norm, normalize
-    pass
-from lib.mathutils import hat
+    from ulab.numpy import linalg, block, matmul
+from lib.mathutils import hat, L
+from math import cos, sin
 
 q = []  # Quaternion attitude vector
 β = []  # Gyro bias vector
@@ -20,9 +19,11 @@ P = [[]]  # Covariance matrix
 
 def f(q, β, ω, δt):
     """State propogation function"""
-    θ = norm(ω - β) * δt
-    r = normalize(ω - β)
-    return L(q) * [cos(θ / 2); r * sin(θ / 2)]
+    θ = linalg.norm(ω - β) * δt
+    r = (ω - β) / linalg.norm(ω - β)
+    print(L(q))
+    print(block([[cos(θ / 2)], [r * sin(θ / 2)]]))
+    return matmul(L(q), block([[cos(θ / 2)], [r * sin(θ / 2)]]))
 
 # function step(
 #     e::EKF,
