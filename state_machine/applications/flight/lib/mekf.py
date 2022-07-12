@@ -5,7 +5,7 @@ try:
     from numpy import linalg, block, dot as matmul
 except Exception:
     from ulab.numpy import linalg, block, matmul
-from lib.mathutils import hat, L
+from lib.mathutils import L
 from math import cos, sin
 
 q = []  # Quaternion attitude vector
