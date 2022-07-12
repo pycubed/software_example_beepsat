@@ -9,7 +9,7 @@ from lib.mekf import f  # noqa: E402
 class PropogationTest(unittest.TestCase):
 
     def test(self):
-        expect = array([[0.5931645151518956,0.5398640677185691,0.41906632470378713,0.42554207999942495]]).transpose()
+        expect = array([[0.5931645151518956, 0.42554207999942495, 0.5398640677185691, 0.41906632470378713]]).transpose()
         testing.assert_almost_equal(
             expect,
             f(
@@ -19,7 +19,3 @@ class PropogationTest(unittest.TestCase):
                 0.5
             )
         )
-
-
-x = PropogationTest()
-x.test()
