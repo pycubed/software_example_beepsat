@@ -44,6 +44,8 @@ class Satellite:
         self.c_state_err = 0
         self.c_boot = None
 
+        # magnetometer and accelerometer chosen to be arbitrary non zero, non parallel values
+        # to provide more interesting output from the b-cross controller.
         self._accel = [1.0, 2.0, 3.0]
         self._mag = [4.0, 3.0, 1.0]
         self._gyro = [0.0, 0.0, 0.0]
