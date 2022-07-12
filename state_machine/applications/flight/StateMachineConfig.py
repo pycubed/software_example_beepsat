@@ -3,8 +3,6 @@ from Tasks.beacon_task import task as beacon
 from Tasks.blink_task import task as blink
 from Tasks.imu_task import task as imu
 from Tasks.time_task import task as time
-from Tasks.lowpower5 import task as lowpower5
-from Tasks.lowpower5later import task as lowpower5later
 from Tasks.detumble import task as detumble
 from Tasks.radio import task as radio
 
@@ -16,8 +14,6 @@ TaskMap = {
     'Blink': blink,
     'IMU': imu,
     'Time': time,
-    'LowPower5': lowpower5,
-    'LowPower5Later': lowpower5later,
     'Detumble': detumble,
     'Radio': radio,
 }
@@ -76,16 +72,6 @@ config = {
                 'Priority': 1,
                 'ScheduleLater': False
             },
-            'LowPower5': {
-                'Interval': 5.0,
-                'Priority': 2,
-                'ScheduleLater': False
-            },
-            'LowPower5Later': {
-                'Interval': 15.0,
-                'Priority': 2,
-                'ScheduleLater': True
-            }
         },
         'StepsTo': ['Normal'],
         'EnterFunctions': ['Announcer', 'LowPowerOn'],
