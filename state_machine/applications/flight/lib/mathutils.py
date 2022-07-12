@@ -1,22 +1,37 @@
+from numpy import identity
+
+
 try:
-    from ulab.numpy import array, vstack
+    from ulab.numpy import array, block, ndarray
 except Exception:
-    from numpy import array, vstack
+    from numpy import array, block, ndarray
 
 def hat(v):
     """Converts v to a matrix such that hat(v)w = cross(w, v) = -cross(v, w)"""
-    return array([
-        [0, -v[2], v[1]],
-        [v[2], 0, -v[0]],
-        [-v[1], v[0], 0]]
-    )
+    print(v)
+    if not isinstance(v, ndarray):
+        v = array(v)
+    if v.shape == (3, 1):
+        return array([
+            [0,         -v[2][0],   v[1][0]],
+            [v[2][0],    0,        -v[0][0]],
+            [-v[1][0],   v[0][0],   0]])
+    elif v.shape == (3,):
+        return array([
+            [0, -v[2], v[1]],
+            [v[2], 0, -v[0]],
+            [-v[1], v[0], 0]])
+    else:
+        raise ValueError("v must be a 3x1 numpy array")
 
 def L(q):
     """Converts a scalar-first unit quaternion into the left-side matrix for quaternion multiplication"""
-    qs, qv = q[0], array([q[1:3]]).transpose()
+    qs, qv = q[0], array([q[1:4]]).transpose()
+    print("qs: ", qs, "qv: ", qv)
 
-    M = vstack()
-    # M = [qₛ -qᵥ'
-    # qᵥ qₛ*I(3)+hat(qᵥ)]
+    dr = qs * identity(3) + hat(qv)
+    M = block([
+        [qs,  -qv.transpose()],
+        [qv,  dr]])
 
-    return array([[1, 2, 3], [4, 5, 6]])
+    return M

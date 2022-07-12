@@ -23,16 +23,21 @@ class HatTests(unittest.TestCase):
                  [-0.4, 0.3,  0.0]]),
             hat([0.3, 0.4, 0.6])
         )
+        self.assertRaises(ValueError, hat, [1, 2, 3, 4])
 
 class LTests(unittest.TestCase):
 
     def test(self):
-        q = array([[0.692, -0.332,  0.499,  0.403]]).transpose()
+        q = array([0.692, -0.332,  0.499,  0.403])
         testing.assert_equal(
             array(
                 [[0.692,   0.332,  -0.499,  -0.403],
                  [-0.332,  0.692,  -0.403,   0.499],
-                 [0.499,   0.403,   0.692,   0.332]
+                 [0.499,   0.403,   0.692,   0.332],
                  [0.403,  -0.499,  -0.332,   0.692]]),
             L(q)
         )
+
+
+x = LTests()
+x.test()
