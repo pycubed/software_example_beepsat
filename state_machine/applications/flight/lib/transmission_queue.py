@@ -13,3 +13,7 @@ def pop():
 
 def empty():
     return len(queue) == 0
+
+def clear():
+    global queue
+    queue = []
