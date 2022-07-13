@@ -21,8 +21,6 @@ def f(q, β, ω, δt):
     """State propogation function"""
     θ = linalg.norm(ω - β) * δt
     r = (ω - β) / linalg.norm(ω - β)
-    print(L(q))
-    print(block([[cos(θ / 2)], [r * sin(θ / 2)]]))
     return matmul(L(q), block([[cos(θ / 2)], [r * sin(θ / 2)]]))
 
 # function step(
