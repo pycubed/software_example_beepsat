@@ -4,6 +4,7 @@ except Exception:
     from numpy import identity, array, linalg, cross, matmul, isfinite, all
 
 from lib.template_task import Task
+import time
 
 def bcross(b, ω, k=7e-4):
     b = (array(b))
@@ -17,6 +18,9 @@ def bcross(b, ω, k=7e-4):
         return m
     return [0, 0, 0]
 
+def toStr(arr):
+    return f'[{", ".join(map(str, arr))}]'
+
 class task(Task):
     name = 'detumble'
     color = 'pink'
@@ -24,8 +28,9 @@ class task(Task):
     rgb_on = False
 
     async def main_task(self):
-        b = (array(self.cubesat.magnetic))
         m = bcross(self.cubesat.magnetic, self.cubesat.gyro)
 
-        self.debug(f'Detumbling with magnetorquer set to {m}')
-        self.debug(f'M = m x b = {cross(m, b)}')
+        # replace with calls to pycubed lib once it is ready
+        if hasattr(self.cubesat, 'sim') and self.cubesat.sim:  # detects if we are hooked up to simulator
+            print(f">>>m{toStr(m)}")
+            print(f">>>t{time.monotonic_ns()}")
