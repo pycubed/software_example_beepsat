@@ -1,7 +1,8 @@
 Usage
 =====
 
-.. _installation:
+.. _Dependencies:
+.. _Building:
 
 Dependencies 
 ------------
