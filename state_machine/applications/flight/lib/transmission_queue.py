@@ -1,9 +1,13 @@
 import lib.priority_queue as pq
 
 queue = []
+limit = 100
 
 def push(msg):
-    pq.push(queue, msg)
+    if len(queue) < limit:
+        pq.push(queue, msg)
+    else:
+        raise Exception("Queue is full")
 
 def peek():
     return queue[0]
@@ -13,3 +17,7 @@ def pop():
 
 def empty():
     return len(queue) == 0
+
+def clear():
+    global queue
+    queue = []

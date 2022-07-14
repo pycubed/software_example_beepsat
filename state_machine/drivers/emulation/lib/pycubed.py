@@ -1,6 +1,7 @@
 import time
 import tasko
 
+import lib.reader as reader
 
 class Radio:
     def __init__(self):
@@ -34,7 +35,7 @@ class Radio:
         return True
 
 
-class Sattelite:
+class Satellite:
     tasko = None
 
     def __init__(self):
@@ -49,22 +50,33 @@ class Sattelite:
         self.c_state_err = 0
         self.c_boot = None
 
+        # magnetometer and accelerometer chosen to be arbitrary non zero, non parallel values
+        # to provide more interesting output from the b-cross controller.
+        self._accel = [1.0, 2.0, 3.0]
+        self._mag = [4.0, 3.0, 1.0]
+        self._gyro = [0.0, 0.0, 0.0]
+        self._torque = [0, 0, 0]
+        self.sim = False
+
     def new_file(self, substring, binary=False):
         print(
-            f"new file not implemented, {substring} not written with binary={binary}")
+            f"new file not implemented, string not written with binary={binary}")
         return None
 
     @property
     def acceleration(self):
-        return (0.0, 0.0, 0.0)
+        reader.read(self)
+        return self._accel
 
     @property
     def magnetic(self):
-        return (0.8, 0.3, -0.3)
+        reader.read(self)
+        return self._mag
 
     @property
     def gyro(self):
-        return (0.3, 0.0, 0.6)
+        reader.read(self)
+        return self._gyro
 
     def log(self, str):
         """Logs to sd card"""
@@ -72,4 +84,4 @@ class Sattelite:
         print(f'log not implemented, tried to log: {str}')
 
 
-pocketqube = Sattelite()
+pocketqube = Satellite()

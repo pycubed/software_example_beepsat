@@ -53,7 +53,7 @@ config = {
                 'ScheduleLater': False
             },
             'Detumble': {
-                'Interval': 5.0,
+                'Interval': 0.1,
                 'Priority': 3,
                 'ScheduleLater': False
             },
