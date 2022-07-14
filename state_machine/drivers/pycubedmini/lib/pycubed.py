@@ -232,7 +232,7 @@ class Satellite:
         try:
             # may need to fix i2c addresses
             # schematic says U7 -> 0xC4 and 0xC5 but these vals are 8 bit instead of 7
-            drv_x = drv8830.DRV8830(self.i2c1, 0x68)  # U6
+            drv_x = drv8830.DRV8830(self.i2c1, 0x68)  # U7
             coil_drivers.append(drv_x)
             self.hardware['Coil X'] = True
         except Exception as e:
@@ -240,7 +240,7 @@ class Satellite:
 
         try:
             # may need to fix i2c addresses
-            # schematic says U7 -> 0xD0 and 0xD1 but these vals are 8 bit instead of 7
+            # schematic says U8 -> 0xD0 and 0xD1 but these vals are 8 bit instead of 7
             drv_y = drv8830.DRV8830(self.i2c1, 0x60)  # U8
             coil_drivers.append(drv_y)
             self.hardware['Coil Y'] = True
@@ -249,8 +249,8 @@ class Satellite:
 
         try:
             # may need to fix i2c addresses
-            # schematic says U7 -> 0xC0 and 0xC1 but these vals are 8 bit instead of 7
-            drv_z = drv8830.DRV8830(self.i2c1, 0x62)  # U4
+            # schematic says U9 -> 0xC0 and 0xC1 but these vals are 8 bit instead of 7
+            drv_z = drv8830.DRV8830(self.i2c1, 0x62)  # U9
             coil_drivers.append(drv_z)
             self.hardware['Coil Z'] = True
         except Exception as e:
