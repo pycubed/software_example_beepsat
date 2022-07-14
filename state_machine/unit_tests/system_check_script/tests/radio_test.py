@@ -2,18 +2,10 @@
 Python system check script for PyCubed satellite board
 PyCubed Mini mainboard-v02 for Pocketqube Mission
 Radio Test
-* Author(s): Yashika Batra
+* Author(s): Aleksei Seletskiy, Yashika Batra
 """
 
-HEADER = '\033[95m'
-OKBLUE = '\033[94m'
-OKCYAN = '\033[96m'
-OKGREEN = '\033[92m'
-WARNING = '\033[93m'
-FAIL = '\033[91m'
-ENDC = '\033[0m'
-BOLD = '\033[1m'
-UNDERLINE = '\033[4m'
+import pycubed
 
 ANTENNA_ATTACHED = False
 
@@ -28,31 +20,30 @@ async def radio_test(cubesat, result_dict, testidx):
         success = False
         success_count = 0
 
-        print("Transmission and Reception Test: \
-            Sending Message and Awaiting Groundstation Response (25s)")
+        print("Transmission and Reception Test: " +
+              "Sending Message and Awaiting Groundstation Response (25s)")
 
         for i in range(attempts):
             # send beacon text and keep listening
-            cubesat.radio.send(send_text, keep_listening=True)
+            pycubed.send(send_text, keep_listening=True)
 
             # await a response for 5 seconds
-            heard_something = await cubesat.radio.await_rx(timeout=5.0)
+            heard_something = await pycubed.await_rx(timeout=5.0)
 
             if heard_something:
                 # get response
-                response = cubesat.radio.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED)
+                response = pycubed.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED)
                 response_text = str(response, "ascii")
-                # print("packet received: \"" + response_text + "\"")
 
                 # if the response is correct, print an acknowledgement
                 if response_text == receive_text:
                     success_count += 1
                     success = True
                     print("Attempt", str(i + 1) + ": Received \"" + response_text + "\"")
-                else:
-                    print("Attempt", str(i + 1) + ": Received \"" + response_text + "\", \
-                        Expected \"" + receive_text + "\"")
-            else:
+                else:  # else print an acknowledgement
+                    print("Attempt", str(i + 1) + ": Received \"" + response_text +
+                          "\", Expected \"" + receive_text + "\"")
+            else:  # if no packet received, print an acknowledement
                 print("Attempt", str(i + 1) + ": Did not receive \"" + receive_text + "\"")
 
         return success, success_count, attempts
@@ -64,11 +55,11 @@ async def radio_test(cubesat, result_dict, testidx):
         print("Reception Test: Awaiting Groundstation Message (25s)")
         for i in range(attempts):
             # await a response for 5 seconds
-            heard_something = await cubesat.radio.await_rx(timeout=5.0)
+            heard_something = await pycubed.await_rx(timeout=5.0)
 
             if heard_something:
                 # get response
-                response = cubesat.radio.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED)
+                response = pycubed.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED)
                 response_text = str(response, "ascii")
 
                 # if the response is correct, print an acknowledgement
@@ -76,10 +67,10 @@ async def radio_test(cubesat, result_dict, testidx):
                     receive_count += 1
                     receive_success = True
                     print("Attempt", str(i + 1) + ": Received \"" + response_text + "\"")
-                else:
-                    print("Attempt", str(i + 1) + ": Received \"" + response_text + "\", \
-                        Expected \"" + receive_text + "\"")
-            else:
+                else:  # else print an acknowledgement
+                    print("Attempt", str(i + 1) + ": Received \"" + response_text +
+                          "\", Expected \"" + receive_text + "\"")
+            else:  # if no packet received, print an acknowledement
                 print("Attempt", str(i + 1) + ": Did not receive \"" + receive_text + "\"")
         return receive_success, receive_count, attempts
 
@@ -90,14 +81,15 @@ async def radio_test(cubesat, result_dict, testidx):
         print("Transmission Test: Sending Message to Groundstation (25s)")
         for i in range(attempts):
             # send beacon text and keep listening
-            cubesat.radio.send(send_text, keep_listening=True)
+            pycubed.send(send_text, keep_listening=True)
 
-            message_sent = input("Does the groundstation confirm reception? (Y/N)")
+            # if the message is sent correctly, print an acknowledgement
+            message_sent = input("Does the groundstation confirm correct reception? (Y/N)")
             if message_sent == "Y":
                 send_success = True
                 send_count += 1
                 print("Attempt", str(i + 1) + ": Sent \"" + send_text + "\"")
-            else:
+            else:  # else print an acknowledgement
                 print("Attempt", str(i + 1) + ": Did not send \"" + send_text + "\"")
 
         return send_success, send_count, attempts
@@ -126,13 +118,13 @@ def run(cubesat, hardware_dict, result_dict, antenna_attached):
 
         # if the test fails
         if not result:
-            # individually test reception
+            # individually test reception and update result dict
             receive_result, receive_count, receive_attempts = radio_test(cubesat, result_dict, "Receive")
             receive_val_string = ("Succeeded in receiving message" + str(receive_count) +
                                   "/" + str(receive_attempts) + " times.")
             result_dict['Radio_Receive_Beacon'] = (receive_val_string, receive_result)
 
-            # individually test transmission
+            # individually test transmission and update result dict
             send_result, send_count, send_attempts = radio_test(cubesat, result_dict, "Send")
             send_val_string = ("Succeeded in sending message" + str(send_count) +
                                "/" + str(send_attempts) + " times.")

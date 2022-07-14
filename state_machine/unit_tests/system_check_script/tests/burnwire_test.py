@@ -32,13 +32,14 @@ def user_test(burnnum, burnwire, vlevel):
     time.sleep(multimeter_wait_time)
 
     # conduct the test
-    print("Please read the voltage between the ground pin (GND) and burnwire pin on the -Z solar board. \
-        Waiting", str(burn_time), "seconds.")
+    print("Please read the voltage between the ground pin (GND) and burnwire pin on the -Z solar board.")
+    print("Waiting", str(burn_time), "seconds.")
     burnwire.duty_cycle = dutycycle
     time.sleep(burn_time)
     burnwire.duty_cycle = 0
 
     # gather input and return results
+    print("Burnwire Test Complete")
     actual_voltage = float(input("Please enter the voltage you recorded: "))
     return projected_voltage, actual_voltage
 
@@ -58,7 +59,7 @@ def voltage_levelx(cubesat, result_dict, vnum, burnnum):
         burnwire = cubesat.burnwire2
     else:
         print("Not a valid burnwire.")
-        exit()
+        return result_dict
 
     # choose a voltage level or exit
     vlevel = 0
@@ -70,7 +71,7 @@ def voltage_levelx(cubesat, result_dict, vnum, burnnum):
         vlevel = v3
     else:
         print("Not a valid voltage level option.")
-        exit()
+        return result_dict
 
     # set string constant
     result_key = 'Burnwire' + str(burnnum) + '_Volt' + str(vlevel)
@@ -93,12 +94,12 @@ def voltage_levelx(cubesat, result_dict, vnum, burnnum):
 def run(cubesat, hardware_dict, result_dict):
     # if no Burn Wire 1 detected, update result dictionary
     if not hardware_dict['Burn Wire 1']:
-        result_dict['Burnwire1_Volt1'] = ('Cannot test burnwire \
-            1 at ' + v1 + '; no burnwire 1 detected', False)
-        result_dict['Burnwire1_Volt2'] = ('Cannot test burnwire \
-            1 at ' + v2 + '; no burnwire 1 detected', False)
-        result_dict['Burnwire1_Volt3'] = ('Cannot test burnwire \
-            1 at ' + v3 + '; no burnwire 1 detected', False)
+        result_dict['Burnwire1_Volt1'] = ('Cannot test burnwire 1 at ' +
+                                          v1 + '; no burnwire 1 detected', False)
+        result_dict['Burnwire1_Volt2'] = ('Cannot test burnwire 1 at ' +
+                                          v2 + '; no burnwire 1 detected', False)
+        result_dict['Burnwire1_Volt3'] = ('Cannot test burnwire 1 at ' +
+                                          v3 + '; no burnwire 1 detected', False)
     else:  # Burn Wire 1 detected, run tests
         voltage_levelx(cubesat, result_dict, 1, 1)
         voltage_levelx(cubesat, result_dict, 2, 1)
@@ -106,12 +107,12 @@ def run(cubesat, hardware_dict, result_dict):
 
     # if no Burn Wire 2 detected, update result dictionary
     if not hardware_dict['Burn Wire 2']:
-        result_dict['Burnwire1_Volt1'] = ('Cannot test burnwire \
-            2 at ' + v1 + '; burnwire 2 integrated circuit is not set up', False)
-        result_dict['Burnwire1_Volt2'] = ('Cannot test burnwire \
-            2 at ' + v2 + '; burnwire 2 integrated circuit is not set up', False)
-        result_dict['Burnwire1_Volt3'] = ('Cannot test burnwire \
-            2 at ' + v3 + '; burnwire 2 integrated circuit is not set up', False)
+        result_dict['Burnwire1_Volt1'] = ('Cannot test burnwire 2 at ' + v1 +
+                                          '; burnwire 2 integrated circuit is not set up', False)
+        result_dict['Burnwire1_Volt2'] = ('Cannot test burnwire 2 at ' + v2 +
+                                          '; burnwire 2 integrated circuit is not set up', False)
+        result_dict['Burnwire1_Volt3'] = ('Cannot test burnwire 2 at ' + v3 +
+                                          '; burnwire 2 integrated circuit is not set up', False)
     else:  # Burn Wire 2 detected, run tests
         voltage_levelx(cubesat, result_dict, 1, 2)
         voltage_levelx(cubesat, result_dict, 2, 2)

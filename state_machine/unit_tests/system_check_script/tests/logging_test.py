@@ -5,6 +5,8 @@ SD Card Logging Test
 * Author(s): Yashika Batra
 """
 
+# copy and paste logging functions and use them
+
 def run(cubesat, hardware_dict, result_dict):
     # if no SD Card detected, update result dictionary and return
     if not hardware_dict['SDcard']:
