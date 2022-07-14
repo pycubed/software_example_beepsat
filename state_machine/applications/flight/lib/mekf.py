@@ -2,11 +2,12 @@
 # Based on Zac Manchester's Formulation
 # Writen by Aleksei Seletskiy
 try:
-    from numpy import linalg, block, dot as matmul
+    from ulab.numpy import block, matmul, identity
+    import ulab.linalg as linalg
 except Exception:
-    from ulab.numpy import linalg, block, matmul
-from lib.mathutils import L
-from math import cos, sin
+    from numpy import linalg, block, dot as matmul, identity
+from lib.mathutils import L, hat
+from math import cos, e, sin
 
 q = []  # Quaternion attitude vector
 β = []  # Gyro bias vector
@@ -23,6 +24,21 @@ def f(q, β, ω, δt):
     r = (ω - β) / linalg.norm(ω - β)
     return matmul(L(q), block([[cos(θ / 2)], [r * sin(θ / 2)]]))
 
+def step(
+    ω,
+    δt,
+    nr_mag,
+    nr_sun,
+    br_mag,
+    br_sun
+):
+    W = identity(6) * 1e-6
+    V = identity(6) * 1e-6
+    # Predict
+    q_p = f(q, β, ω, δt)  # β remains constant
+    # need from scipy.linalg import expm
+    R = linalg.matrix_power(-hat(ω - β) * δt, e)
+    pass
 # function step(
 #     e::EKF,
 #     ω::Vector{Float64},
