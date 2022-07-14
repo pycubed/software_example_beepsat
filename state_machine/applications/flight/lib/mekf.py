@@ -2,9 +2,10 @@
 # Based on Zac Manchester's Formulation
 # Writen by Aleksei Seletskiy
 try:
-    from numpy import linalg, block, dot as matmul
+    from ulab.numpy import block, matmul, identity
+    import ulab.linalg as linalg
 except Exception:
-    from ulab.numpy import linalg, block, matmul
+    from numpy import linalg, block, dot as matmul, identity
 from lib.mathutils import L
 from math import cos, sin
 
