@@ -2,12 +2,12 @@
 # Based on Zac Manchester's Formulation
 # Writen by Aleksei Seletskiy
 try:
-    from ulab.numpy import block, matmul, identity
+    from ulab.numpy import block, matmul, identity, zeros
     import ulab.linalg as linalg
 except Exception:
-    from numpy import linalg, block, dot as matmul, identity
+    from numpy import linalg, block, dot as matmul, identity, zeros
 from lib.mathutils import L, hat
-from math import cos, e, sin
+from math import cos, sin
 
 q = []  # Quaternion attitude vector
 β = []  # Gyro bias vector
@@ -32,13 +32,28 @@ def step(
     br_mag,
     br_sun
 ):
+    global q
+    global β
+    global P
+
     W = identity(6) * 1e-6
     V = identity(6) * 1e-6
     # Predict
     q_p = f(q, β, ω, δt)  # β remains constant
-    # need from scipy.linalg import expm
-    R = linalg.matrix_power(-hat(ω - β) * δt, e)
-    pass
+
+    # The following is equivalent to:
+    # R = exp(-hat(ω-β) * δt)
+    v = - (ω - β)
+    mag = linalg.norm(v)
+    v̂   = hat(v / mag)
+    R = identity(3) + (v̂) * sin(mag * δt) + (matmul(v̂, v̂)) * (1 - cos(mag * δt))
+
+    A = block([
+        [R,              (-δt * identity(3))],
+        [zeros((3, 3)),  identity(3)]])
+    P = matmul(A, matmul(P, A.tranpose())) + W
+
+    # Innovation
 # function step(
 #     e::EKF,
 #     ω::Vector{Float64},
