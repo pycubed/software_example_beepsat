@@ -2,10 +2,9 @@
 # Based on Zac Manchester's Formulation
 # Writen by Aleksei Seletskiy
 try:
-    from ulab.numpy import dot as matmul, identity as I, zeros, array  # noqa: E741 (I is not ambiguous)
-    import ulab.linalg as linalg
+    from ulab.numpy import dot as matmul, eye as I, zeros, array, linalg  # noqa: E741 (I is not ambiguous)
 except Exception:
-    from numpy import linalg, matmul, identity as I, zeros, array  # noqa: E741 (I is not ambiguous)
+    from numpy import linalg, matmul, eye as I, zeros, array  # noqa: E741 (I is not ambiguous)
 from lib.mathutils import Left, hat, block
 from math import cos, sin
 

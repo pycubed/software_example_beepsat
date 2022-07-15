@@ -1,7 +1,7 @@
 try:
-    from ulab.numpy import array, ndarray, zeros, identity as I
+    from ulab.numpy import array, ndarray, zeros, eye as I  # noqa: E741 (I is not ambiguous)
 except Exception:
-    from numpy import array, ndarray, zeros, identity as I
+    from numpy import array, ndarray, zeros, eye as I  # noqa: E741 (I is not ambiguous)
 
 def block(S):
     w = 0
@@ -52,7 +52,7 @@ def Left(q):
 
     dr = qs * I(3) + hat(qv)
     M = block(
-        [[array([[qs]]),  -qv.transpose()],
+        [[array([qs]),  -qv.transpose()],
          [qv,              dr]])
 
     return M
