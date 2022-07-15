@@ -35,9 +35,9 @@ def hat(v):
             [-v[1][0],   v[0][0],   0]])
     elif v.shape == (3,):
         return array([
-            [0, -v[2], v[1]],
-            [v[2], 0, -v[0]],
-            [-v[1], v[0], 0]])
+            [0,      -v[2],   v[1]],
+            [v[2],    0,     -v[0]],
+            [-v[1],   v[0],   0]])
     else:
         raise ValueError("v must be a 3x1 numpy array")
 
@@ -53,6 +53,6 @@ def Left(q):
     dr = qs * I(3) + hat(qv)
     M = block(
         [[array([[qs]]),  -qv.transpose()],
-         [qv,            dr]])
+         [qv,              dr]])
 
     return M
