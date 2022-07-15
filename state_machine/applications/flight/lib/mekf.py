@@ -8,14 +8,9 @@ except Exception:
 from lib.mathutils import Left, hat, block
 from math import cos, sin
 
-q = []  # Quaternion attitude vector
-β = []  # Gyro bias vector
-P = [[]]  # Covariance matrix
-# mutable struct EKF
-#     q::Vector{Float64}
-#     β::Vector{Float64}
-#     P::Matrix{Float64}
-# end
+q = array([[0], [0], [0]])  # Quaternion attitude vector
+β = array([[0], [0], [0]])  # Gyro bias vector
+P = I(6)  # Covariance matrix
 
 def f(q, β, ω, δt):
     """State propogation function"""
