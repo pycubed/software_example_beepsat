@@ -1,7 +1,7 @@
 class Message:
     def __init__(self, priority, str):
         self.priority = priority
-        self.str = bytes(str, 'utf-8')
+        self.str = bytes(str, 'ascii')
 
     def packet(self):
         """Returns the byte representation of the message, and if it should be sent with or without ack."""
