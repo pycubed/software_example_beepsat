@@ -52,7 +52,7 @@ def Left(q):
 
     dr = qs * I(3) + hat(qv)
     M = block(
-        [[array([qs]),  -qv.transpose()],
-         [qv,              dr]])
+        [[array([[qs]]),  -qv.transpose()],
+         [qv,            dr]])
 
     return M
