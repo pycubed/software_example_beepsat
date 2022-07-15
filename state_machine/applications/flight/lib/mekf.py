@@ -79,19 +79,19 @@ def step(
     δβ = δx[4:6]
     θ = linalg.norm(ϕ)
     r = ϕ / θ
-    qᵤ = matmul(Left(q_p), block([[array([[cos(θ / 2)]])],
+    q_u = matmul(Left(q_p), block([[array([[cos(θ / 2)]])],
                                   [r * sin(θ / 2)]]))
-    βᵤ = β + δβ
+    β_u = β + δβ
     e1 = (I(6) - matmul(L, C))                # I(6) - LC
     e2 = (I(6) - matmul(L, C)).transpose()    # (I(6) - LC)'
     e3 = matmul(e1, matmul(P_p, e2))          # e1 * P_p * e2
     e4 = matmul(L, matmul(V, L.transpose()))  # LVL'
-    Pᵤ = e3 + e4
+    P_u = e3 + e4
     # Pᵤ = (I(6) - LC) * Pₚ * (I(6) - LC)' + LVL'
 
-    q = qᵤ
-    β = βᵤ
-    P = Pᵤ
+    q = q_u
+    β = β_u
+    P = P_u
 
 
 # function step(
