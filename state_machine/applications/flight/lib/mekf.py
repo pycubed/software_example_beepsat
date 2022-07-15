@@ -2,10 +2,10 @@
 # Based on Zac Manchester's Formulation
 # Writen by Aleksei Seletskiy
 try:
-    from ulab.numpy import matmul, identity as I, zeros, array  # noqa: E741 (I is not ambiguous)
+    from ulab.numpy import dot as matmul, identity as I, zeros, array  # noqa: E741 (I is not ambiguous)
     import ulab.linalg as linalg
 except Exception:
-    from numpy import linalg, dot as matmul, identity as I, zeros, array  # noqa: E741 (I is not ambiguous)
+    from numpy import linalg, matmul, identity as I, zeros, array  # noqa: E741 (I is not ambiguous)
 from lib.mathutils import Left, hat, block
 from math import cos, sin
 
@@ -22,8 +22,8 @@ def f(q, β, ω, δt):
     """State propogation function"""
     θ = linalg.norm(ω - β) * δt
     r = (ω - β) / linalg.norm(ω - β)
-    return Left(q) @ block([[array([[cos(θ / 2)]])],
-                            [r * sin(θ / 2)]])
+    return matmul(Left(q), block([[array([[cos(θ / 2)]])],
+                                  [r * sin(θ / 2)]]))
 
 def step(
     ω,
@@ -47,12 +47,12 @@ def step(
     v = - (ω - β)
     mag = linalg.norm(v)
     v̂   = hat(v / mag)
-    R = I(3) + (v̂) * sin(mag * δt) + (v̂ @ v̂) * (1 - cos(mag * δt))
+    R = I(3) + (v̂) * sin(mag * δt) + matmul(v̂, v̂) * (1 - cos(mag * δt))
 
     A = block([
         [R,              (-δt * I(3))],
         [zeros((3, 3)),  I(3)]])
-    P_p = (A @ P @ A.tranpose()) + W
+    P_p = matmul(A, matmul(P, A.tranpose())) + W
 
     # Innovation
 
@@ -63,7 +63,7 @@ def step(
                                    [nr_sun]])
     inertial_to_body = block([[Q,            zeros(3, 3)],
                               [zeros(3, 3),  Q]])
-    Z = body_measurements - inertial_to_body @ inertial_measurements
+    Z = body_measurements - matmul(inertial_to_body, inertial_measurements)
     C = block([[hat(ᵇr_mag), zeros(3, 3)],
                [hat(ᵇr_sun), zeros(3, 3)]])
     S = C * P_p * C.transpose() + V
@@ -79,10 +79,15 @@ def step(
     δβ = δx[4:6]
     θ = linalg.norm(ϕ)
     r = ϕ / θ
-    qᵤ = Left(q_p) @ block([[array([[cos(θ / 2)]])],
-                            [r * sin(θ / 2)]])
+    qᵤ = matmul(Left(q_p), block([[array([[cos(θ / 2)]])],
+                                  [r * sin(θ / 2)]]))
     βᵤ = β + δβ
-    Pᵤ = (I(6) - L @ C) @ P_p @ (I(6) - L @ C).transpose() + L @ V @ L.transpose()
+    e1 = (I(6) - matmul(L, C))                # I(6) - LC
+    e2 = (I(6) - matmul(L, C)).transpose()    # (I(6) - LC)'
+    e3 = matmul(e1, matmul(P_p, e2))          # e1 * P_p * e2
+    e4 = matmul(L, matmul(V, L.transpose()))  # LVL'
+    Pᵤ = e3 + e4
+    # Pᵤ = (I(6) - LC) * Pₚ * (I(6) - LC)' + LVL'
 
     q = qᵤ
     β = βᵤ
