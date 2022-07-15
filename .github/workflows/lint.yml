@@ -1,12 +1,10 @@
 name: Lint
 
 on:
-  # Trigger the workflow on push or pull request,
+  # Trigger the workflow on all pull requests, and pushes to main
   push:
     branches:
-      - '*'         # matches every branch that doesn't contain a '/'
-      - '*/*'       # matches every branch containing a single '/'
-      - '**'        # matches every branch
+      - 'main'
   pull_request:
     branches:
       - '*'         # matches every branch that doesn't contain a '/'
