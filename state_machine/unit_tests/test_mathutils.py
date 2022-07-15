@@ -1,6 +1,6 @@
 import unittest
 import sys
-from numpy import testing, array
+from numpy import testing, array, zeros, eye, ones
 
 sys.path.insert(0, './state_machine/applications/flight')
 
@@ -45,6 +45,18 @@ class blockTests(unittest.TestCase):
                    [3, 3, 4],
                    [3, 3, 4]])
         )
+        a = zeros((2, 3))
+        b = eye(2) * 2
+        c = eye(3) * 5
+        d = ones((3, 2))
+        testing.assert_equal(
+            block([[a, b], [c, d]]),
+            array([[0, 0, 0, 2, 0],
+                   [0, 0, 0, 0, 2],
+                   [5, 0, 0, 1, 1],
+                   [0, 5, 0, 1, 1],
+                   [0, 0, 5, 1, 1]])
+        )
 
 class LeftTests(unittest.TestCase):
 
@@ -67,3 +79,7 @@ class LeftTests(unittest.TestCase):
                  [0.5,  -0.5,   0.5,   0.5]]),
             Left(q)
         )
+
+
+x = blockTests()
+x.test()

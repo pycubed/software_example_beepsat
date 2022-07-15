@@ -4,12 +4,8 @@ except Exception:
     from numpy import array, ndarray, zeros, eye as I  # noqa: E741 (I is not ambiguous)
 
 def block(S):
-    w = 0
-    h = 0
-    for m in S[0]:
-        w += len(m[0])  # Take width of each element in first row
-    for row in S:
-        h += len(row[0])  # Take heigh of element in first column
+    w = sum([len(m[0]) for m in S[0]])
+    h = sum([len(row[0]) for row in S])
     M = zeros((h, w))
     i = 0
     j = 0
