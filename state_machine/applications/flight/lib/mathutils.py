@@ -1,10 +1,7 @@
-from numpy import identity
-
-
 try:
-    from ulab.numpy import array, ndarray, zeros
+    from ulab.numpy import array, ndarray, zeros, identity as I
 except Exception:
-    from numpy import array, ndarray, zeros
+    from numpy import array, ndarray, zeros, identity as I
 
 def block(S):
     w = 0
@@ -44,7 +41,7 @@ def hat(v):
     else:
         raise ValueError("v must be a 3x1 numpy array")
 
-def L(q):
+def Left(q):
     """Converts a scalar-first unit quaternion into the left-side matrix for quaternion multiplication"""
     if not isinstance(q, ndarray):
         q = array([q])
@@ -53,7 +50,7 @@ def L(q):
     elif q.shape == (4, 1):
         qs, qv = q[0], q[1:4]
 
-    dr = qs * identity(3) + hat(qv)
+    dr = qs * I(3) + hat(qv)
     M = block(
         [[array([[qs]]),  -qv.transpose()],
          [qv,              dr]])

@@ -2,11 +2,11 @@
 # Based on Zac Manchester's Formulation
 # Writen by Aleksei Seletskiy
 try:
-    from ulab.numpy import block, matmul, identity, zeros
+    from ulab.numpy import matmul, identity as I, zeros, array  # noqa: E741 (I is not ambiguous)
     import ulab.linalg as linalg
 except Exception:
-    from numpy import linalg, block, dot as matmul, identity, zeros
-from lib.mathutils import L, hat
+    from numpy import linalg, dot as matmul, identity as I, zeros, array  # noqa: E741 (I is not ambiguous)
+from lib.mathutils import Left, hat, block
 from math import cos, sin
 
 q = []  # Quaternion attitude vector
@@ -22,7 +22,8 @@ def f(q, β, ω, δt):
     """State propogation function"""
     θ = linalg.norm(ω - β) * δt
     r = (ω - β) / linalg.norm(ω - β)
-    return matmul(L(q), block([[cos(θ / 2)], [r * sin(θ / 2)]]))
+    return Left(q) @ block([[array([[cos(θ / 2)]])],
+                            [r * sin(θ / 2)]])
 
 def step(
     ω,
@@ -36,8 +37,8 @@ def step(
     global β
     global P
 
-    W = identity(6) * 1e-6
-    V = identity(6) * 1e-6
+    W = I(6) * 1e-6
+    V = I(6) * 1e-6
     # Predict
     q_p = f(q, β, ω, δt)  # β remains constant
 
@@ -46,14 +47,48 @@ def step(
     v = - (ω - β)
     mag = linalg.norm(v)
     v̂   = hat(v / mag)
-    R = identity(3) + (v̂) * sin(mag * δt) + (matmul(v̂, v̂)) * (1 - cos(mag * δt))
+    R = I(3) + (v̂) * sin(mag * δt) + (v̂ @ v̂) * (1 - cos(mag * δt))
 
     A = block([
-        [R,              (-δt * identity(3))],
-        [zeros((3, 3)),  identity(3)]])
-    P = matmul(A, matmul(P, A.tranpose())) + W
+        [R,              (-δt * I(3))],
+        [zeros((3, 3)),  I(3)]])
+    P_p = (A @ P @ A.tranpose()) + W
 
     # Innovation
+
+    Q = Left(q_p).transpose()
+    body_measurements = block([[br_mag],
+                               [br_sun]])
+    inertial_measurements = block([[nr_mag],
+                                   [nr_sun]])
+    inertial_to_body = block([[Q,            zeros(3, 3)],
+                              [zeros(3, 3),  Q]])
+    Z = body_measurements - inertial_to_body @ inertial_measurements
+    C = block([[hat(ᵇr_mag), zeros(3, 3)],
+               [hat(ᵇr_sun), zeros(3, 3)]])
+    S = C * P_p * C.transpose() + V
+
+    # Kalman Gain
+
+    L = P_p * C.transpose() * linalg.inv(S)
+
+    # Update
+
+    δx = L * Z
+    ϕ = δx[1:3]
+    δβ = δx[4:6]
+    θ = linalg.norm(ϕ)
+    r = ϕ / θ
+    qᵤ = Left(q_p) @ block([[array([[cos(θ / 2)]])],
+                            [r * sin(θ / 2)]])
+    βᵤ = β + δβ
+    Pᵤ = (I(6) - L @ C) @ P_p @ (I(6) - L @ C).transpose() + L @ V @ L.transpose()
+
+    q = qᵤ
+    β = βᵤ
+    P = Pᵤ
+
+
 # function step(
 #     e::EKF,
 #     ω::Vector{Float64},

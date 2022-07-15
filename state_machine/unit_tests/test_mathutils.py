@@ -4,7 +4,7 @@ from numpy import testing, array
 
 sys.path.insert(0, './state_machine/applications/flight')
 
-from lib.mathutils import hat, L, block  # noqa: E402
+from lib.mathutils import hat, Left, block  # noqa: E402
 
 class HatTests(unittest.TestCase):
 
@@ -46,7 +46,7 @@ class blockTests(unittest.TestCase):
                    [3, 3, 4]])
         )
 
-class LTests(unittest.TestCase):
+class LeftTests(unittest.TestCase):
 
     def test(self):
         q = array([0.692, -0.332,  0.499,  0.403])
@@ -56,7 +56,7 @@ class LTests(unittest.TestCase):
                  [-0.332,  0.692,  -0.403,   0.499],
                  [0.499,   0.403,   0.692,   0.332],
                  [0.403,  -0.499,  -0.332,   0.692]]),
-            L(q)
+            Left(q)
         )
         q = array([[0.5, 0.5, 0.5, 0.5]]).transpose()
         testing.assert_equal(
@@ -65,5 +65,5 @@ class LTests(unittest.TestCase):
                  [0.5,   0.5,  -0.5,   0.5],
                  [0.5,   0.5,   0.5,  -0.5],
                  [0.5,  -0.5,   0.5,   0.5]]),
-            L(q)
+            Left(q)
         )
