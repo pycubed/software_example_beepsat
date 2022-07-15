@@ -10,6 +10,7 @@ import pycubed_rfm9x
 import board
 import microcontroller
 import busio
+import time
 import digitalio
 import analogio
 import storage
@@ -55,7 +56,7 @@ class Satellite:
     def __init__(self):
         """ Big init routine as the whole board is brought up. """
         self._stat = {}
-        self.BOOTTIME = const(self.timeon)
+        self.BOOTTIME = const(int(time.monotonic()))
         self.hardware = {
             'I2C1': False,
             'I2C2': False,
