@@ -24,8 +24,168 @@ import adafruit_tsl2561
 import time
 
 
+"""
+IMU-related functions
+"""
+
+def acceleration():
+    """ return the accelerometer reading from the IMU """
+    return _cubesat.IMU.accel
+
+def magnetic():
+    """ return the magnetometer reading from the IMU """
+    return _cubesat.IMU.mag
+
+def gyro():
+    """ return the gyroscope reading from the IMU """
+    return _cubesat.IMU.gyro
+
+def temperature_imu():
+    """ return the thermometer reading from the IMU """
+    return _cubesat.IMU.temperature  # Celsius
+
+
+"""
+Burnwire-related functions
+"""
+
+def burn(burn_num='1', dutycycle=0, freq=1000, duration=1):
+    """
+    control the burnwire(s)
+    initialize with burn_num = '1' ; burnwire 2 IC is not set up
+    """
+    # BURN1 = -Z,BURN2 = extra burnwire pin, dutycycle ~0.13%
+    dtycycl = int((dutycycle / 100) * (0xFFFF))
+
+    # print configuration information
+    print('----- BURN WIRE CONFIGURATION -----')
+    print(f'\tFrequency of: {freq}Hz')
+    print(f'\tDuty cycle of: {100 * dtycycl / 0xFFFF}% (int:{dtycycl})')
+    print(f'\tDuration of {duration}sec')
+
+    # initialize burnwire based on the burn_num passed to the function
+    if '1' in burn_num:
+        burnwire = _cubesat.burnwire1
+    elif '2' in burn_num:
+        return False  # return False because burnwire 2 IC is not set up
+        # burnwire = self.burnwire2
+    else:
+        return False
+
+    set_RGB(255, 0, 0)  # set RGB to red
+
+    # set the burnwire's dutycycle; begins the burn
+    burnwire.duty_cycle = dtycycl
+    time.sleep(duration)  # wait for given duration
+
+    # set burnwire's dutycycle back to 0; ends the burn
+    burnwire.duty_cycle = 0
+    set_RGB(0, 0, 0)  # set RGB to no color
+
+    _cubesat._deployA = True  # sets deployment variable to true
+    burnwire.deinit()  # deinitialize burnwire
+
+    return _cubesat._deployA  # return true
+
+
+"""
+Radio related functions
+"""
+
+def send(data, *, keep_listening=False, destination=None, node=None,
+         identifier=None, flags=None):
+    """ Wrap _cubesat.radio.send to allow for hardware checks """
+    _cubesat.radio.send(data, keep_listening=keep_listening,
+                        destination=destination, node=node, identifier=identifier,
+                        flags=flags)
+
+def listen():
+    """ Wrap _cubesat.radio.listen to allow for hardware checks """
+    _cubesat.radio.listen()
+
+async def await_rx(timeout=60):
+    """ Wrap _cubesat.radio.await_rx to allow for hardware checks """
+    _cubesat.radio.await_rx(timeout=timeout)
+
+def receive(*, keep_listening=True, with_header=False, with_ack=False,
+            timeout=None, debug=False):
+    """ Wrap _cubesat.radio.receive to allow for hardware checks """
+    _cubesat.radio.receive(keep_listening=keep_listening, with_header=with_header,
+                           with_ack=with_ack, timeout=timeout, debug=debug)
+
+def sleep():
+    """ Wrap _cubesat.radio.sleep to allow for hardware checks """
+    _cubesat.radio.sleep()
+
+
+"""
+Miscellaneous statistic functions
+"""
+
+def temperature_cpu():
+    """ return the temperature reading from the CPU """
+    return _cubesat.micro.cpu.temperature  # Celsius
+
+
+def RGB():
+    """ return the current RGB settings of the neopixel object """
+    return _cubesat.neopixel[0]
+
+
+def set_RGB(value):
+    """ set an RGB value to the neopixel object """
+    if _cubesat.hardware['Neopixel']:
+        try:
+            _cubesat.neopixel[0] = value
+        except Exception as e:
+            print('[WARNING]', e)
+
+
+def battery_voltage():
+    """ return the battery voltage """
+    # initialize vbat
+    vbat = 0
+
+    for _ in range(50):
+        # 65536 = 2^16, number of increments we can have to voltage
+        vbat += _cubesat._vbatt.value * 3.3 / 65536
+
+    # 100k/100k voltage divider
+    voltage = (vbat / 50) * (100 + 100) / 100
+
+    # volts
+    return voltage
+
+
+def fuel_gauge():
+    """ report battery voltage as % full """
+    return 100 * battery_voltage() / 4.2
+
+
+def timeon():
+    """ return the time on a monotonic clock """
+    return int(time.monotonic())
+
+
+def reset_boot_count():
+    """ reset boot count in non-volatile memory (nvm) """
+    _cubesat.c_boot = 0
+
+
+def incr_logfail_count():
+    """ increment logfail count in non-volatile memory (nvm) """
+    _cubesat.c_logfail += 1
+
+
+def reset_logfail_count():
+    """ reset logfail count in non-volatile memory (nvm) """
+    _cubesat.c_logfail = 0
+
+
+"""
+Define constants and Satellite Class
+"""
 # NVM register numbers
-# TODO: confirm registers start in MRAM partition & update board build file
 _FLAG = const(20)
 _DWNLINK = const(4)
 _DCOUNT = const(3)
@@ -34,7 +194,7 @@ _BOOTCNT = const(0)
 _LOGFAIL = const(5)
 
 
-class Satellite:
+class _Satellite:
     # Define NVM flags
     f_deploy = bitFlag(register=_FLAG, bit=1)
     f_mdeploy = bitFlag(register=_FLAG, bit=2)
@@ -86,17 +246,17 @@ class Satellite:
         self._vbatt = analogio.AnalogIn(board.BATTERY)  # Define battery voltage
 
         # Define and initialize hardware
-        self.__init_i2c__()
-        self.__init_spi__()
-        self.__init_sdcard__()
-        self.__init_neopixel__()
-        self.__init_imu__()
-        self.__init_radio__()
-        self.__init_sun_sensors__()
-        self.__init_coil_drivers__()
-        self.__init_burnwires__()
+        self._init_i2c()
+        self._init_spi()
+        self._init_sdcard()
+        self._init_neopixel()
+        self._init_imu()
+        self._init_radio()
+        self._init_sun_sensors()
+        self._init_coil_drivers()
+        self._init_burnwires()
 
-    def __init_i2c__(self):
+    def _init_i2c(self):
         """ Define I2C buses and initialize one at a time """
         try:
             self.i2c1 = busio.I2C(board.SCL1, board.SDA1)
@@ -116,7 +276,7 @@ class Satellite:
         except Exception as e:
             print("[ERROR][Initializing I2C3]", e)
 
-    def __init_spi__(self):
+    def _init_spi(self):
         """ Define and initialize SPI bus """
         try:
             self.spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
@@ -124,7 +284,7 @@ class Satellite:
         except Exception as e:
             print("[ERROR][Initializing SPI]", e)
 
-    def __init_sdcard__(self):
+    def _init_sdcard(self):
         """ Define SD Parameters and initialize SD Card """
         try:
             self._sd = sdcardio.SDCard(self.spi, board.CS_SD, baudrate=4000000)
@@ -135,7 +295,7 @@ class Satellite:
         except Exception as e:
             print('[ERROR][Initializing SD Card]', e)
 
-    def __init_neopixel__(self):
+    def _init_neopixel(self):
         """ Define neopixel parameters and initialize """
         try:
             self.neopixel = neopixel.NeoPixel(
@@ -145,7 +305,7 @@ class Satellite:
         except Exception as e:
             print('[WARNING][Neopixel]', e)
 
-    def __init_imu__(self):
+    def _init_imu(self):
         """ Define IMU parameters and initialize """
         try:
             self.IMU = bmx160.BMX160_I2C(self.i2c1, address=0x68)
@@ -153,7 +313,7 @@ class Satellite:
         except Exception as e:
             print(f'[ERROR][Initializing IMU] {e}\n\tMaybe try address=0x68?')
 
-    def __init_radio__(self):
+    def _init_radio(self):
         """ Define radio parameters and initialize UHF radio """
         self._rf_cs = digitalio.DigitalInOut(board.RF_CS)
         self._rf_rst = digitalio.DigitalInOut(board.RF_RST)
@@ -174,7 +334,7 @@ class Satellite:
         except Exception as e:
             print('[ERROR][Initializing RADIO]', e)
 
-    def __init_sun_sensors__(self):
+    def _init_sun_sensors(self):
         """ Initialize sun sensors one at a time """
         sun_sensors = []
 
@@ -225,7 +385,7 @@ class Satellite:
 
         self.sun_sensors = sun_sensors
 
-    def __init_coil_drivers__(self):
+    def _init_coil_drivers(self):
         """ Initialize coil drivers one at a time """
         coil_drivers = []
 
@@ -236,7 +396,7 @@ class Satellite:
             coil_drivers.append(drv_x)
             self.hardware['Coil X'] = True
         except Exception as e:
-            print('[ERROR][Initializing H-Bridge U6]', e)
+            print('[ERROR][Initializing H-Bridge U7]', e)
 
         try:
             # may need to fix i2c addresses
@@ -254,7 +414,7 @@ class Satellite:
             coil_drivers.append(drv_z)
             self.hardware['Coil Z'] = True
         except Exception as e:
-            print('[ERROR][Initializing H-Bridge U4]', e)
+            print('[ERROR][Initializing H-Bridge U9]', e)
 
         for driver in coil_drivers:
             driver.mode = drv8830.COAST
@@ -262,7 +422,7 @@ class Satellite:
 
         self.coil_drivers = coil_drivers
 
-    def __init_burnwires__(self):
+    def _init_burnwires(self):
         """ Define burnwire parameters and initialize """
         # TODO: update firmware so we can use board.BURN1 and board.BURN2
         # instead of microcontroller.pin.PA19 and microcontroller.pin.PA18
@@ -308,166 +468,4 @@ class Satellite:
 
 
 # initialize Satellite as cubesat
-cubesat = Satellite()
-
-"""
-IMU-related functions
-TODO: cubesat.imu hardware check
-"""
-
-def acceleration():
-    """ return the accelerometer reading from the IMU """
-    return cubesat.IMU.accel
-
-def magnetic():
-    """ return the magnetometer reading from the IMU """
-    return cubesat.IMU.mag
-
-def gyro():
-    """ return the gyroscope reading from the IMU """
-    return cubesat.IMU.gyro
-
-def temperature():
-    """ return the thermometer reading from the IMU """
-    return cubesat.IMU.temperature  # Celsius
-
-
-"""
-Burnwire-related functions
-TODO: cubesat.burnwire1 hardware check
-"""
-
-def burn(burn_num='1', dutycycle=0, freq=1000, duration=1):
-    """
-    control the burnwire(s)
-    initialize with burn_num = '1' ; burnwire 2 IC is not set up
-    """
-    # BURN1 = -Z,BURN2 = extra burnwire pin, dutycycle ~0.13%
-    dtycycl = int((dutycycle / 100) * (0xFFFF))
-
-    # print configuration information
-    print('----- BURN WIRE CONFIGURATION -----')
-    print(f'\tFrequency of: {freq}Hz')
-    print(f'\tDuty cycle of: {100 * dtycycl / 0xFFFF}% (int:{dtycycl})')
-    print(f'\tDuration of {duration}sec')
-
-    # initialize burnwire based on the burn_num passed to the function
-    if '1' in burn_num:
-        burnwire = cubesat.burnwire1
-    elif '2' in burn_num:
-        return False  # return False because burnwire 2 IC is not set up
-        # burnwire = self.burnwire2
-    else:
-        return False
-
-    set_RGB(255, 0, 0)  # set RGB to red
-
-    # set the burnwire's dutycycle; begins the burn
-    burnwire.duty_cycle = dtycycl
-    time.sleep(duration)  # wait for given duration
-
-    # set burnwire's dutycycle back to 0; ends the burn
-    burnwire.duty_cycle = 0
-    set_RGB(0, 0, 0)  # set RGB to no color
-
-    cubesat._deployA = True  # sets deployment variable to true
-    burnwire.deinit()  # deinitialize burnwire
-
-    return cubesat._deployA  # return true
-
-
-"""
-Radio related functions
-TODO: cubesat.radio hardware check
-Keeping the aliasing so we can do a hardware check for cubesat.radio
-"""
-
-def send(data, *, keep_listening=False, destination=None, node=None,
-         identifier=None, flags=None):
-    """ Wrap cubesat.radio.send to allow for hardware checks """
-    cubesat.radio.send(data, keep_listening=keep_listening,
-                       destination=destination, node=node, identifier=identifier,
-                       flags=flags)
-
-def listen():
-    """ Wrap cubesat.radio.listen to allow for hardware checks """
-    cubesat.radio.listen()
-
-async def await_rx(timeout=60):
-    """ Wrap cubesat.radio.await_rx to allow for hardware checks """
-    cubesat.radio.await_rx(timeout=timeout)
-
-def receive(*, keep_listening=True, with_header=False, with_ack=False,
-            timeout=None, debug=False):
-    """ Wrap cubesat.radio.receive to allow for hardware checks """
-    cubesat.radio.receive(keep_listening=keep_listening, with_header=with_header,
-                          with_ack=with_ack, timeout=timeout, debug=debug)
-
-def sleep():
-    """ Wrap cubesat.radio.sleep to allow for hardware checks """
-    cubesat.radio.sleep()
-
-
-"""
-Miscellaneous statistic functions
-TODO: cubesat.neopixel hardware check
-"""
-
-def temperature_cpu():
-    """ return the temperature reading from the CPU """
-    return cubesat.micro.cpu.temperature  # Celsius
-
-
-def RGB():
-    """ return the current RGB settings of the neopixel object """
-    return cubesat.neopixel[0]
-
-
-def set_RGB(value):
-    """ set an RGB value to the neopixel object """
-    if cubesat.hardware['Neopixel']:
-        try:
-            cubesat.neopixel[0] = value
-        except Exception as e:
-            print('[WARNING]', e)
-
-
-def battery_voltage():
-    """ return the battery voltage """
-    # initialize vbat
-    vbat = 0
-
-    for _ in range(50):
-        # 65536 = 2^16, number of increments we can have to voltage
-        vbat += cubesat._vbatt.value * 3.3 / 65536
-
-    # 100k/100k voltage divider
-    voltage = (vbat / 50) * (100 + 100) / 100
-
-    # volts
-    return voltage
-
-
-def fuel_gauge():
-    """ report battery voltage as % full """
-    return 100 * battery_voltage() / 4.2
-
-
-def timeon():
-    """ return the time on a monotonic clock """
-    return int(time.monotonic())
-
-
-def reset_boot_count():
-    """ reset boot count in non-volatile memory (nvm) """
-    cubesat.c_boot = 0
-
-
-def incr_logfail_count():
-    """ increment logfail count in non-volatile memory (nvm) """
-    cubesat.c_logfail += 1
-
-
-def reset_logfail_count():
-    """ reset logfail count in non-volatile memory (nvm) """
-    cubesat.c_logfail = 0
+_cubesat = _Satellite()
