@@ -22,7 +22,6 @@ import drv8830
 from bitflags import bitFlag, multiBitFlag
 from micropython import const
 import adafruit_tsl2561
-import time
 
 
 """
