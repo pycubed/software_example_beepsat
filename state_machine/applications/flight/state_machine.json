@@ -1,0 +1,72 @@
+{
+    "Normal": {
+        "Tasks": {
+            "Battery": {
+                "Interval": 10,
+                "Priority": 3,
+                "ScheduleLater": false
+            },
+            "IMU": {
+                "Interval": 10,
+                "Priority": 5,
+                "ScheduleLater": false
+            },
+            "Beacon": {
+                "Interval": 30,
+                "Priority": 1,
+                "ScheduleLater": true
+            },
+            "Blink": {
+                "Interval": 2,
+                "Priority": 255,
+                "ScheduleLater": false
+            },
+            "Time": {
+                "Interval": 20,
+                "Priority": 4,
+                "ScheduleLater": false
+            },
+            "Detumble": {
+                "Interval": 0.1,
+                "Priority": 3,
+                "ScheduleLater": false
+            }
+        },
+        "StepsTo": [
+            "LowPower",
+            "DeTumble"
+        ]
+    },
+    "LowPower": {
+        "Tasks": {
+            "Battery": {
+                "Interval": 15.0,
+                "Priority": 1,
+                "ScheduleLater": false
+            }
+        },
+        "StepsTo": [
+            "Normal"
+        ],
+        "EnterFunctions": [
+            "Announcer",
+            "LowPowerOn"
+        ],
+        "ExitFunctions": [
+            "Announcer",
+            "LowPowerOff"
+        ]
+    },
+    "DeTumble": {
+        "Tasks": {
+            "Battery": {
+                "Interval": 15.0,
+                "Priority": 3,
+                "ScheduleLater": false
+            }
+        },
+        "StepsTo": [
+            "Normal"
+        ]
+    }
+}
