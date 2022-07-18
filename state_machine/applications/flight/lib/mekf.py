@@ -5,19 +5,19 @@ try:
     from ulab.numpy import dot as matmul, eye as I, zeros, array, linalg  # noqa: E741 (I is not ambiguous)
 except Exception:
     from numpy import linalg, matmul, eye as I, zeros, array  # noqa: E741 (I is not ambiguous)
-from lib.mathutils import Left, hat, block
+from lib.mathutils import quaternion_to_left_matrix, hat, block
 from math import cos, sin
 
 q = array([[0], [0], [0]])  # Quaternion attitude vector
 β = array([[0], [0], [0]])  # Gyro bias vector
 P = I(6)  # Covariance matrix
 
-def f(q, β, ω, δt):
+def propagate_state(q, β, ω, δt):
     """State propogation function"""
     θ = linalg.norm(ω - β) * δt
     r = (ω - β) / linalg.norm(ω - β)
-    return matmul(Left(q), block([[array([[cos(θ / 2)]])],
-                                  [r * sin(θ / 2)]]))
+    return matmul(quaternion_to_left_matrix(q), block([[array([[cos(θ / 2)]])],
+                                                       [r * sin(θ / 2)]]))
 
 def step(
     ω,
@@ -34,7 +34,7 @@ def step(
     W = I(6) * 1e-6
     V = I(6) * 1e-6
     # Predict
-    q_p = f(q, β, ω, δt)  # β remains constant
+    q_p = propagate_state(q, β, ω, δt)  # β remains constant
 
     # The following is equivalent to:
     # R = exp(-hat(ω-β) * δt)
@@ -50,7 +50,7 @@ def step(
 
     # Innovation
 
-    Q = Left(q_p).transpose()
+    Q = quaternion_to_left_matrix(q_p).transpose()
     body_measurements = block([[br_mag],
                                [br_sun]])
     inertial_measurements = block([[nr_mag],
@@ -73,8 +73,8 @@ def step(
     δβ = δx[4:6]
     θ = linalg.norm(ϕ)
     r = ϕ / θ
-    q_u = matmul(Left(q_p), block([[array([[cos(θ / 2)]])],
-                                  [r * sin(θ / 2)]]))
+    q_u = matmul(quaternion_to_left_matrix(q_p), block([[array([[cos(θ / 2)]])],
+                                                        [r * sin(θ / 2)]]))
     β_u = β + δβ
     e1 = (I(6) - matmul(L, C))                # I(6) - LC
     e2 = (I(6) - matmul(L, C)).transpose()    # (I(6) - LC)'

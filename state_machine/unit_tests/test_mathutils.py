@@ -4,7 +4,7 @@ from numpy import testing, array, zeros, eye, ones
 
 sys.path.insert(0, './state_machine/applications/flight')
 
-from lib.mathutils import hat, Left, block  # noqa: E402
+from lib.mathutils import hat, quaternion_to_left_matrix, block  # noqa: E402
 
 class HatTests(unittest.TestCase):
 
@@ -58,7 +58,7 @@ class blockTests(unittest.TestCase):
                    [0, 0, 5, 1, 1]])
         )
 
-class LeftTests(unittest.TestCase):
+class QuaternionToLeftTests(unittest.TestCase):
 
     def test(self):
         q = array([0.692, -0.332,  0.499,  0.403])
@@ -68,7 +68,7 @@ class LeftTests(unittest.TestCase):
                  [-0.332,  0.692,  -0.403,   0.499],
                  [0.499,   0.403,   0.692,   0.332],
                  [0.403,  -0.499,  -0.332,   0.692]]),
-            Left(q)
+            quaternion_to_left_matrix(q)
         )
         q = array([[0.5, 0.5, 0.5, 0.5]]).transpose()
         testing.assert_equal(
@@ -77,9 +77,5 @@ class LeftTests(unittest.TestCase):
                  [0.5,   0.5,  -0.5,   0.5],
                  [0.5,   0.5,   0.5,  -0.5],
                  [0.5,  -0.5,   0.5,   0.5]]),
-            Left(q)
+            quaternion_to_left_matrix(q)
         )
-
-
-x = blockTests()
-x.test()

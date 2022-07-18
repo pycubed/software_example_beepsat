@@ -37,7 +37,7 @@ def hat(v):
     else:
         raise ValueError("v must be a 3x1 numpy array")
 
-def Left(q):
+def quaternion_to_left_matrix(q):
     """Converts a scalar-first unit quaternion into the left-side matrix for quaternion multiplication"""
     if not isinstance(q, ndarray):
         q = array([q])
