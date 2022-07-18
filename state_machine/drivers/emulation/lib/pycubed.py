@@ -52,29 +52,39 @@ class Satellite:
         self._torque = [0, 0, 0]
         self.sim = False
 
-    def new_file(self, substring, binary=False):
-        print(
-            f"new file not implemented, string not written with binary={binary}")
-        return None
 
-    @property
-    def acceleration(self):
-        reader.read(self)
-        return self._accel
+_cubesat = Satellite()
 
-    @property
-    def magnetic(self):
-        reader.read(self)
-        return self._mag
+"""
+IMU-related functions
+"""
 
-    @property
-    def gyro(self):
-        reader.read(self)
-        return self._gyro
+def acceleration():
+    """ return the accelerometer reading from the IMU """
+    reader.read(_cubesat)
+    return _cubesat.IMU.accel
 
-    def log(self, str):
-        """Logs to sd card"""
-        print('log not implemented')
+def magnetic():
+    """ return the magnetometer reading from the IMU """
+    reader.read(_cubesat)
+    return _cubesat.IMU.mag
+
+def gyro():
+    """ return the gyroscope reading from the IMU """
+    reader.read(_cubesat)
+    return _cubesat.IMU.gyro
+
+def temperature_imu():
+    """ return the thermometer reading from the IMU """
+    reader.read(_cubesat)
+    return _cubesat.IMU.temperature  # Celsius
 
 
-pocketqube = Satellite()
+"""
+Radio related functions
+"""
+send = _cubesat.radio.send
+listen = _cubesat.radio.listen
+await_rx = _cubesat.radio.await_rx
+receive = _cubesat.radio.receive
+sleep = _cubesat.radio.sleep
