@@ -1,35 +1,35 @@
-{
+config = {
     "Normal": {
         "Tasks": {
             "Battery": {
                 "Interval": 10,
                 "Priority": 3,
-                "ScheduleLater": false
+                "ScheduleLater": False
             },
             "IMU": {
                 "Interval": 10,
                 "Priority": 5,
-                "ScheduleLater": false
+                "ScheduleLater": False
             },
             "Beacon": {
                 "Interval": 30,
                 "Priority": 1,
-                "ScheduleLater": true
+                "ScheduleLater": True
             },
             "Blink": {
                 "Interval": 2,
                 "Priority": 255,
-                "ScheduleLater": false
+                "ScheduleLater": False
             },
             "Time": {
                 "Interval": 20,
                 "Priority": 4,
-                "ScheduleLater": false
+                "ScheduleLater": False
             },
             "Detumble": {
                 "Interval": 0.1,
                 "Priority": 3,
-                "ScheduleLater": false
+                "ScheduleLater": False
             }
         },
         "StepsTo": [
@@ -42,7 +42,7 @@
             "Battery": {
                 "Interval": 15.0,
                 "Priority": 1,
-                "ScheduleLater": false
+                "ScheduleLater": False
             }
         },
         "StepsTo": [
@@ -62,7 +62,7 @@
             "Battery": {
                 "Interval": 15.0,
                 "Priority": 3,
-                "ScheduleLater": false
+                "ScheduleLater": False
             }
         },
         "StepsTo": [

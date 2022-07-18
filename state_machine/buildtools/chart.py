@@ -1,9 +1,6 @@
 import json
 
-config_file = open('./state_machine.json', 'r')
-config = config_file.read()
-config_file.close()
-config = json.loads(config)
+from config import config
 
 def format(v):
     (name, value) = v

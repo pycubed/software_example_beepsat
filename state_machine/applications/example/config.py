@@ -1,25 +1,25 @@
-{
+config = {
     "Normal": {
         "Tasks": {
             "Every5Seconds": {
                 "Interval": 5,
                 "Priority": 3,
-                "ScheduleLater": false
+                "ScheduleLater": False
             },
             "Battery": {
                 "Interval": 10,
                 "Priority": 5,
-                "ScheduleLater": false
+                "ScheduleLater": False
             },
             "Time": {
                 "Interval": 7,
                 "Priority": 4,
-                "ScheduleLater": false
+                "ScheduleLater": False
             },
             "Transition": {
                 "Interval": 20,
                 "Priority": 1,
-                "ScheduleLater": true
+                "ScheduleLater": True
             }
         },
         "StepsTo": [
@@ -37,12 +37,12 @@
             "Battery": {
                 "Interval": 3.0,
                 "Priority": 1,
-                "ScheduleLater": false
+                "ScheduleLater": False
             },
             "Transition": {
                 "Interval": 15,
                 "Priority": 1,
-                "ScheduleLater": true
+                "ScheduleLater": True
             }
         },
         "StepsTo": [

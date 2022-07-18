@@ -4,7 +4,8 @@ from Tasks.every_5_seconds import task as every5
 from Tasks.transition_task import task as transition
 
 from TransitionFunctions import announcer
-import json
+
+from config import config  # noqa: F401
 
 TaskMap = {
     'Battery': battery,
@@ -16,8 +17,3 @@ TaskMap = {
 TransitionFunctionMap = {
     'Announcer': announcer
 }
-
-config_file = open('./state_machine.json', 'r')
-config = config_file.read()
-config_file.close()
-config = json.loads(config)
