@@ -1,14 +1,15 @@
 name: Unit Test
 
 on:
-  # Trigger the workflow on push or pull request,
-  # but only for the main branch
+  # Trigger the workflow on all pull requests, and pushes to main
   push:
     branches:
-      - main
+      - 'main'
   pull_request:
     branches:
-      - main
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
 
 jobs:
   unit-test:
