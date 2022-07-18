@@ -1,10 +1,11 @@
 import unittest
 import sys
-from numpy import testing, array
+from numpy import testing, array, eye
 
 sys.path.insert(0, './state_machine/applications/flight')
 
-from lib.mekf import propagate_state  # noqa: E402
+import lib.mekf as mekf  # noqa: E402
+
 
 class PropogationTest(unittest.TestCase):
 
@@ -12,10 +13,40 @@ class PropogationTest(unittest.TestCase):
         expect = array([[0.5931645151518956, 0.42554207999942495, 0.5398640677185691, 0.41906632470378713]]).transpose()
         testing.assert_almost_equal(
             expect,
-            propagate_state(
+            mekf.propagate_state(
                 array([[0.5, 0.5, 0.5, 0.5]]).transpose(),
                 array([[0.324, 0.24, 0.9]]).transpose(),
                 array([[0.23, 0.12, 0.321]]).transpose(),
                 0.5
             )
         )
+
+class StepTest(unittest.TestCase):
+
+    def test(self):
+        mekf.q = array([[-0.07645495384212857, 0.3619254033174279,
+                         -0.7364329596192662, -0.5664195780981829]]).transpose()
+        mekf.β = array([[0.0, 0.0, 0.0]]).transpose()
+        mekf.P = eye(6)
+        ω = array([[-0.10592279203639549, 0.42550406114211803, 0.23096538314340964]]).transpose()
+        δt = 0.01
+        nr_mag = array([[0.2345168146765361, 0.16687989127229255, -0.9576810353781258]]).transpose()
+        nr_sun = array([[-0.3682619499438915, -0.8530201183062908, -0.36978346905756115]]).transpose()
+        br_mag = array([[-0.008219386167193088, -0.9392245253829402, 0.34320508826389207]]).transpose()
+        br_sun = array([[0.8998112287313249, -0.2579310131394576, -0.35186836332622623]]).transpose()
+        mekf.step(ω, δt, nr_mag, nr_sun, br_mag, br_sun)
+        nq = array([[-0.07859113437419031, 0.3535364037463655, -0.7402868901059715, -0.5664015935368598]]).transpose()
+        nβ = array([[5.4948827560573105e-6, -2.667164801034254e-5, 0.0001987640695582728]]).transpose()
+        nP = array([[9.093480685954398e-7, -1.6239021019771063e-7, -1.4380731974813026e-7, -9.092562337158345e-9, 1.6237381044285594e-9, 1.4379279667566557e-9],
+                    [-1.6239021019771063e-7, 1.008595787740563e-6, -1.0333614872764871e-7,
+                        1.62373810442856e-9, -1.0084939298536479e-8, 1.033257128306526e-9],
+                    [-1.438073197481303e-7, -1.033361487276487e-7, 6.08433115453758e-7,
+                        1.437927966756662e-9, 1.0332571283065409e-9, -6.083716699150954e-9],
+                    [-9.092562337158345e-9, 1.6237381044285598e-9, 1.4379279667566621e-9,
+                        0.9999010101898964, -1.623574123266055e-11, -1.4377827506034473e-11],
+                    [1.6237381044285594e-9, -1.0084939298536479e-8, 1.0332571283065413e-9, -
+                        1.623574123266055e-11, 0.9999010101998191, -1.0331527802573308e-11],
+                    [1.437927966756656e-9, 1.0332571283065258e-9, -6.083716699150954e-9, -1.4377827506034474e-11, -1.0331527802573307e-11, 0.9999010101598109]])
+        testing.assert_almost_equal(mekf.q, nq)
+        testing.assert_almost_equal(mekf.β, nβ)
+        testing.assert_almost_equal(mekf.P, nP)

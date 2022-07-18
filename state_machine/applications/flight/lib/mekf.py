@@ -5,10 +5,10 @@ try:
     from ulab.numpy import dot as matmul, eye as I, zeros, array, linalg  # noqa: E741 (I is not ambiguous)
 except Exception:
     from numpy import linalg, matmul, eye as I, zeros, array  # noqa: E741 (I is not ambiguous)
-from lib.mathutils import quaternion_to_left_matrix, hat, block
+from lib.mathutils import quaternion_to_left_matrix, hat, block, quaternion_to_rotation_matrix
 from math import cos, sin
 
-q = array([[0], [0], [0]])  # Quaternion attitude vector
+q = array([[0], [0], [0], [0]])  # Quaternion attitude vector
 β = array([[0], [0], [0]])  # Gyro bias vector
 P = I(6)  # Covariance matrix
 
@@ -46,20 +46,20 @@ def step(
     A = block([
         [R,              (-δt * I(3))],
         [zeros((3, 3)),  I(3)]])
-    P_p = matmul(A, matmul(P, A.tranpose())) + W
+    P_p = matmul(A, matmul(P, A.transpose())) + W
 
     # Innovation
 
-    Q = quaternion_to_left_matrix(q_p).transpose()
+    Q = quaternion_to_rotation_matrix(q_p).transpose()
     body_measurements = block([[br_mag],
                                [br_sun]])
     inertial_measurements = block([[nr_mag],
                                    [nr_sun]])
-    inertial_to_body = block([[Q,            zeros(3, 3)],
-                              [zeros(3, 3),  Q]])
+    inertial_to_body = block([[Q,              zeros((3, 3))],
+                              [zeros((3, 3)),  Q]])
     Z = body_measurements - matmul(inertial_to_body, inertial_measurements)
-    C = block([[hat(ᵇr_mag), zeros(3, 3)],
-               [hat(ᵇr_sun), zeros(3, 3)]])
+    C = block([[hat(ᵇr_mag), zeros((3, 3))],
+               [hat(ᵇr_sun), zeros((3, 3))]])
     S = C * P_p * C.transpose() + V
 
     # Kalman Gain
@@ -68,9 +68,9 @@ def step(
 
     # Update
 
-    δx = L * Z
-    ϕ = δx[1:3]
-    δβ = δx[4:6]
+    δx = matmul(L, Z)
+    ϕ = δx[0:3]
+    δβ = δx[3:]
     θ = linalg.norm(ϕ)
     r = ϕ / θ
     q_u = matmul(quaternion_to_left_matrix(q_p), block([[array([[cos(θ / 2)]])],

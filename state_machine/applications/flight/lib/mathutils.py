@@ -1,7 +1,7 @@
 try:
-    from ulab.numpy import array, ndarray, zeros, eye as I  # noqa: E741 (I is not ambiguous)
+    from ulab.numpy import array, ndarray, zeros, eye as I, dot as matmul  # noqa: E741 (I is not ambiguous)
 except Exception:
-    from numpy import array, ndarray, zeros, eye as I  # noqa: E741 (I is not ambiguous)
+    from numpy import array, ndarray, zeros, eye as I, matmul  # noqa: E741 (I is not ambiguous)
 
 def block(S):
     w = sum([len(m[0]) for m in S[0]])
@@ -52,3 +52,14 @@ def quaternion_to_left_matrix(q):
          [qv,              dr]])
 
     return M
+
+def quaternion_to_rotation_matrix(q):
+    """Converts a scalar-first unit quaternion into the rotation matrix Qv = qvq+"""
+    if not isinstance(q, ndarray):
+        q = array([q])
+    if q.shape == (4,):
+        qs, qv = q[0], array([q[1:4]]).transpose()
+    elif q.shape == (4, 1):
+        qs, qv = q[0], q[1:4]
+
+    return I(3) + 2 * matmul(hat(qv), (qs * I(3) + hat(qv)))
