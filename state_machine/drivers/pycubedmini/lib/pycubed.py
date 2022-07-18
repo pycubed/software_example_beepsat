@@ -182,6 +182,11 @@ def reset_logfail_count():
     _cubesat.c_logfail = 0
 
 
+vlowbatt = 3.0
+BOOTTIME = int(time.monotonic())
+data_cache = {}
+
+
 """
 Define constants and Satellite Class
 """
@@ -215,7 +220,6 @@ class _Satellite:
     def __init__(self):
         """ Big init routine as the whole board is brought up. """
         self._stat = {}
-        self.BOOTTIME = const(int(time.monotonic()))
         self.hardware = {
             'I2C1': False,
             'I2C2': False,
@@ -469,3 +473,7 @@ class _Satellite:
 
 # initialize Satellite as cubesat
 _cubesat = _Satellite()
+
+
+# Make radio accesible
+radio = _cubesat.radio
