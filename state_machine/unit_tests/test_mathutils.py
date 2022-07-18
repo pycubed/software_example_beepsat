@@ -1,10 +1,10 @@
 import unittest
 import sys
-from numpy import testing, array
+from numpy import testing, array, zeros, eye, ones
 
 sys.path.insert(0, './state_machine/applications/flight')
 
-from lib.mathutils import hat, L  # noqa: E402
+from lib.mathutils import hat, quaternion_to_left_matrix, block  # noqa: E402
 
 class HatTests(unittest.TestCase):
 
@@ -25,7 +25,40 @@ class HatTests(unittest.TestCase):
         )
         self.assertRaises(ValueError, hat, [1, 2, 3, 4])
 
-class LTests(unittest.TestCase):
+class blockTests(unittest.TestCase):
+
+    def test(self):
+        a = array([[1, 1]])
+        b = array([[2]])
+        c = array(
+            [[3, 3],
+             [3, 3],
+             [3, 3]])
+        d = array(
+            [[4],
+             [4],
+             [4]])
+        testing.assert_equal(
+            block([[a, b], [c, d]]),
+            array([[1, 1, 2],
+                   [3, 3, 4],
+                   [3, 3, 4],
+                   [3, 3, 4]])
+        )
+        a = zeros((2, 3))
+        b = eye(2) * 2
+        c = eye(3) * 5
+        d = ones((3, 2))
+        testing.assert_equal(
+            block([[a, b], [c, d]]),
+            array([[0, 0, 0, 2, 0],
+                   [0, 0, 0, 0, 2],
+                   [5, 0, 0, 1, 1],
+                   [0, 5, 0, 1, 1],
+                   [0, 0, 5, 1, 1]])
+        )
+
+class QuaternionToLeftTests(unittest.TestCase):
 
     def test(self):
         q = array([0.692, -0.332,  0.499,  0.403])
@@ -35,7 +68,7 @@ class LTests(unittest.TestCase):
                  [-0.332,  0.692,  -0.403,   0.499],
                  [0.499,   0.403,   0.692,   0.332],
                  [0.403,  -0.499,  -0.332,   0.692]]),
-            L(q)
+            quaternion_to_left_matrix(q)
         )
         q = array([[0.5, 0.5, 0.5, 0.5]]).transpose()
         testing.assert_equal(
@@ -44,5 +77,5 @@ class LTests(unittest.TestCase):
                  [0.5,   0.5,  -0.5,   0.5],
                  [0.5,   0.5,   0.5,  -0.5],
                  [0.5,  -0.5,   0.5,   0.5]]),
-            L(q)
+            quaternion_to_left_matrix(q)
         )
