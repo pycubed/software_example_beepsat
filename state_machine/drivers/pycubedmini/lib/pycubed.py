@@ -474,6 +474,5 @@ class _Satellite:
 # initialize Satellite as cubesat
 _cubesat = _Satellite()
 
-
 # Make radio accesible
 radio = _cubesat.radio
