@@ -1,6 +1,7 @@
 # Transmit "Hello World" beacon
 
 from lib.template_task import Task
+import lib.pycubed as cubesat
 import cdh
 
 ANTENNA_ATTACHED = False
@@ -27,8 +28,8 @@ class task(Task):
     def __init__(self, satellite):
         super().__init__(satellite)
         # set our radiohead node ID so we can get ACKs
-        self.cubesat.radio.node = 0xFA  # our ID
-        self.cubesat.radio.destination = 0xAB  # target's ID
+        cubesat.radio.node = 0xFA  # our ID
+        cubesat.radio.destination = 0xAB  # target's ID
 
     async def main_task(self):
         """
@@ -38,7 +39,7 @@ class task(Task):
         """
         if ANTENNA_ATTACHED:
             self.debug("Sending beacon")
-            self.cubesat.radio.send("Hello World!", destination=0xFF, keep_listening=True)
+            cubesat.radio.send("Hello World!", destination=0xFF, keep_listening=True)
         else:
             # Fake beacon since we don't know if an antenna is attached
             print()  # blank line
@@ -46,17 +47,17 @@ class task(Task):
             self.debug("NOT sending beacon (unknown antenna state)", 2)
             self.debug("If you've attached an antenna, edit '/Tasks/beacon_task.py' to actually beacon", 2)
             print()  # blank line
-            self.cubesat.radio.listen()
+            cubesat.radio.listen()
 
         self.debug("Listening 10s for response (non-blocking)")
-        heard_something = await self.cubesat.radio.await_rx(timeout=10)
+        heard_something = await cubesat.radio.await_rx(timeout=10)
 
         if heard_something:
             # retrieve response but don't ACK back unless an antenna is attached
-            response = self.cubesat.radio.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED)
+            response = cubesat.radio.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED)
             if response is not None:
                 self.debug("packet received")
-                self.debug('msg: {}, RSSI: {}'.format(response, self.cubesat.radio.last_rssi - 137), 2)
+                self.debug('msg: {}, RSSI: {}'.format(response, cubesat.radio.last_rssi - 137), 2)
 
                 """
                 ########### ADVANCED ###########
@@ -87,11 +88,11 @@ class task(Task):
                                         self.cmd_dispatch[cdh.commands[cmd]](self, cmd_args)
                                 except Exception as e:
                                     self.debug(f'something went wrong: {e}')
-                                    self.cubesat.radio.send(str(e).encode())
+                                    cubesat.radio.send(str(e).encode())
                             else:
                                 self.debug('invalid command!')
-                                self.cubesat.radio.send(b'invalid cmd' + response[4:])
+                                cubesat.radio.send(b'invalid cmd' + response[4:])
         else:
             self.debug('no messages')
-        self.cubesat.radio.sleep()
+        cubesat.radio.sleep()
         self.debug('finished')
