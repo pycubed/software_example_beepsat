@@ -49,6 +49,9 @@ class task(Task):
                     #  - Execute commands
                     #  - Mark messages as received (and remove from tq)
 
+                    # header = response[0]
+                    response = response[1:]  # remove the header byte
+
                     # Begin Old Beacon Task Code
                     if len(response) >= 6:
                         if not ANTENNA_ATTACHED:
