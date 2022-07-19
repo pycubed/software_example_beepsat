@@ -5,7 +5,7 @@ try:
     from ulab.numpy import dot as matmul, eye as I, zeros, array, linalg  # noqa: E741 (I is not ambiguous)
 except Exception:
     from numpy import linalg, matmul, eye as I, zeros, array  # noqa: E741 (I is not ambiguous)
-from lib.mathutils import quaternion_to_left_matrix, hat, block, quaternion_to_rotation_matrix
+from lib.mathutils import quaternion_mul, quaternion_to_left_matrix, hat, block, quaternion_to_rotation_matrix
 from math import cos, sin
 
 q = array([[0], [0], [0], [0]])  # Quaternion attitude vector
@@ -16,8 +16,9 @@ def propagate_state(q, β, ω, δt):
     """State propogation function"""
     θ = linalg.norm(ω - β) * δt
     r = (ω - β) / linalg.norm(ω - β)
-    return matmul(quaternion_to_left_matrix(q), block([[array([[cos(θ / 2)]])],
-                                                       [r * sin(θ / 2)]]))
+    print(quaternion_to_left_matrix(q))
+    return quaternion_mul(q, block([[array([[cos(θ / 2)]])],
+                                    [r * sin(θ / 2)]]))
 
 def step(
     ω,

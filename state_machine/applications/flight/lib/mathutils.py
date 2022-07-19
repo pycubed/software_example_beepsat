@@ -25,6 +25,9 @@ def hat(v):
     if not isinstance(v, ndarray):
         v = array(v)
     if v.shape == (3, 1):
+        print(v.shape)
+        print(v)
+        print(v[2], -v[2][0])
         return array([
             [0,         -v[2][0],   v[1][0]],
             [v[2][0],    0,        -v[0][0]],
@@ -63,3 +66,7 @@ def quaternion_to_rotation_matrix(q):
         qs, qv = q[0], q[1:4]
 
     return I(3) + 2 * matmul(hat(qv), (qs * I(3) + hat(qv)))
+
+def quaternion_mul(q1, q2):
+    """Multiplies a scalar-first unit quaternion by another scalar-first unit quaternion"""
+    return matmul(quaternion_to_left_matrix(q1), q2)
