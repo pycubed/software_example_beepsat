@@ -25,9 +25,6 @@ def hat(v):
     if not isinstance(v, ndarray):
         v = array(v)
     if v.shape == (3, 1):
-        print(v.shape)
-        print(v)
-        print(v[2], -v[2][0])
         return array([
             [0,         -v[2][0],   v[1][0]],
             [v[2][0],    0,        -v[0][0]],

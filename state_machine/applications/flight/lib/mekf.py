@@ -16,7 +16,6 @@ def propagate_state(q, β, ω, δt):
     """State propogation function"""
     θ = linalg.norm(ω - β) * δt
     r = (ω - β) / linalg.norm(ω - β)
-    print(quaternion_to_left_matrix(q))
     return quaternion_mul(q, block([[array([[cos(θ / 2)]])],
                                     [r * sin(θ / 2)]]))
 
@@ -34,6 +33,7 @@ def step(
 
     W = I(6) * 1e-6
     V = I(6) * 1e-6
+
     # Predict
     q_p = propagate_state(q, β, ω, δt)  # β remains constant
 
@@ -50,7 +50,6 @@ def step(
     P_p = matmul(A, matmul(P, A.transpose())) + W
 
     # Innovation
-
     Q = quaternion_to_rotation_matrix(q_p).transpose()
     body_measurements = block([[br_mag],
                                [br_sun]])
@@ -61,14 +60,12 @@ def step(
     Z = body_measurements - matmul(inertial_to_body, inertial_measurements)
     C = block([[hat(ᵇr_mag), zeros((3, 3))],
                [hat(ᵇr_sun), zeros((3, 3))]])
-    S = C * P_p * C.transpose() + V
+    S = matmul(C, matmul(P_p, C.transpose())) + V
 
     # Kalman Gain
-
-    L = P_p * C.transpose() * linalg.inv(S)
+    L = matmul(P_p, matmul(C.transpose(), linalg.inv(S)))
 
     # Update
-
     δx = matmul(L, Z)
     ϕ = δx[0:3]
     δβ = δx[3:]

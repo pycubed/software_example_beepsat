@@ -6,6 +6,9 @@ sys.path.insert(0, './state_machine/applications/flight')
 
 from lib.mathutils import hat, quaternion_to_left_matrix, block  # noqa: E402
 
+def col(arr):
+    return array([arr]).transpose()
+
 class HatTests(unittest.TestCase):
 
     def test(self):
