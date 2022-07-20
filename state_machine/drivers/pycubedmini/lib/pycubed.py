@@ -10,7 +10,6 @@ import pycubed_rfm9x
 import board
 import microcontroller
 import busio
-import time
 import digitalio
 import analogio
 import storage
@@ -22,10 +21,11 @@ import drv8830
 from bitflags import bitFlag, multiBitFlag
 from micropython import const
 import adafruit_tsl2561
+import time
 
 
 """
-IMU-related functions
+Interface functions
 """
 
 def acceleration():
@@ -45,10 +45,39 @@ def temperature_imu():
     return _cubesat.IMU.temperature  # Celsius
 
 
-"""
-Burnwire-related functions
-"""
+def coildriver_vout(driver_index, vset):
+    if driver_index == "X" or driver_index == "U7":
+        _cubesat.drvx.vout(vset)
+    elif driver_index == "Y" or driver_index == "U8":
+        _cubesat.drvy.vout(vset)
+    elif driver_index == "Z" or driver_index == "U9":
+        _cubesat.drvz.vout(vset)
+    else:
+        # TODO: possibly throw an exception?
+        # this function doesn't return anything so not doing 
+        # anything is also an option
+        print(driver_index, "is not a defined coil driver.")
 
+
+def lux(sun_sensor_index):
+    if sun_sensor_index == "-Y":
+        return _cubesat.sun_yn.lux
+    elif sun_sensor_index == "-Z":
+        return _cubesat.sun_zn.lux
+    elif sun_sensor_index == "-X":
+        return _cubesat.sun_xn.lux
+    elif sun_sensor_index == "+Y":
+        return _cubesat.sun_yp.lux
+    elif sun_sensor_index == "+Z":
+        return _cubesat.sun_zp.lux
+    elif sun_sensor_index == "+X":
+        return _cubesat.sun_xp.lux
+    else:
+        print(sun_sensor_index, "is not a defined sun sensor.")
+        # TODO: possibly throw an exception?
+
+
+# TODO: after checking RGB overload, edit this function
 def burn(burn_num='1', dutycycle=0, freq=1000, duration=1):
     """
     control the burnwire(s)
@@ -72,7 +101,7 @@ def burn(burn_num='1', dutycycle=0, freq=1000, duration=1):
     else:
         return False
 
-    set_RGB(255, 0, 0)  # set RGB to red
+    # set_RGB(255, 0, 0)  # set RGB to red
 
     # set the burnwire's dutycycle; begins the burn
     burnwire.duty_cycle = dtycycl
@@ -80,7 +109,7 @@ def burn(burn_num='1', dutycycle=0, freq=1000, duration=1):
 
     # set burnwire's dutycycle back to 0; ends the burn
     burnwire.duty_cycle = 0
-    set_RGB(0, 0, 0)  # set RGB to no color
+    # set_RGB(0, 0, 0)  # set RGB to no color
 
     _cubesat._deployA = True  # sets deployment variable to true
     burnwire.deinit()  # deinitialize burnwire
@@ -88,57 +117,24 @@ def burn(burn_num='1', dutycycle=0, freq=1000, duration=1):
     return _cubesat._deployA  # return true
 
 
-"""
-Radio related functions
-"""
-
-def send(data, *, keep_listening=False, destination=None, node=None,
-         identifier=None, flags=None):
-    """ Wrap _cubesat.radio.send to allow for hardware checks """
-    _cubesat.radio.send(data, keep_listening=keep_listening,
-                        destination=destination, node=node, identifier=identifier,
-                        flags=flags)
-
-def listen():
-    """ Wrap _cubesat.radio.listen to allow for hardware checks """
-    _cubesat.radio.listen()
-
-async def await_rx(timeout=60):
-    """ Wrap _cubesat.radio.await_rx to allow for hardware checks """
-    _cubesat.radio.await_rx(timeout=timeout)
-
-def receive(*, keep_listening=True, with_header=False, with_ack=False,
-            timeout=None, debug=False):
-    """ Wrap _cubesat.radio.receive to allow for hardware checks """
-    _cubesat.radio.receive(keep_listening=keep_listening, with_header=with_header,
-                           with_ack=with_ack, timeout=timeout, debug=debug)
-
-def sleep():
-    """ Wrap _cubesat.radio.sleep to allow for hardware checks """
-    _cubesat.radio.sleep()
-
-
-"""
-Miscellaneous statistic functions
-"""
-
 def temperature_cpu():
     """ return the temperature reading from the CPU """
     return _cubesat.micro.cpu.temperature  # Celsius
 
 
-def RGB():
+# TODO: spoof this function to check overloading works this way
+def RGB(*, value):
     """ return the current RGB settings of the neopixel object """
+    if value is not None:
+        _cubesat.neopixel[0] = value
     return _cubesat.neopixel[0]
 
 
+"""
 def set_RGB(value):
-    """ set an RGB value to the neopixel object """
-    if _cubesat.hardware['Neopixel']:
-        try:
-            _cubesat.neopixel[0] = value
-        except Exception as e:
-            print('[WARNING]', e)
+    set an RGB value to the neopixel object
+    _cubesat.neopixel[0] = value
+"""
 
 
 def battery_voltage():
@@ -183,7 +179,14 @@ def reset_logfail_count():
 
 
 """
-Define constants and Satellite Class
+Define HardwareInitException
+"""
+class HardwareInitException(Exception):
+    pass
+
+
+"""
+Define constants, Satellite attributes and Satellite Class
 """
 # NVM register numbers
 _FLAG = const(20)
@@ -192,6 +195,11 @@ _DCOUNT = const(3)
 _RSTERRS = const(2)
 _BOOTCNT = const(0)
 _LOGFAIL = const(5)
+
+# Satellite attributes
+vlowbatt = 3.0
+BOOTTIME = int(time.monotonic())
+data_cache = {}
 
 
 class _Satellite:
@@ -209,13 +217,11 @@ class _Satellite:
     c_downlink = multiBitFlag(register=_DWNLINK, lowest_bit=0, num_bits=8)
     c_logfail = multiBitFlag(register=_LOGFAIL, lowest_bit=0, num_bits=8)
 
-    # change to 433?
     UHF_FREQ = 433.0
 
     def __init__(self):
         """ Big init routine as the whole board is brought up. """
         self._stat = {}
-        self.BOOTTIME = const(int(time.monotonic()))
         self.hardware = {
             'I2C1': False,
             'I2C2': False,
@@ -238,14 +244,14 @@ class _Satellite:
             'Burn Wire 2': False,
             'WDT': False  # Watch Dog Timer pending
         }
+        # TODO: create accessors for all cubesat attributes
         self.micro = microcontroller
-        self.data_cache = {}
         self.filenumbers = {}
-        self.vlowbatt = 3.5
         self.debug = True
         self._vbatt = analogio.AnalogIn(board.BATTERY)  # Define battery voltage
 
         # Define and initialize hardware
+        # TODO: add underscores to hardware names in all these functions
         self._init_i2c()
         self._init_spi()
         self._init_sdcard()
@@ -336,6 +342,8 @@ class _Satellite:
 
     def _init_sun_sensors(self):
         """ Initialize sun sensors one at a time """
+        # TODO: check sun sensor addresses on the schematic once
+
         sun_sensors = []
 
         try:
@@ -387,6 +395,8 @@ class _Satellite:
 
     def _init_coil_drivers(self):
         """ Initialize coil drivers one at a time """
+        # TODO: check coil driver addresses on the schematic once
+
         coil_drivers = []
 
         try:
@@ -451,6 +461,7 @@ class _Satellite:
         self.burnwires = burnwires
 
     def reinit(self, dev):
+        # TODO: rewrite this function
         """ Reinit: reinitialize radio, sd, or IMU based upon contents of dev """
         # dev is a string of all lowercase letters,
         dev = dev.lower()
@@ -466,6 +477,165 @@ class _Satellite:
         else:
             print('Invalid Device? ->', dev)
 
+    def hardwarecheck_device(self, devicestr, device):
+        # TODO: check with a spoofed file that this function works as intended
+        try:
+            if device is None:
+                raise HardwareInitException
+            else:
+                return device
+        except HardwareInitException:
+            device = self.reinit(devicestr)
+            if device is None:
+                print("Failed to access", devicestr)
+                raise HardwareInitException
+            else:
+                return device
+
+    @property
+    def i2c1(self):
+        # TODO: check with a spoofed file that this function works as intended
+        try:
+            return self.hardwarecheck_device("I2C1", self._i2c1)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def i2c2(self):
+        try:
+            return self.hardwarecheck_device("I2C2", self._i2c2)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def i2c3(self):
+        try:
+            return self.hardwarecheck_device("I2C3", self._i2c3)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def spi(self):
+        try:
+            return self.hardwarecheck_device("SPI", self._spi)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def sd(self):
+        try:
+            return self.hardwarecheck_device("SD", self._sd)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def neopixel(self):
+        try:
+            return self.hardwarecheck_device("Neopixel", self._neopixel)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def imu(self):
+        try:
+            return self.hardwarecheck_device("IMU", self._imu)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def radio(self):
+        try:
+            return self.hardwarecheck_device("Radio", self._radio)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def sun_yn(self):
+        try:
+            return self.hardwarecheck_device("Sun -Y", self._sun_yn)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def sun_zn(self):
+        try:
+            return self.hardwarecheck_device("Sun -Z", self._sun_zn)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def sun_xn(self):
+        try:
+            return self.hardwarecheck_device("Sun -X", self._sun_xn)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def sun_yp(self):
+        try:
+            return self.hardwarecheck_device("Sun +Y", self._sun_yp)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def sun_zp(self):
+        try:
+            return self.hardwarecheck_device("Sun +Z", self._sun_zp)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def sun_xp(self):
+        try:
+            return self.hardwarecheck_device("Sun +X", self._sun_xp)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def drv_x(self):
+        try:
+            return self.hardwarecheck_device("Coil X", self._drv_x)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def drv_y(self):
+        try:
+            return self.hardwarecheck_device("Coil Y", self._drv_y)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def drv_z(self):
+        try:
+            return self.hardwarecheck_device("Coil Z", self._drv_z)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def burnwire1(self):
+        try:
+            return self.hardwarecheck_device("Burn Wire 1", self._burnwire1)
+        except HardwareInitException as e:
+            raise e
+
+    @property
+    def burnwire2(self):
+        try:
+            return self.hardwarecheck_device("Burn Wire 2", self._burnwire2)
+        except HardwareInitException:
+            pass
+
+    @property
+    def test(self):
+        try:
+            return self.hardwarecheck_device("Test", self._test)
+        except HardwareInitException:
+            print("Failed to initialize Test")
+
 
 # initialize Satellite as cubesat
 _cubesat = _Satellite()
+
+# Make radio accesible
+radio = _cubesat.radio
