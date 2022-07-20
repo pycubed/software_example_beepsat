@@ -9,12 +9,12 @@ class NaiveMessage(Message):
         self.packet_len = 249  # not 251 because for some reason packet loss is extremely high at this threshold
 
     def packet(self):
-        str = self.str[self.cursor:self.cursor + self.packet_len]
-        pkt = bytearray(len(str) + 1)
+        strng = self.str[self.cursor:self.cursor + self.packet_len]
+        pkt = bytearray(len(strng) + 1)
         pkt[0] = self.header
         if len(self.str) <= self.cursor + self.packet_len:  # last packet
-            self.header = 0xfe
-        pkt[1:] = self.str
+            pkt[0] = 0xfe
+        pkt[1:] = strng
         return pkt, True
 
     def done(self):
