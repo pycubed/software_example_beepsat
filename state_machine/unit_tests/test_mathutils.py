@@ -6,6 +6,9 @@ sys.path.insert(0, './state_machine/applications/flight')
 
 from lib.mathutils import hat, quaternion_to_left_matrix, block  # noqa: E402
 
+def col(arr):
+    return array([arr]).transpose()
+
 class HatTests(unittest.TestCase):
 
     def test(self):
@@ -24,6 +27,12 @@ class HatTests(unittest.TestCase):
             hat([0.3, 0.4, 0.6])
         )
         self.assertRaises(ValueError, hat, [1, 2, 3, 4])
+        testing.assert_equal(
+            array([[0.0, 0.3982060297895143, 0.2543322132742208],
+                   [-0.3982060297895143, 0.0, -0.7083212680159963],
+                   [-0.2543322132742208, 0.7083212680159963, 0.0]]),
+            hat(array([[0.7083212680159963, 0.2543322132742208, -0.3982060297895143]]).transpose())
+        )
 
 class blockTests(unittest.TestCase):
 
@@ -62,7 +71,7 @@ class QuaternionToLeftTests(unittest.TestCase):
 
     def test(self):
         q = array([0.692, -0.332,  0.499,  0.403])
-        testing.assert_equal(
+        testing.assert_almost_equal(
             array(
                 [[0.692,   0.332,  -0.499,  -0.403],
                  [-0.332,  0.692,  -0.403,   0.499],
@@ -78,4 +87,13 @@ class QuaternionToLeftTests(unittest.TestCase):
                  [0.5,   0.5,   0.5,  -0.5],
                  [0.5,  -0.5,   0.5,   0.5]]),
             quaternion_to_left_matrix(q)
+        )
+        q = array([[-0.5244311817641283, 0.7083212680159963, 0.2543322132742208, -0.3982060297895143]]).transpose()
+        testing.assert_almost_equal(
+            array([[-0.524431, -0.708321, -0.254332, 0.398206],
+                   [0.708321, -0.524431, 0.398206, 0.254332],
+                   [0.254332, -0.398206, -0.524431, -0.708321],
+                   [-0.398206, -0.254332, 0.708321, -0.524431]]),
+            quaternion_to_left_matrix(q),
+            decimal=6
         )
