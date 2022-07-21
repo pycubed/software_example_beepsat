@@ -84,10 +84,10 @@ def step(
     Z = body_measurements - matmul(inertial_to_body, inertial_measurements)
     C = block([[hat(ᵇr_mag), zeros((3, 3))],
                [hat(ᵇr_sun), zeros((3, 3))]])
-    S = matmul(C, matmul(P_p, C.transpose())) + V
+    S = matmul(C, matmul(P_p, C.transpose())) + V  # CP_PC' + V
 
     # Kalman Gain
-    L = matmul(P_p, matmul(C.transpose(), linalg.inv(S)))
+    L = matmul(P_p, matmul(C.transpose(), linalg.inv(S)))  # P_pC'S^-1
 
     # Update
     δx = matmul(L, Z)
