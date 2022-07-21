@@ -4,6 +4,20 @@ except Exception:
     from numpy import array, ndarray, zeros, eye as I, matmul  # noqa: E741 (I is not ambiguous)
 
 def block(S):
+    """Returns a block matrix from a list of lists of matrices
+    For example:
+    A = eye(2)
+    B = zeros((2, 3))
+    C = ones((4, 2))
+    D = ones((4, 3))*4
+    block([[A, B],
+           [C, D]])
+    >>> array([[1., 0., 0., 0., 0.],
+               [0., 1., 0., 0., 0.],
+               [1., 1., 4., 4., 4.],
+               [1., 1., 4., 4., 4.],
+               [1., 1., 4., 4., 4.],
+               [1., 1., 4., 4., 4.]])"""
     w = sum([len(m[0]) for m in S[0]])
     h = sum([len(row[0]) for row in S])
     M = zeros((h, w))
@@ -21,7 +35,7 @@ def block(S):
 
 
 def hat(v):
-    """Converts v to a matrix such that hat(v)w = cross(w, v) = -cross(v, w)"""
+    """Converts v to a matrix such that hat(v)w = cross(v, w)"""
     if not isinstance(v, ndarray):
         v = array(v)
     if v.shape == (3, 1):
