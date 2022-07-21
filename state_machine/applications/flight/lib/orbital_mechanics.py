@@ -1,3 +1,4 @@
+# Based on: https://github.com/RoboticExplorationLab/pycubed_circuitpython/blob/master/Scheduler/sched2.py
 try:
     from ulab import norm, zeros, array
 except ImportError:
