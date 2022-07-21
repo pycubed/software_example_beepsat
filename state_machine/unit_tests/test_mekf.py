@@ -4,7 +4,7 @@ from numpy import testing, array, eye
 
 sys.path.insert(0, './state_machine/applications/flight')
 
-import lib.mekf as mekf  # noqa: E402
+import lib.mekf as mekf
 
 def col(arr):
     return array([arr]).transpose()
