@@ -216,8 +216,7 @@ class igrfclass:
         self.q = [0.0 for _ in range(21)]
 
     def ned_igrf(self, date, latitude_degrees, elongitude_degrees, r_norm_km):
-
-        print(igrf13_5(self.gh, date, latitude_degrees, elongitude_degrees, r_norm_km, self.cl, self.sl, self.p, self.q))
+        return igrf13_5(self.gh, date, latitude_degrees, elongitude_degrees, r_norm_km, self.cl, self.sl, self.p, self.q)
 
 
 # let's create the class and call it once
