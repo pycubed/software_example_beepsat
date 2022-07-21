@@ -24,7 +24,7 @@ Then his apprentice killed him in his sleep. It's ironic. He could save others f
 class task(Task):
     name = 'beacon'
     color = 'teal'
-    first_time = False
+    first_time = True
 
     async def main_task(self):
         """
@@ -33,8 +33,8 @@ class task(Task):
         to actually send the beacon packet
         """
         tq.push(Message(10, "Hello World!"))
-        if not self.first_time:
-            self.first_time = True
+        if self.first_time:
+            self.first_time = False
             self.debug("Pushing the large msg to tq")
             tq.push(NaiveMessage(1, msg))
         self.debug("Beacon task pushing to tq")
