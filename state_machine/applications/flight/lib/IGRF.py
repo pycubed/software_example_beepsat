@@ -1,4 +1,8 @@
 # Based on: https://github.com/RoboticExplorationLab/pycubed_circuitpython/blob/master/IGRF/igrf.py
+# Fifth order approximatin.
+# "Few degree error between 5th order and 13th order"
+# Should be less than 5 degrees of error
+# - random check gave 0.7 degrees of error
 try:
     import ulab as np
 except ImportError:
@@ -15,6 +19,11 @@ def reset_list(input_list):
 def reset_array(input_array):
     for i in range(len(input_array)):
         input_array[i] = 0.0
+
+def unix_time_to_years_since_2020(unix_time):
+    twentytwenty = 1577854800  # 2022-01-01 00:00:00 time stamp
+    t = (unix_time - twentytwenty) / 31557600  # seconds in a Julian astronomical year
+    return t
 
 def igrf13_5(gh, date, latitude_degrees, elongitude_degrees, r_norm_km, cl, sl, p, q):
 
@@ -40,8 +49,7 @@ def igrf13_5(gh, date, latitude_degrees, elongitude_degrees, r_norm_km, cl, sl, 
     t = 0.0
     tc = 0.0
 
-    twentytwenty = 1577854800  # 2022-01-01 00:00:00 time stamp
-    t = (date - twentytwenty) / 31557600  # seconds in a Julian astronomical year
+    t = unix_time_to_years_since_2020(date)
     print("Years ahead of 2020: ", t)
     tc = 1.0
 

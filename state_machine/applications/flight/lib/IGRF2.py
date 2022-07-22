@@ -39,9 +39,7 @@ def igrf13_5(gh, date, latitude_degrees, elongitude_degrees, r_norm_km):
     t = 0.0
     tc = 0.0
 
-    twentytwenty = 1577854800  # 2022-01-01 00:00:00 time stamp
-    t = (date - twentytwenty) / 31557600  # seconds in a Julian astronomical year
-    print("Years ahead of 2020: ", t)
+    t = date - 2020
     tc = 1.0
 
     ll = 0
@@ -222,13 +220,14 @@ class igrfclass:
 # let's create the class and call it once
 igrf = igrfclass()
 
-# print(igrf.gh)
+print(igrf.gh)
 
-# R_EARTH = 6.378136300e6  # m
-# date = 2020.3
-# latitude_degrees = 34.567
-# elongitude_degrees = 45.678
-# r_norm_km = 1.05 * R_EARTH / 1000
+R_EARTH = 6.378136300e6  # m
+date = 2020.3
+latitude_degrees = 34.567
+elongitude_degrees = 45.678
+r_norm_km = 1.05 * R_EARTH / 1000
 
+print("r_norm_km: ", r_norm_km)
 
-# print(igrf.ned_igrf(date, latitude_degrees, elongitude_degrees, r_norm_km))
+print(igrf.ned_igrf(date, latitude_degrees, elongitude_degrees, r_norm_km))
