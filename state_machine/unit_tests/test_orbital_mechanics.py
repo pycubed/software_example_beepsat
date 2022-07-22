@@ -22,7 +22,3 @@ class TestRK4(unittest.TestCase):
         for _ in range(20):
             x = propogate(x, 60 * 60 * 24, integration_step=60)
             self.assertGreaterEqual(norm(x[0:3]), 6371.009)
-
-
-x = TestRK4()
-x.test_orbit()
