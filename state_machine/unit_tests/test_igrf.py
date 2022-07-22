@@ -58,6 +58,7 @@ class IGRFTests(unittest.TestCase):
         )
 
     def test_no_changes(self):
+        """Test that our changes to the IGRF model do not change the results."""
         equal = np.testing.assert_array_almost_equal
 
         t = dt(2020, 4, 19, 15).timestamp()
