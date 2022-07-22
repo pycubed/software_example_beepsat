@@ -10,9 +10,11 @@ def approx_sun_position_ECI(utime):
     Formula taken from "Satellite Orbits: Models, Methods and Applications" by Motenbruck and Gill
     See section 3.3.2 on page 70 for the formula
     Modified to take unix time as input.
-    Inputs:
-    utime - unix timestamp
-    Outputs:
+
+    Args:
+        - utime: unix timestamp
+
+    Returns:
         - sun pointing in Earth Centered Intertial (ECI) frame
     """
     JD = unix_time_to_julian_day(utime)
