@@ -8,7 +8,6 @@ sys.path.insert(0, './state_machine/applications/flight')
 from lib.IGRF import igrf
 
 def assert_almost_same(a, b, assertLessEqual, angle_tolerance=5, nt_tolerance=3000):
-    print(a, b)
     ua = a / np.linalg.norm(a)
     ub = b / np.linalg.norm(b)
     angle = np.arccos(np.dot(ua, ub)) * 180 / np.pi
@@ -74,6 +73,3 @@ class IGRFTests(unittest.TestCase):
             [28092.523258, 1432.59565072, -22804.66673182],
             decimal=1
         )
-
-        t = dt(2020, 4, 19, 15).timestamp()
-        print(igrf(t, 34.567, 45.678, 6697.043115))
