@@ -23,7 +23,6 @@ from micropython import const
 import adafruit_tsl2561
 import time
 
-initialized = False
 
 """
 Interface functions
