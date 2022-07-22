@@ -1,8 +1,7 @@
+# flake8: noqa E741
 # Based on: https://github.com/RoboticExplorationLab/pycubed_circuitpython/blob/master/IGRF/igrf.py
 # Fifth order approximatin.
-# "Few degree error between 5th order and 13th order"
-# Should be less than 5 degrees of error
-# - random check gave 0.7 degrees of error
+
 try:
     import ulab as np
 except ImportError:
@@ -42,7 +41,6 @@ def igrf13_5(gh, date, latitude_degrees, elongitude_degrees, r_norm_km, cl, sl, 
     kmx = 0
     ll = 0
     nc = 0
-    nmx = 0
     x = 0.0
     y = 0.0
     z = 0.0
@@ -50,23 +48,15 @@ def igrf13_5(gh, date, latitude_degrees, elongitude_degrees, r_norm_km, cl, sl, 
     tc = 0.0
 
     t = unix_time_to_years_since_2020(date)
-    print("Years ahead of 2020: ", t)
     tc = 1.0
 
     ll = 0
-    nmx = 5
 
     # nc = int(nmx * (nmx + 2))
     nc = 35
 
     # kmx = int((nmx + 1) * (nmx + 2) / 2)
     kmx = 21
-
-    # allocate
-    # cl = [0.0 for _ in range(nmx)]
-    # sl = [0.0 for _ in range(nmx)]
-    # p = [0.0 for _ in range(kmx)]
-    # q = [0.0 for _ in range(kmx)]
 
     r = r_norm_km
     ct = math.cos(colat * math.pi / 180)
@@ -229,17 +219,4 @@ class igrfclass:
         return igrf13_5(self.gh, date, latitude_degrees, elongitude_degrees, r_norm_km, self.cl, self.sl, self.p, self.q)
 
 
-# let's create the class and call it once
 igrf = igrfclass()
-
-# print(igrf.gh)
-
-# R_EARTH = 6.378136300e6  # m
-# date = 2020.3
-# latitude_degrees = 34.567
-# elongitude_degrees = 45.678
-# r_norm_km = 1.05 * R_EARTH / 1000
-
-# a = igrf.ned_igrf(date, latitude_degrees, elongitude_degrees, r_norm_km)
-
-# print(a)
