@@ -1,8 +1,10 @@
 # Based on: https://github.com/RoboticExplorationLab/pycubed_circuitpython/blob/master/Scheduler/sched2.py
 try:
-    from ulab import norm, zeros, array
+    from ulab.numpy import zeros, array
+    from ulab.numpy.linalg import norm
 except ImportError:
-    from numpy import norm, zeros, array
+    from numpy import zeros, array
+    from numpy.linalg import norm
 
 MU = 3.986004418E5
 R = 6371.009  # Earth's radius (km)
