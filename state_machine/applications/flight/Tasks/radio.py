@@ -88,8 +88,10 @@ class task(Task):
             msg = tq.peek()
             packet, with_ack = msg.packet()
             self.debug(f'Transmission Queue {tq.queue}')
-            short_packet = str(packet)[:20] + "...." if len(packet) > 23 else packet
-            self.debug(f"Sending packet: {short_packet}")
+
+            debug_packet = str(packet)[:20] + "...." if len(packet) > 23 else packet
+            self.debug(f"Sending packet: {debug_packet}")
+
             if with_ack:
                 if self.cubesat.radio.send_with_ack(packet):
                     msg.ack()
