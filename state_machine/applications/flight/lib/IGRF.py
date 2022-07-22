@@ -204,7 +204,7 @@ sl = [0.0 for _ in range(5)]
 p = [0.0 for _ in range(21)]
 q = [0.0 for _ in range(21)]
 
-def igrf2(date, latitude_degrees, elongitude_degrees, r_norm_km):
+def igrf(date, latitude_degrees, elongitude_degrees, r_norm_km):
     """Returns the fifth order approximation from the IGRF-13 model. 
     Only contains data from 2020, so it should only be accurate from 2020-2025.
     Args:

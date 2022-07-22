@@ -5,7 +5,7 @@ import numpy as np
 
 sys.path.insert(0, './state_machine/applications/flight')
 
-from lib.IGRF import igrf2 as igrf
+from lib.IGRF import igrf
 
 def assert_almost_same(a, b, assertLessEqual, angle_tolerance=5, nt_tolerance=3000):
     print(a, b)
@@ -63,11 +63,16 @@ class IGRFTests(unittest.TestCase):
         t = dt(2020, 4, 19, 15).timestamp()
         equal(
             igrf(t, 34.567, 45.678, 6697.043115),
-            [24694.17511877, 2125.5475454, 32160.37154219]
+            [24694.17511877, 2125.5475454, 32160.37154219],
+            decimal=1
         )
 
         t = dt(2021, 7, 28, 2).timestamp()
         equal(
             igrf(t, -12, 127, 6873),
-            [28092.523258, 1432.59565072, -22804.66673182]
+            [28092.523258, 1432.59565072, -22804.66673182],
+            decimal=1
         )
+
+        t = dt(2020, 4, 19, 15).timestamp()
+        print(igrf(t, 34.567, 45.678, 6697.043115))
