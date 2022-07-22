@@ -5,7 +5,7 @@ import numpy as np
 
 sys.path.insert(0, './state_machine/applications/flight')
 
-from lib.IGRF import igrf as igrflib
+from lib.IGRF import igrf2 as igrf
 
 def assert_almost_same(a, b, assertLessEqual, angle_tolerance=5, nt_tolerance=3000):
     print(a, b)
@@ -29,7 +29,6 @@ class IGRFTests(unittest.TestCase):
         # using pyIGRF.py
         # Note that we use geocentric coordinates
         # We are comparing the results with the IGRF13 results
-        igrf = igrflib.ned_igrf
         t = dt(2020, 4, 19, 15).timestamp()  # time is about 2020.3
         assert_almost_same(
             igrf(t, 34.567, 45.678, 6697.043115),
@@ -59,7 +58,6 @@ class IGRFTests(unittest.TestCase):
         )
 
     def test_no_changes(self):
-        igrf = igrflib.ned_igrf
         equal = np.testing.assert_array_almost_equal
 
         t = dt(2020, 4, 19, 15).timestamp()
@@ -73,7 +71,3 @@ class IGRFTests(unittest.TestCase):
             igrf(t, -12, 127, 6873),
             [28092.523258, 1432.59565072, -22804.66673182]
         )
-
-
-x = IGRFTests()
-x.test_no_changes()
