@@ -4,7 +4,6 @@ PyCubed Mini mainboard-v02 for Pocketqube Mission
 * Author(s): Max Holliday, Yashika Batra
 """
 
-
 import sdcardio
 import pycubed_rfm9x
 import board
@@ -27,22 +26,24 @@ import time
 """
 IMU Interface functions
 """
-
 def acceleration():
     """ return the accelerometer reading from the IMU in m/s^2 """
-    return _cubesat.IMU.accel
+    return _cubesat.imu.accel
+
 
 def magnetic():
     """ return the magnetometer reading from the IMU in µT """
-    return _cubesat.IMU.mag
+    return _cubesat.imu.mag
+
 
 def gyro():
     """ return the gyroscope reading from the IMU in deg/s """
-    return _cubesat.IMU.gyro
+    return _cubesat.imu.gyro
+
 
 def temperature_imu():
     """ return the thermometer reading from the IMU in celsius """
-    return _cubesat.IMU.temperature  # Celsius
+    return _cubesat.imu.temperature  # Celsius
 
 
 """
@@ -51,11 +52,11 @@ Coil Driver Interface functions
 def coildriver_vout(driver_index, vset):
     """ Set a given voltage for a given driver """
     if driver_index == "X" or driver_index == "U7":
-        _cubesat.drvx.vout(vset)
+        _cubesat.drv_x.vout(vset)
     elif driver_index == "Y" or driver_index == "U8":
-        _cubesat.drvy.vout(vset)
+        _cubesat.drv_y.vout(vset)
     elif driver_index == "Z" or driver_index == "U9":
-        _cubesat.drvz.vout(vset)
+        _cubesat.drv_z.vout(vset)
     else:
         # TODO: possibly throw an exception?
         print(driver_index, "is not a defined coil driver.")
@@ -81,6 +82,7 @@ def lux(sun_sensor_index):
     else:
         # TODO: possibly throw an exception?
         print(sun_sensor_index, "is not a defined sun sensor.")
+
 
 """
 Burnwire Interface functions
@@ -120,6 +122,7 @@ def burn(burn_num='1', dutycycle=0, duration=1):
     burnwire.deinit()  # deinitialize burnwire
 
     return _cubesat._deployA  # return true
+
 
 """
 Miscellaneous Interface functions
@@ -308,7 +311,7 @@ class _Satellite:
         try:
             self._sd = sdcardio.SDCard(self.spi, board.CS_SD, baudrate=4000000)
             self._vfs = storage.VfsFat(self.sd)
-            storage.mount(self.vfs, "/sd")
+            storage.mount(self._vfs, "/sd")
             sys.path.append("/sd")
             self.hardware['SDcard'] = True
         except Exception as e:
