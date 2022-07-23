@@ -25,39 +25,45 @@ import time
 
 
 """
-Interface functions
+IMU Interface functions
 """
 
 def acceleration():
-    """ return the accelerometer reading from the IMU """
-    return _cubesat.imu.accel
+    """ return the accelerometer reading from the IMU in m/s^2 """
+    return _cubesat.IMU.accel
 
 def magnetic():
-    """ return the magnetometer reading from the IMU """
-    return _cubesat.imu.mag
+    """ return the magnetometer reading from the IMU in µT """
+    return _cubesat.IMU.mag
 
 def gyro():
-    """ return the gyroscope reading from the IMU """
-    return _cubesat.imu.gyro
+    """ return the gyroscope reading from the IMU in deg/s """
+    return _cubesat.IMU.gyro
 
 def temperature_imu():
-    """ return the thermometer reading from the IMU """
-    return _cubesat.imu.temperature  # Celsius
+    """ return the thermometer reading from the IMU in celsius """
+    return _cubesat.IMU.temperature  # Celsius
 
 
+"""
+Coil Driver Interface functions
+"""
 def coildriver_vout(driver_index, vset):
     """ Set a given voltage for a given driver """
     if driver_index == "X" or driver_index == "U7":
-        _cubesat.drv_x.vout(vset)
+        _cubesat.drvx.vout(vset)
     elif driver_index == "Y" or driver_index == "U8":
-        _cubesat.drv_y.vout(vset)
+        _cubesat.drvy.vout(vset)
     elif driver_index == "Z" or driver_index == "U9":
-        _cubesat.drv_z.vout(vset)
+        _cubesat.drvz.vout(vset)
     else:
         # TODO: possibly throw an exception?
         print(driver_index, "is not a defined coil driver.")
 
 
+"""
+Sun Sensor Interface functions
+"""
 def lux(sun_sensor_index):
     """ Return the lux reading for a given sun sensor """
     if sun_sensor_index == "-Y":
@@ -76,7 +82,9 @@ def lux(sun_sensor_index):
         # TODO: possibly throw an exception?
         print(sun_sensor_index, "is not a defined sun sensor.")
 
-
+"""
+Burnwire Interface functions
+"""
 def burn(burn_num='1', dutycycle=0, duration=1):
     """
     initialize with default burn_num = '1' ; burnwire 2 IC is not set up
@@ -113,7 +121,9 @@ def burn(burn_num='1', dutycycle=0, duration=1):
 
     return _cubesat._deployA  # return true
 
-
+"""
+Miscellaneous Interface functions
+"""
 def temperature_cpu():
     """ return the temperature reading from the CPU """
     return _cubesat.micro.cpu.temperature  # Celsius
@@ -143,11 +153,6 @@ def battery_voltage():
 
     # volts
     return voltage
-
-
-def fuel_gauge():
-    """ report battery voltage as % full """
-    return 100 * battery_voltage() / 4.2
 
 
 def timeon():
@@ -303,7 +308,7 @@ class _Satellite:
         try:
             self._sd = sdcardio.SDCard(self.spi, board.CS_SD, baudrate=4000000)
             self._vfs = storage.VfsFat(self.sd)
-            storage.mount(self._vfs, "/sd")
+            storage.mount(self.vfs, "/sd")
             sys.path.append("/sd")
             self.hardware['SDcard'] = True
         except Exception as e:
