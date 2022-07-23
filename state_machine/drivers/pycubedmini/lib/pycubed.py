@@ -30,29 +30,29 @@ Interface functions
 
 def acceleration():
     """ return the accelerometer reading from the IMU """
-    return _cubesat.IMU.accel
+    return _cubesat.imu.accel
 
 def magnetic():
     """ return the magnetometer reading from the IMU """
-    return _cubesat.IMU.mag
+    return _cubesat.imu.mag
 
 def gyro():
     """ return the gyroscope reading from the IMU """
-    return _cubesat.IMU.gyro
+    return _cubesat.imu.gyro
 
 def temperature_imu():
     """ return the thermometer reading from the IMU """
-    return _cubesat.IMU.temperature  # Celsius
+    return _cubesat.imu.temperature  # Celsius
 
 
 def coildriver_vout(driver_index, vset):
     """ Set a given voltage for a given driver """
     if driver_index == "X" or driver_index == "U7":
-        _cubesat.drvx.vout(vset)
+        _cubesat.drv_x.vout(vset)
     elif driver_index == "Y" or driver_index == "U8":
-        _cubesat.drvy.vout(vset)
+        _cubesat.drv_y.vout(vset)
     elif driver_index == "Z" or driver_index == "U9":
-        _cubesat.drvz.vout(vset)
+        _cubesat.drv_z.vout(vset)
     else:
         # TODO: possibly throw an exception?
         print(driver_index, "is not a defined coil driver.")
@@ -303,7 +303,7 @@ class _Satellite:
         try:
             self._sd = sdcardio.SDCard(self.spi, board.CS_SD, baudrate=4000000)
             self._vfs = storage.VfsFat(self.sd)
-            storage.mount(self.vfs, "/sd")
+            storage.mount(self._vfs, "/sd")
             sys.path.append("/sd")
             self.hardware['SDcard'] = True
         except Exception as e:
