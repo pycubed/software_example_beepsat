@@ -63,6 +63,7 @@ def d_state(x):
 def propogate(state, time_forward, integration_step=5):
     """Propogate the satelite state forward time_forward (s), in steps of integration_step (s) using rk4 integration.
     Takes into account spherical gravity and the J2 perturbation.
+    In the ECI frame
     Args:
         - state: 6-vector, first 3 are position (km), last 3 are velocity (km/s)
         - time_forward: time to propogate forward (s)
