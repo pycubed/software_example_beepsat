@@ -67,7 +67,7 @@ class Satellite:
 
         self.data_cache = {}
         self.filenumbers = {}
-        self.vlowbatt = 3.5
+        self.vlowbatt = 3.0
         self.debug = True
 
         # Define battery voltage
