@@ -19,7 +19,7 @@ Unfortunately, he taught his apprentice everything he knew.
 Then his apprentice killed him in his sleep. It's ironic. He could save others from death, but not himself."
 "Is it possible to learn this power?"
 "Not from a Jedi."
-―Darth Sidious and Anakin Skywalker"""
+--Darth Sidious and Anakin Skywalker"""
 
 class task(Task):
     name = 'beacon'
