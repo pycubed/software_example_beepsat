@@ -26,12 +26,8 @@ class hardware:
     """Modified @hardware decorator.
     Based on the code from: https://docs.python.org/3/howto/descriptor.html#properties"""
 
-    def __init__(self, fget=None, fset=None, fdel=None, name=None):
+    def __init__(self, fget=None):
         self.fget = fget
-        self.fset = fset
-        self.fdel = fdel
-        self.name = name
-        self._name = ''
 
     def __get__(self, obj, objtype=None):
         if obj is None:
@@ -48,16 +44,6 @@ class hardware:
                 raise HardwareInitException
             else:
                 return device
-
-    def __set__(self, obj, value):
-        if self.fset is None:
-            raise AttributeError(f"can't set attribute {self._name}")
-        self.fset(obj, value)
-
-    def __delete__(self, obj):
-        if self.fdel is None:
-            raise AttributeError(f"can't delete attribute {self._name}")
-        self.fdel(obj)
 
 
 """
