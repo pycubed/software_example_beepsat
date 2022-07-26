@@ -272,8 +272,8 @@ class _Satellite:
             'WDT': False  # Watch Dog Timer pending
         }
         self.micro = microcontroller
-        self._vbatt = analogio.AnalogIn(board.BATTERY)  # Define battery voltage
-        # TODO: do we need self._stat = {}, self.filenumbers = {}, self.debug = True
+        self._vbatt = analogio.AnalogIn(board.BATTERY)  # Battery voltage
+        # TODO: need self._stat = {}, self.filenumbers = {}, self.debug = True?
 
         # Define and initialize hardware
         self._init_i2c1()
@@ -416,7 +416,6 @@ class _Satellite:
 
     def _init_sun_plusz(self):
         """ Initialize the +Z sun sensor on I2C1 """
-        # TODO: check address; -X, +Y, +Z initialize with 3 diff addresses for I2C1
         try:
             self._sun_zp = adafruit_tsl2561.TSL2561(self.i2c1, address=0x39)
             self.sun_zp.enabled = False
