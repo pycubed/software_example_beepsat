@@ -22,6 +22,61 @@ from micropython import const
 import adafruit_tsl2561
 import time
 
+class hardware:
+    """Modified @hardware decorator.
+    Based on the code from: https://docs.python.org/3/howto/descriptor.html#properties"""
+
+    def __init__(self, fget=None, fset=None, fdel=None, name=None):
+        self.fget = fget
+        self.fset = fset
+        self.fdel = fdel
+        self.name = name
+        self._name = ''
+
+    def __set_name__(self, owner, name):
+        self._name = name
+
+    def __get__(self, obj, objtype=None):
+        if obj is None:
+            return self
+        if self.fget is None:
+            raise AttributeError(f'unreadable attribute {self._name}')
+        device, reinit = self.fget(obj)
+        if device is not None:
+            return device
+        else:
+            reinit()
+            device, _ = self.fget(obj)
+            if device is None:
+                raise HardwareInitException
+            else:
+                return device
+
+    def __set__(self, obj, value):
+        if self.fset is None:
+            raise AttributeError(f"can't set attribute {self._name}")
+        self.fset(obj, value)
+
+    def __delete__(self, obj):
+        if self.fdel is None:
+            raise AttributeError(f"can't delete attribute {self._name}")
+        self.fdel(obj)
+
+    def getter(self, fget):
+        prop = type(self)(fget, self.fset, self.fdel)
+        prop._name = self._name
+        return prop
+
+    def setter(self, fset):
+        prop = type(self)(self.fget, fset, self.fdel)
+        prop._name = self._name
+        return prop
+
+    def deleter(self, fdel):
+        prop = type(self)(self.fget, self.fset, fdel)
+        prop._name = self._name
+        return prop
+
 
 """
 IMU Interface functions
@@ -143,10 +198,10 @@ def temperature_cpu():
     return _cubesat.micro.cpu.temperature
 
 def setRGB(v):
-    _cubesat.neopixel()[0] = (v)
+    _cubesat.neopixel[0] = v
 
 def getRGB():
-    return _cubesat.neopixel()[0]
+    return _cubesat.neopixel[0]
 
 def battery_voltage():
     """
@@ -539,99 +594,100 @@ class _Satellite:
             else:
                 return device
 
-    @property
+    @hardware
     def i2c1(self):
         """ Return I2C1 bus object or raise HardwareInitException """
-        return self.hardwarecheck_device("I2C1", self._i2c1)
+        return self.hardwarecheck_device("I2C1", self._i2c1), self._init_i2c1
 
-    @property
+    @hardware
     def i2c2(self):
         """ Return I2C2 bus object or raise HardwareInitException """
-        return self.hardwarecheck_device("I2C2", self._i2c2)
+        return self.hardwarecheck_device("I2C2", self._i2c2), self._init_i2c2
 
-    @property
+    @hardware
     def i2c3(self):
         """ Return I2C3 bus object or raise HardwareInitException """
-        return self.hardwarecheck_device("I2C3", self._i2c3)
+        return self.hardwarecheck_device("I2C3", self._i2c3), self._init_i2c3
 
-    @property
+    @hardware
     def spi(self):
         """ Return SPI bus object or raise HardwareInitException """
-        return self.hardwarecheck_device("SPI", self._spi)
+        return self.hardwarecheck_device("SPI", self._spi), self._init_i2c3
 
-    @property
+    @hardware
     def sd(self):
         """ Return SD Card object or raise HardwareInitException """
-        return self.hardwarecheck_device("SD", self._sd)
+        return self.hardwarecheck_device("SD", self._sd), self._init_i2c3
 
+    @hardware
     def neopixel(self):
-        """ Return Neopixel object or raise HardwareInitException """
-        return self.hardwarecheck_device("Neopixel", self._neopixel)
+        """Return neopixel and its init function"""
+        return self._neopixel, self._init_neopixel
 
-    @property
+    @hardware
     def imu(self):
         """ Return IMU object or raise HardwareInitException """
-        return self.hardwarecheck_device("IMU", self._imu)
+        return self.hardwarecheck_device("IMU", self._imu), self._init_imu
 
-    @property
+    @hardware
     def radio(self):
         """ Return Radio object or raise HardwareInitException """
-        return self.hardwarecheck_device("Radio", self._radio)
+        return self.hardwarecheck_device("Radio", self._radio), self._init_radio
 
-    @property
+    @hardware
     def sun_yn(self):
         """ Return Sun Sensor -Y object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun-Y", self._sun_yn)
+        return self.hardwarecheck_device("Sun-Y", self._sun_yn), self._init_sun_minusy
 
-    @property
+    @hardware
     def sun_zn(self):
         """ Return Sun Sensor -Z object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun-Z", self._sun_zn)
+        return self.hardwarecheck_device("Sun-Z", self._sun_zn), self._init_sun_minusz
 
-    @property
+    @hardware
     def sun_xn(self):
         """ Return Sun Sensor -X object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun-X", self._sun_xn)
+        return self.hardwarecheck_device("Sun-X", self._sun_xn), self._init_sun_minusx
 
-    @property
+    @hardware
     def sun_yp(self):
         """ Return Sun Sensor +Y object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun+Y", self._sun_yp)
+        return self.hardwarecheck_device("Sun+Y", self._sun_yp), self._init_sun_plusy
 
-    @property
+    @hardware
     def sun_zp(self):
         """ Return Sun Sensor +Z object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun+Z", self._sun_zp)
+        return self.hardwarecheck_device("Sun+Z", self._sun_zp), self._init_sun_plusz
 
-    @property
+    @hardware
     def sun_xp(self):
         """ Return Sun Sensor +X object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun+X", self._sun_xp)
+        return self.hardwarecheck_device("Sun+X", self._sun_xp), self._init_sun_plusx
 
-    @property
+    @hardware
     def drv_x(self):
         """ Return Coil Driver X object or raise HardwareInitException """
-        return self.hardwarecheck_device("CoilDriverX", self._drv_x)
+        return self.hardwarecheck_device("CoilDriverX", self._drv_x), self._init_coildriverx
 
-    @property
+    @hardware
     def drv_y(self):
         """ Return Coil Driver Y object or raise HardwareInitException """
-        return self.hardwarecheck_device("CoilDriverY", self._drv_y)
+        return self.hardwarecheck_device("CoilDriverY", self._drv_y), self._init_coildrivery
 
-    @property
+    @hardware
     def drv_z(self):
         """ Return Coil Driver Z object or raise HardwareInitException """
-        return self.hardwarecheck_device("CoilDriverZ", self._drv_z)
+        return self.hardwarecheck_device("CoilDriverZ", self._drv_z), self._init_coildriverz
 
-    @property
+    @hardware
     def burnwire1(self):
         """ Return Burnwire1 object or raise HardwareInitException """
-        return self.hardwarecheck_device("Burnwire1", self._burnwire1)
+        return self.hardwarecheck_device("Burnwire1", self._burnwire1), self._init_burnwire1
 
-    @property
+    @hardware
     def burnwire2(self):
         """ Return Burnwire2 object or raise HardwareInitException """
-        return self.hardwarecheck_device("Burnwire2", self._burnwire2)
+        return self.hardwarecheck_device("Burnwire2", self._burnwire2), self._init_burnwire2
 
 
 # initialize Satellite as cubesat
