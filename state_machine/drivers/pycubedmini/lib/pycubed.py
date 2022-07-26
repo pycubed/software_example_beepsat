@@ -24,7 +24,11 @@ import time
 
 class hardware:
     """Modified @hardware decorator.
-    Based on the code from: https://docs.python.org/3/howto/descriptor.html#properties"""
+    Based on the code from: https://docs.python.org/3/howto/descriptor.html#properties
+    Attempts to return the appropriate hardware device. 
+    If this fails, it will attempt to reinitialize the hardware.
+    If this fails again, it will raise an exception.
+    """
 
     def __init__(self, fget=None):
         self.fget = fget
