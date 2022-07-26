@@ -502,27 +502,27 @@ class _Satellite:
 
     @hardware
     def i2c1(self):
-        """ Return I2C1 bus object or raise HardwareInitException """
+        """ Return I2C1 bus and init function"""
         return self._i2c1, self._init_i2c1
 
     @hardware
     def i2c2(self):
-        """ Return I2C2 bus object or raise HardwareInitException """
+        """ Return I2C2 bus object and init function"""
         return self._i2c2, self._init_i2c2
 
     @hardware
     def i2c3(self):
-        """ Return I2C3 bus object or raise HardwareInitException """
+        """ Return I2C3 bus object and init function"""
         return self._i2c3, self._init_i2c3
 
     @hardware
     def spi(self):
-        """ Return SPI bus object or raise HardwareInitException """
+        """ Return SPI bus object and init function"""
         return self._spi, self._init_i2c3
 
     @hardware
     def sd(self):
-        """ Return SD Card object or raise HardwareInitException """
+        """ Return SD Card object and init function"""
         return self._sd, self._init_i2c3
 
     @hardware
@@ -532,67 +532,67 @@ class _Satellite:
 
     @hardware
     def imu(self):
-        """ Return IMU object or raise HardwareInitException """
+        """ Return IMU object and init function"""
         return self._imu, self._init_imu
 
     @hardware
     def radio(self):
-        """ Return Radio object or raise HardwareInitException """
+        """ Return Radio and init function"""
         return self._radio, self._init_radio
 
     @hardware
     def sun_yn(self):
-        """ Return Sun Sensor -Y object or raise HardwareInitException """
+        """ Return Sun Sensor -Y and init function"""
         return self._sun_yn, self._init_sun_minusy
 
     @hardware
     def sun_zn(self):
-        """ Return Sun Sensor -Z object or raise HardwareInitException """
+        """ Return Sun Sensor -Z and init function"""
         return self._sun_zn, self._init_sun_minusz
 
     @hardware
     def sun_xn(self):
-        """ Return Sun Sensor -X object or raise HardwareInitException """
+        """ Return Sun Sensor -X and init function"""
         return self._sun_xn, self._init_sun_minusx
 
     @hardware
     def sun_yp(self):
-        """ Return Sun Sensor +Y object or raise HardwareInitException """
+        """ Return Sun Sensor +Y and init function"""
         return self._sun_yp, self._init_sun_plusy
 
     @hardware
     def sun_zp(self):
-        """ Return Sun Sensor +Z object or raise HardwareInitException """
+        """ Return Sun Sensor +Z and init function"""
         return self._sun_zp, self._init_sun_plusz
 
     @hardware
     def sun_xp(self):
-        """ Return Sun Sensor +X object or raise HardwareInitException """
+        """ Return Sun Sensor +X and init function"""
         return self._sun_xp, self._init_sun_plusx
 
     @hardware
     def drv_x(self):
-        """ Return Coil Driver X object or raise HardwareInitException """
+        """ Return Coil Driver X and init function"""
         return self._drv_x, self._init_coildriverx
 
     @hardware
     def drv_y(self):
-        """ Return Coil Driver Y object or raise HardwareInitException """
+        """ Return Coil Driver Y and init function"""
         return self._drv_y, self._init_coildrivery
 
     @hardware
     def drv_z(self):
-        """ Return Coil Driver Z object or raise HardwareInitException """
+        """ Return Coil Driver Z and init function"""
         return self._drv_z, self._init_coildriverz
 
     @hardware
     def burnwire1(self):
-        """ Return Burnwire1 object or raise HardwareInitException """
+        """ Return Burnwire1 object and init function"""
         return self._burnwire1, self._init_burnwire1
 
     @hardware
     def burnwire2(self):
-        """ Return Burnwire2 object or raise HardwareInitException """
+        """ Return Burnwire2 object and init function"""
         return self._burnwire2, self._init_burnwire2
 
 
