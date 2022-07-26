@@ -119,7 +119,7 @@ def burn(burn_num='1', dutycycle=0, duration=1):
         print("Burnwire2 IC is not set up.", e)
         return False
 
-    RGB(255, 0, 0)  # set RGB to red
+    setRGB(255, 0, 0)  # set RGB to red
 
     # set the burnwire's dutycycle; begins the burn
     burnwire.duty_cycle = dtycycl
@@ -127,7 +127,7 @@ def burn(burn_num='1', dutycycle=0, duration=1):
 
     # set burnwire's dutycycle back to 0; ends the burn
     burnwire.duty_cycle = 0
-    RGB(0, 0, 0)  # set RGB to no color
+    setRGB(0, 0, 0)  # set RGB to no color
 
     _cubesat._deployA = True  # sets deployment variable to true
     burnwire.deinit()  # deinitialize burnwire
@@ -142,13 +142,18 @@ def temperature_cpu():
     """ return the temperature reading from the CPU in celsius """
     return _cubesat.micro.cpu.temperature
 
+def setRGB(v):
+    _cubesat.neopixel()[0] = (v)
+
+def getRGB():
+    return _cubesat.neopixel()[0]
 
 def battery_voltage():
     """
     Return the battery voltage
-    _cubesat._vbatt.value converts the analog value of the 
-    board.BATTERY pin to a digital one. We read this value 50 
-    times and then later average it to get as close as possible 
+    _cubesat._vbatt.value converts the analog value of the
+    board.BATTERY pin to a digital one. We read this value 50
+    times and then later average it to get as close as possible
     to a reliable battery voltage value
     """
     # initialize vbat
@@ -559,7 +564,6 @@ class _Satellite:
         """ Return SD Card object or raise HardwareInitException """
         return self.hardwarecheck_device("SD", self._sd)
 
-    @property
     def neopixel(self):
         """ Return Neopixel object or raise HardwareInitException """
         return self.hardwarecheck_device("Neopixel", self._neopixel)
@@ -636,4 +640,3 @@ _cubesat = _Satellite()
 # Make radio and microcontroller accessible
 radio = _cubesat.radio
 cubesat_microcontroller = _cubesat.micro
-RGB = _cubesat.neopixel[0]
