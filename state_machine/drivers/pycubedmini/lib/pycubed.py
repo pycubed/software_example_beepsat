@@ -237,16 +237,6 @@ class _Satellite:
 
     UHF_FREQ = 433.0
 
-    def __new__(cls):
-        """ 
-        Override the built-in __new__ function
-        Ensure only one instance of this class can be made per process
-        """
-        if not cls.instance:
-            cls.instance = object.__new__(cls)
-            cls.instance = super(_Satellite, cls).__new__(cls)
-        return cls.instance
-
     def __init__(self):
         """ Big init routine as the whole board is brought up. """
         self.hardware = {
