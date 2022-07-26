@@ -380,7 +380,6 @@ class _Satellite:
 
     def _init_sun_minusy(self):
         """ Initialize the -Y sun sensor on I2C2 """
-        # TODO: check address; -Y, -Z, +Z initialize with 3 diff addresses for I2C2
         try:
             self._sun_yn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x29)
             self.sun_yn.enabled = False
@@ -390,7 +389,6 @@ class _Satellite:
 
     def _init_sun_minusz(self):
         """ Initialize the -Z sun sensor on I2C2 """
-        # TODO: check address; -Y, -Z, +Z initialize with 3 diff addresses for I2C2
         try:
             self._sun_zn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x39)
             self.sun_zn.enabled = False
@@ -400,7 +398,6 @@ class _Satellite:
 
     def _init_sun_minusx(self):
         """ Initialize the -X sun sensor on I2C1 """
-        # TODO: check address; -X, +Y, +Z initialize with 3 diff addresses for I2C1
         try:
             self._sun_xn = adafruit_tsl2561.TSL2561(self.i2c1, address=0x49)
             self.sun_xn.enabled = False
@@ -410,7 +407,6 @@ class _Satellite:
 
     def _init_sun_plusy(self):
         """ Initialize the +Y sun sensor on I2C1 """
-        # TODO: check address; -X, +Y, +Z initialize with 3 diff addresses for I2C1
         try:
             self._sun_yp = adafruit_tsl2561.TSL2561(self.i2c1, address=0x29)
             self.sun_yp.enabled = False
@@ -430,7 +426,6 @@ class _Satellite:
 
     def _init_sun_plusx(self):
         """ Initialize the +X sun sensor on I2C2 """
-        # TODO: check address; -Y, -Z, +Z initialize with 3 diff addresses for I2C2
         try:
             self._sun_xp = adafruit_tsl2561.TSL2561(self.i2c2, address=0x49)
             self.sun_xp.enabled = False
