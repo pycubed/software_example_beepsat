@@ -197,6 +197,11 @@ def reset_logfail_count():
     _cubesat.c_logfail = 0
 
 
+vlowbatt = 3.0
+BOOTTIME = int(time.monotonic())
+data_cache = {}
+
+
 """
 Define HardwareInitException
 """

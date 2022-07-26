@@ -1,6 +1,7 @@
 # Blink the RGB LED
 
 from lib.template_task import Task
+import lib.pycubed as cubesat
 
 
 class task(Task):
@@ -11,8 +12,8 @@ class task(Task):
 
     async def main_task(self):
         if self.rgb_on:
-            self.cubesat.RGB = (0, 0, 0)
+            cubesat.set_RGB((0, 0, 0))
             self.rgb_on = False
         else:
-            self.cubesat.RGB = (0, 255, 0)
+            cubesat.set_RGB((0, 255, 0))
             self.rgb_on = True

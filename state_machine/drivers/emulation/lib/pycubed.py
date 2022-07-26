@@ -35,9 +35,6 @@ class Satellite:
     def __init__(self):
         self.task = None
         self.scheduled_tasks = {}
-        self.battery_voltage = 6.4
-        self.vlowbatt = 4.0
-        self.BOOTTIME = time.monotonic()
         self.radio = Radio()
         self.data_cache = {}
         self.c_gs_resp = 1
@@ -52,29 +49,54 @@ class Satellite:
         self._torque = [0, 0, 0]
         self.sim = False
 
-    def new_file(self, substring, binary=False):
-        print(
-            f"new file not implemented, string not written with binary={binary}")
-        return None
 
-    @property
-    def acceleration(self):
-        reader.read(self)
-        return self._accel
+_cubesat = Satellite()
 
-    @property
-    def magnetic(self):
-        reader.read(self)
-        return self._mag
+"""
+IMU-related functions
+"""
 
-    @property
-    def gyro(self):
-        reader.read(self)
-        return self._gyro
+def acceleration():
+    """ return the accelerometer reading from the IMU """
+    reader.read(_cubesat)
+    return _cubesat._accel
 
-    def log(self, str):
-        """Logs to sd card"""
-        print('log not implemented')
+def magnetic():
+    """ return the magnetometer reading from the IMU """
+    reader.read(_cubesat)
+    return _cubesat._mag
+
+def gyro():
+    """ return the gyroscope reading from the IMU """
+    reader.read(_cubesat)
+    return _cubesat._gyro
+
+def temperature_imu():
+    """ return the thermometer reading from the IMU """
+    reader.read(_cubesat)
+    return 20  # Celsius
 
 
-pocketqube = Satellite()
+"""
+Misc Functions
+"""
+
+vlowbatt = 4.0
+BOOTTIME = time.monotonic()
+data_cache = {}
+def battery_voltage():
+    return 6.4
+
+def sim():
+    return _cubesat.sim
+
+
+"""
+Radio related functions
+"""
+# send = _cubesat.radio.send
+# listen = _cubesat.radio.listen
+await_rx = _cubesat.radio.await_rx
+receive = _cubesat.radio.receive
+sleep = _cubesat.radio.sleep
+radio = _cubesat.radio
