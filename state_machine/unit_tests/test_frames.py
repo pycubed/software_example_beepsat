@@ -1,7 +1,8 @@
 import unittest
 import sys
-from numpy import array, cos, sin, pi
+from numpy import array, cos, sin, pi, testing
 from numpy.linalg import norm
+from datetime import datetime as dt, timezone
 
 sys.path.insert(0, './state_machine/applications/flight')
 
@@ -54,7 +55,6 @@ class TestECIToECF(unittest.TestCase):
     def test_similar_to_SD(self):
         """Test that our ECI to ECF transformation is similar enough to the Satellite Dynamics implementation.
         Note that for these test cases the max error was 27km."""
-        from datetime import datetime as dt, timezone
 
         t = dt(2000, 1, 1, tzinfo=timezone.utc).timestamp()
         A = array([[-0.170822,    0.985302,     2.31292e-5],
@@ -80,6 +80,143 @@ class TestECIToECF(unittest.TestCase):
                    [0.00217802,  2.8192e-5,  0.999998]])
         assert_matrices_close(A, frames.eci_to_ecef(t))
 
+    def test_almost_no_change(self):
+        """Makes sure that changes to the implementation had no effect on results.
+        Tests this by making sure there are minimal (floating point precission error) level changes on 12 dates"""
+        t = dt(2021, 1, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[-0.1839457605221258, 0.9829363952901209, 0.0],
+                   [-0.9829363952901209, -0.1839457605221258, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2021, 2, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[-0.6580806377921898, 0.7529474577704772, 0.0],
+                   [-0.7529474577704772, -0.6580806377921898, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2021, 3, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[-0.9320129243938287, 0.3624250388188755, 0.0],
+                   [-0.3624250388188755, -0.9320129243938287, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2021, 4, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[-0.9868422306700495, -0.16168615205440712, 0.0],
+                   [0.16168615205440712, -0.9868422306700495, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2021, 5, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[-0.7785373536811516, -0.6275982703315469, 0.0],
+                   [0.6275982703315469, -0.7785373536811516, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2021, 6, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[-0.3513983831437039, -0.9362260284375726, 0.0],
+                   [0.9362260284375726, -0.3513983831437039, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2021, 7, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[0.15635686230392626, -0.9877006285360311, 0.0],
+                   [0.9877006285360311, 0.15635686230392626, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2021, 8, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[0.6367443390207271, -0.7710749942288736, 0.0],
+                   [0.7710749942288736, 0.6367443390207271, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2021, 9, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[0.9403086811984223, -0.34032276453814236, 0.0],
+                   [0.34032276453814236, 0.9403086811984223, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2021, 10, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[0.9857861928327254, 0.1680047083279533, 0.0],
+                   [-0.1680047083279533, 0.9857861928327254, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2021, 11, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[0.7635051952063154, 0.6458016854212802, 0.0],
+                   [-0.6458016854212802, 0.7635051952063154, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2021, 12, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[0.3453935542734844, 0.9384579333493481, 0.0],
+                   [-0.9384579333493481, 0.3453935542734844, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2022, 1, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[-0.17962914501591593, 0.9837344002630237, 0.0],
+                   [-0.9837344002630237, -0.17962914501591593, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2022, 2, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[-0.6547690475062801, 0.755829011369449, 0.0],
+                   [-0.755829011369449, -0.6547690475062801, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2022, 3, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[-0.9304129898262267, 0.36651284883701135, 0.0],
+                   [-0.36651284883701135, -0.9304129898262267, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2022, 4, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[-0.9875424839359093, -0.15735260538578436, 0.0],
+                   [0.15735260538578436, -0.9875424839359093, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2022, 5, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[-0.7812848508065111, -0.6241746405456149, 0.0],
+                   [0.6241746405456149, -0.7812848508065111, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2022, 6, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[-0.35550479386916095, -0.9346744575177206, 0.0],
+                   [0.9346744575177206, -0.35550479386916095, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2022, 7, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[0.15201959883257268, -0.988377479291583, 0.0],
+                   [0.988377479291583, 0.15201959883257268, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2022, 8, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[0.6333533789908415, -0.7738627121918225, 0.0],
+                   [0.7738627121918225, 0.6333533789908415, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2022, 9, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[0.9388056901181695, -0.34444720379435156, 0.0],
+                   [0.34444720379435156, 0.9388056901181695, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2022, 10, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[0.9865141931440005, 0.16367573652023631, 0.0],
+                   [-0.16367573652023631, 0.9865141931440005, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2022, 11, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[0.7663327455735337, 0.6424438676349317, 0.0],
+                   [-0.6424438676349317, 0.7663327455735337, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        t = dt(2022, 12, 1, tzinfo=timezone.utc).timestamp()
+        A = array([[0.3495098203557688, 0.9369327006113504, 0.0],
+                   [-0.9369327006113504, 0.3495098203557688, 0.0],
+                   [0.0, 0.0, 1.0]])
+        testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
+        print("no changes!")
 
-x = TestECIToECF()
-x.test_similar_to_SD()
+def np_arr_to_py(arr):
+    def format_row(row):
+        return f"[{', '.join(map(str, row))}]"
+    spliter = ',\n'
+    return f"array([{spliter.join([format_row(row) for row in arr])}])"
+
+
+def generate_no_change_tests():
+    for year in range(2021, 2023):
+        for month in range(1, 13):
+            t = dt(year, month, 1, tzinfo=timezone.utc).timestamp()
+            res = frames.eci_to_ecef(t)
+            print(f't = dt({year}, {month}, 1, tzinfo=timezone.utc).timestamp()')
+            print(f'A = {np_arr_to_py(res)}')
+            print('testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))')
