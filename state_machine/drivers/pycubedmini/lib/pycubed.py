@@ -4,7 +4,6 @@ PyCubed Mini mainboard-v02 for Pocketqube Mission
 * Author(s): Max Holliday, Yashika Batra
 """
 
-
 import sdcardio
 import pycubed_rfm9x
 import board
@@ -25,77 +24,99 @@ import time
 
 
 """
-Interface functions
+IMU Interface functions
 """
-
 def acceleration():
-    """ return the accelerometer reading from the IMU """
-    return _cubesat.IMU.accel
+    """ return the accelerometer reading from the IMU in m/s^2 """
+    return _cubesat.imu.accel
+
 
 def magnetic():
-    """ return the magnetometer reading from the IMU """
-    return _cubesat.IMU.mag
+    """ return the magnetometer reading from the IMU in µT """
+    return _cubesat.imu.mag
+
 
 def gyro():
-    """ return the gyroscope reading from the IMU """
-    return _cubesat.IMU.gyro
+    """ return the gyroscope reading from the IMU in deg/s """
+    return _cubesat.imu.gyro
+
 
 def temperature_imu():
-    """ return the thermometer reading from the IMU """
-    return _cubesat.IMU.temperature  # Celsius
+    """ return the thermometer reading from the IMU in celsius """
+    return _cubesat.imu.temperature
 
 
-def coildriver_vout(driver_index, vset):
-    """ Set a given voltage for a given driver """
-    if driver_index == "X" or driver_index == "U7":
-        _cubesat.drvx.vout(vset)
-    elif driver_index == "Y" or driver_index == "U8":
-        _cubesat.drvy.vout(vset)
-    elif driver_index == "Z" or driver_index == "U9":
-        _cubesat.drvz.vout(vset)
-    else:
-        # TODO: possibly throw an exception?
-        print(driver_index, "is not a defined coil driver.")
+"""
+Coil Driver Interface functions
+"""
+def coildriver_vout(driver_index, projected_voltage):
+    """ Set a given voltage for a given coil driver """
+    try:
+        if driver_index == "X" or driver_index == "U7":
+            _cubesat.drv_x.throttle_volts = projected_voltage
+        elif driver_index == "Y" or driver_index == "U8":
+            _cubesat.drv_y.throttle_volts = projected_voltage
+        elif driver_index == "Z" or driver_index == "U9":
+            _cubesat.drv_z.throttle_volts = projected_voltage
+        else:
+            raise HardwareInitException
+    # TODO: we can change how this is handled
+    except HardwareInitException as e:
+        print(driver_index, "is not a defined coil driver", e)
 
 
+"""
+Sun Sensor Interface functions
+"""
 def lux(sun_sensor_index):
     """ Return the lux reading for a given sun sensor """
-    if sun_sensor_index == "-Y":
-        return _cubesat.sun_yn.lux
-    elif sun_sensor_index == "-Z":
-        return _cubesat.sun_zn.lux
-    elif sun_sensor_index == "-X":
-        return _cubesat.sun_xn.lux
-    elif sun_sensor_index == "+Y":
-        return _cubesat.sun_yp.lux
-    elif sun_sensor_index == "+Z":
-        return _cubesat.sun_zp.lux
-    elif sun_sensor_index == "+X":
-        return _cubesat.sun_xp.lux
-    else:
-        # TODO: possibly throw an exception?
-        print(sun_sensor_index, "is not a defined sun sensor.")
+    try:
+        if sun_sensor_index == "-Y":
+            return _cubesat.sun_yn.lux
+        elif sun_sensor_index == "-Z":
+            return _cubesat.sun_zn.lux
+        elif sun_sensor_index == "-X":
+            return _cubesat.sun_xn.lux
+        elif sun_sensor_index == "+Y":
+            return _cubesat.sun_yp.lux
+        elif sun_sensor_index == "+Z":
+            return _cubesat.sun_zp.lux
+        elif sun_sensor_index == "+X":
+            return _cubesat.sun_xp.lux
+        else:
+            raise HardwareInitException
+    # TODO: we can change how this is handled
+    except HardwareInitException as e:
+        print(sun_sensor_index, "is not a defined sun sensor.", e)
 
 
+"""
+Burnwire Interface functions
+"""
 def burn(burn_num='1', dutycycle=0, duration=1):
     """
-    initialize with default burn_num = '1' ; burnwire 2 IC is not set up
     Given a burn wire num, a dutycycle, and a burn duration, control
     the voltage of the corresponding burnwire IC
     "dutycycle" tells us the proportion of total voltage we will
     run the IC at (ex. if "dtycycl" = 0.5, we burn at 1.65 volts)
+
+    initialize with default burn_num = '1' ; burnwire 2 IC is not set up
     """
     # BURN1 = -Z,BURN2 = extra burnwire pin, dutycycle ~0.13%
     dtycycl = int((dutycycle / 100) * (0xFFFF))
 
-    # initialize burnwire based on the burn_num passed to the function
-    if '1' in burn_num:
-        burnwire = _cubesat.burnwire1
-    elif '2' in burn_num:
-        # because burnwire2 is not set up, will throw HardwareInitException
-        burnwire = _cubesat.burnwire2
-    else:
-        # TODO: throw an exception?
+    try:
+        # initialize burnwire based on the burn_num passed to the function
+        if '1' in burn_num:
+            burnwire = _cubesat.burnwire1
+        elif '2' in burn_num:
+            # because burnwire2 is not set up, will throw HardwareInitException
+            burnwire = _cubesat.burnwire2
+        else:
+            raise HardwareInitException
+    # TODO: we can change how this is handled
+    except HardwareInitException as e:
+        print("Burnwire2 IC is not set up.", e)
         return False
 
     RGB(255, 0, 0)  # set RGB to red
@@ -114,9 +135,12 @@ def burn(burn_num='1', dutycycle=0, duration=1):
     return _cubesat._deployA  # return true
 
 
+"""
+Miscellaneous Interface functions
+"""
 def temperature_cpu():
-    """ return the temperature reading from the CPU """
-    return _cubesat.micro.cpu.temperature  # Celsius
+    """ return the temperature reading from the CPU in celsius """
+    return _cubesat.micro.cpu.temperature
 
 
 def RGB(value=None):
@@ -130,24 +154,27 @@ def RGB(value=None):
 
 
 def battery_voltage():
-    """ return the battery voltage """
+    """
+    Return the battery voltage
+    _cubesat._vbatt.value converts the analog value of the 
+    board.BATTERY pin to a digital one. We read this value 50 
+    times and then later average it to get as close as possible 
+    to a reliable battery voltage value
+    """
     # initialize vbat
     vbat = 0
 
+    # get the battery value 50 times
     for _ in range(50):
         # 65536 = 2^16, number of increments we can have to voltage
         vbat += _cubesat._vbatt.value * 3.3 / 65536
 
+    # vbat / 50 = average of all battery voltage values read
     # 100k/100k voltage divider
     voltage = (vbat / 50) * (100 + 100) / 100
 
     # volts
     return voltage
-
-
-def fuel_gauge():
-    """ report battery voltage as % full """
-    return 100 * battery_voltage() / 4.2
 
 
 def timeon():
@@ -215,9 +242,11 @@ class _Satellite:
 
     UHF_FREQ = 433.0
 
-    instance = None
-
     def __new__(cls):
+        """ 
+        Override the built-in __new__ function
+        Ensure only one instance of this class can be made per process
+        """
         if not cls.instance:
             cls.instance = object.__new__(cls)
             cls.instance = super(_Satellite, cls).__new__(cls)
@@ -249,9 +278,7 @@ class _Satellite:
         }
         self.micro = microcontroller
         self._vbatt = analogio.AnalogIn(board.BATTERY)  # Define battery voltage
-        # self._stat = {}  # Do we need this? Only used in logging functions
-        # self.filenumbers = {}  # Do we need this? Not used in library
-        # self.debug = True  # Do we need this? Not used in library
+        # TODO: do we need self._stat = {}, self.filenumbers = {}, self.debug = True
 
         # Define and initialize hardware
         self._init_i2c1()
@@ -275,6 +302,7 @@ class _Satellite:
         self._init_burnwire2()
 
     def _init_i2c1(self):
+        """ Initialize I2C1 bus """
         try:
             self._i2c1 = busio.I2C(board.SCL1, board.SDA1)
             self.hardware['I2C1'] = True
@@ -282,6 +310,7 @@ class _Satellite:
             print("[ERROR][Initializing I2C1]", e)
 
     def _init_i2c2(self):
+        """ Initialize I2C2 bus """
         try:
             self._i2c2 = busio.I2C(board.SCL2, board.SDA2)
             self.hardware['I2C2'] = True
@@ -289,6 +318,7 @@ class _Satellite:
             print("[ERROR][Initializing I2C2]", e)
 
     def _init_i2c3(self):
+        """ Initialize I2C3 bus """
         try:
             self._i2c3 = busio.I2C(board.SCL3, board.SDA3)
             self.hardware['I2C3'] = True
@@ -296,7 +326,7 @@ class _Satellite:
             print("[ERROR][Initializing I2C3]", e)
 
     def _init_spi(self):
-        """ Define and initialize SPI bus """
+        """ Initialize SPI bus """
         try:
             self._spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
             self.hardware['SPI'] = True
@@ -308,7 +338,7 @@ class _Satellite:
         try:
             self._sd = sdcardio.SDCard(self.spi, board.CS_SD, baudrate=4000000)
             self._vfs = storage.VfsFat(self.sd)
-            storage.mount(self.vfs, "/sd")
+            storage.mount(self._vfs, "/sd")
             sys.path.append("/sd")
             self.hardware['SDcard'] = True
         except Exception as e:
@@ -354,98 +384,101 @@ class _Satellite:
             print('[ERROR][Initializing RADIO]', e)
 
     def _init_sun_minusy(self):
-        # TODO: check sun sensor addresses on the schematic once
+        """ Initialize the -Y sun sensor on I2C2 """
+        # TODO: check address; -Y, -Z, +Z initialize with 3 diff addresses for I2C2
         try:
-            self._sun_yn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x29)  # -Y
+            self._sun_yn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x29)
             self.sun_yn.enabled = False
             self.hardware['Sun-Y'] = True
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor -Y]', e)
 
     def _init_sun_minusz(self):
-        # TODO: check sun sensor addresses on the schematic once
+        """ Initialize the -Z sun sensor on I2C2 """
+        # TODO: check address; -Y, -Z, +Z initialize with 3 diff addresses for I2C2
         try:
-            self._sun_zn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x39)  # -Z
+            self._sun_zn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x39)
             self.sun_zn.enabled = False
             self.hardware['Sun-Z'] = True
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor -Z]', e)
 
     def _init_sun_minusx(self):
-        # TODO: check sun sensor addresses on the schematic once
+        """ Initialize the -X sun sensor on I2C1 """
+        # TODO: check address; -X, +Y, +Z initialize with 3 diff addresses for I2C1
         try:
-            self._sun_xn = adafruit_tsl2561.TSL2561(self.i2c1, address=0x49)  # -X
+            self._sun_xn = adafruit_tsl2561.TSL2561(self.i2c1, address=0x49)
             self.sun_xn.enabled = False
             self.hardware['Sun-X'] = True
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor -X]', e)
 
     def _init_sun_plusy(self):
-        # TODO: check sun sensor addresses on the schematic once
+        """ Initialize the +Y sun sensor on I2C1 """
+        # TODO: check address; -X, +Y, +Z initialize with 3 diff addresses for I2C1
         try:
-            self._sun_yp = adafruit_tsl2561.TSL2561(self.i2c1, address=0x29)  # +Y
+            self._sun_yp = adafruit_tsl2561.TSL2561(self.i2c1, address=0x29)
             self.sun_yp.enabled = False
             self.hardware['Sun+Y'] = True
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor +Y]', e)
 
     def _init_sun_plusz(self):
-        # TODO: check sun sensor addresses on the schematic once
+        """ Initialize the +Z sun sensor on I2C1 """
+        # TODO: check address; -X, +Y, +Z initialize with 3 diff addresses for I2C1
         try:
-            self._sun_zp = adafruit_tsl2561.TSL2561(self.i2c1, address=0x39)  # +Z
+            self._sun_zp = adafruit_tsl2561.TSL2561(self.i2c1, address=0x39)
             self.sun_zp.enabled = False
             self.hardware['Sun+Z'] = True
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor +Z]', e)
 
     def _init_sun_plusx(self):
-        # TODO: check sun sensor addresses on the schematic once
+        """ Initialize the +X sun sensor on I2C2 """
+        # TODO: check address; -Y, -Z, +Z initialize with 3 diff addresses for I2C2
         try:
-            self._sun_xp = adafruit_tsl2561.TSL2561(self.i2c2, address=0x49)  # +X
+            self._sun_xp = adafruit_tsl2561.TSL2561(self.i2c2, address=0x49)
             self.sun_xp.enabled = False
             self.hardware['Sun+X'] = True
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor +X]', e)
 
     def _init_coildriverx(self):
-        # TODO: check coil driver addresses on the schematic once
+        """ Initialize Coil Driver X on I2C3, set mode and voltage """
         try:
-            # may need to fix i2c addresses
-            # schematic says U7 -> 0xC4 and 0xC5 but these vals are 8 bit instead of 7
-            self._drv_x = drv8830.DRV8830(self.i2c1, 0x68)  # U7
-            self.drv_x.mode = drv8830.COAST
-            self.drv_x.vout = 0
+            self._drv_x = drv8830.DRV8830(self.i2c3, 0x62)  # U7
+            # TODO: initialization automatically sets mode to STANDBY
+            # do we want STANDBY or COAST
+            self.drv_x.mode = drv8830.BridgeControl.COAST
             self.hardware['CoilDriverX'] = True
         except Exception as e:
             print('[ERROR][Initializing H-Bridge U7]', e)
 
     def _init_coildrivery(self):
-        # TODO: check coil driver addresses on the schematic once
+        """ Initialize Coil Driver Y on I2C3, set mode and voltage """
         try:
-            # may need to fix i2c addresses
-            # schematic says U8 -> 0xD0 and 0xD1 but these vals are 8 bit instead of 7
-            self._drv_y = drv8830.DRV8830(self.i2c1, 0x60)  # U8
-            self.drv_y.mode = drv8830.COAST
-            self.drv_y.vout = 0
+            self._drv_y = drv8830.DRV8830(self.i2c3, 0x68)  # U8
+            # TODO: initialization automatically sets mode to STANDBY
+            # do we want STANDBY or COAST
+            self.drv_y.mode = drv8830.BridgeControl.COAST
             self.hardware['CoilDriverY'] = True
         except Exception as e:
             print('[ERROR][Initializing H-Bridge U8]', e)
 
     def _init_coildriverz(self):
-        # TODO: check coil driver addresses on the schematic once
+        """ Initialize Coil Driver Z on I2C3, set mode and voltage """
         try:
-            # may need to fix i2c addresses
-            # schematic says U9 -> 0xC0 and 0xC1 but these vals are 8 bit instead of 7
-            self._drv_z = drv8830.DRV8830(self.i2c1, 0x62)  # U9
-            self.drv_z.mode = drv8830.COAST
-            self.drv_z.vout = 0
+            self._drv_z = drv8830.DRV8830(self.i2c3, 0x60)  # U9
+            # TODO: initialization automatically sets mode to STANDBY
+            # do we want STANDBY or COAST
+            self.drv_z.mode = drv8830.BridgeControl.COAST
             self.hardware['CoilDriverZ'] = True
         except Exception as e:
             print('[ERROR][Initializing H-Bridge U9]', e)
 
     def _init_burnwire1(self):
-        # TODO: update firmware so we can use board.BURN1 and board.BURN2
-        # instead of microcontroller.pin.PA19 and microcontroller.pin.PA18
+        """ Initialize Burnwire1 on PA19 """
+        # TODO: update firmware so we can use board.BURN1
         try:
             # changed pinout from BURN1 to PA19 (BURN1 did not support PWMOut)
             self._burnwire1 = pwmio.PWMOut(
@@ -455,19 +488,19 @@ class _Satellite:
             print('[ERROR][Initializing Burn Wire IC1]', e)
 
     def _init_burnwire2(self):
-        # TODO: update firmware so we can use board.BURN1 and board.BURN2
-        # instead of microcontroller.pin.PA19 and microcontroller.pin.PA18
+        """ Initialize Burnwire2 on PA18 """
+        # TODO: update firmware so we can use board.BURN2
         try:
             # changed pinout from BURN2 to PA18 (BURN2 did not support PWMOut)
             self._burnwire2 = pwmio.PWMOut(
                 microcontroller.pin.PA18, frequency=1000, duty_cycle=0)
-            # Initializing Burn Wire 2 hardware as false; no corresponding IC yet
+            # Initializing Burn Wire 2 hardware as false; no corresponding IC
             self.hardware['Burnwire2'] = False
         except Exception as e:
             print('[ERROR][Initializing Burn Wire IC2]', e)
 
     def reinit(self, device_string):
-        """ Reinit: reinitialize radio, sd, or IMU based upon contents of dev """
+        """ Reinit: reinitialize the given device in device_string """
         # dev is a string of all lowercase letters,
         dev = device_string.lower()
 
@@ -513,6 +546,11 @@ class _Satellite:
             print("Invalid Device:", device_string)
 
     def hardwarecheck_device(self, devicestr, device):
+        """ 
+        Check if the given device is initialized. If not, 
+        attempt to reinitialized it. If reinitialization fails,
+        raise HardwareInitException (to be handled in application) 
+        """
         if device is not None:
             return device
         else:
@@ -524,84 +562,103 @@ class _Satellite:
 
     @property
     def i2c1(self):
+        """ Return I2C1 bus object or raise HardwareInitException """
         return self.hardwarecheck_device("I2C1", self._i2c1)
 
     @property
     def i2c2(self):
+        """ Return I2C2 bus object or raise HardwareInitException """
         return self.hardwarecheck_device("I2C2", self._i2c2)
 
     @property
     def i2c3(self):
+        """ Return I2C3 bus object or raise HardwareInitException """
         return self.hardwarecheck_device("I2C3", self._i2c3)
 
     @property
     def spi(self):
+        """ Return SPI bus object or raise HardwareInitException """
         return self.hardwarecheck_device("SPI", self._spi)
 
     @property
     def sd(self):
+        """ Return SD Card object or raise HardwareInitException """
         return self.hardwarecheck_device("SD", self._sd)
 
     @property
     def neopixel(self):
+        """ Return Neopixel object or raise HardwareInitException """
         return self.hardwarecheck_device("Neopixel", self._neopixel)
 
     @property
     def imu(self):
+        """ Return IMU object or raise HardwareInitException """
         return self.hardwarecheck_device("IMU", self._imu)
 
     @property
     def radio(self):
+        """ Return Radio object or raise HardwareInitException """
         return self.hardwarecheck_device("Radio", self._radio)
 
     @property
     def sun_yn(self):
+        """ Return Sun Sensor -Y object or raise HardwareInitException """
         return self.hardwarecheck_device("Sun-Y", self._sun_yn)
 
     @property
     def sun_zn(self):
+        """ Return Sun Sensor -Z object or raise HardwareInitException """
         return self.hardwarecheck_device("Sun-Z", self._sun_zn)
 
     @property
     def sun_xn(self):
+        """ Return Sun Sensor -X object or raise HardwareInitException """
         return self.hardwarecheck_device("Sun-X", self._sun_xn)
 
     @property
     def sun_yp(self):
+        """ Return Sun Sensor +Y object or raise HardwareInitException """
         return self.hardwarecheck_device("Sun+Y", self._sun_yp)
 
     @property
     def sun_zp(self):
+        """ Return Sun Sensor +Z object or raise HardwareInitException """
         return self.hardwarecheck_device("Sun+Z", self._sun_zp)
 
     @property
     def sun_xp(self):
+        """ Return Sun Sensor +X object or raise HardwareInitException """
         return self.hardwarecheck_device("Sun+X", self._sun_xp)
 
     @property
     def drv_x(self):
+        """ Return Coil Driver X object or raise HardwareInitException """
         return self.hardwarecheck_device("CoilDriverX", self._drv_x)
 
     @property
     def drv_y(self):
+        """ Return Coil Driver Y object or raise HardwareInitException """
         return self.hardwarecheck_device("CoilDriverY", self._drv_y)
 
     @property
     def drv_z(self):
+        """ Return Coil Driver Z object or raise HardwareInitException """
         return self.hardwarecheck_device("CoilDriverZ", self._drv_z)
 
     @property
     def burnwire1(self):
+        """ Return Burnwire1 object or raise HardwareInitException """
         return self.hardwarecheck_device("Burnwire1", self._burnwire1)
 
     @property
     def burnwire2(self):
+        """ Return Burnwire2 object or raise HardwareInitException """
         return self.hardwarecheck_device("Burnwire2", self._burnwire2)
 
 
 # initialize Satellite as cubesat
 _cubesat = _Satellite()
 
-# Make radio accesible
+# Make radio and microcontroller accessible
 radio = _cubesat.radio
 cubesat_microcontroller = _cubesat.micro
