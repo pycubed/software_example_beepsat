@@ -510,91 +510,30 @@ class _Satellite:
         except Exception as e:
             print('[ERROR][Initializing Burn Wire IC2]', e)
 
-    def reinit(self, device_string):
-        """ Reinit: reinitialize the given device in device_string """
-        # dev is a string of all lowercase letters,
-        dev = device_string.lower()
-
-        if dev == "i2c1":
-            self._init_i2c1()
-        elif dev == "i2c2":
-            self._init_i2c2()
-        elif dev == "i2c3":
-            self._init_i2c3()
-        elif dev == "spi":
-            self._init_spi()
-        elif dev == "sd":
-            self._init_sdcard()
-        elif dev == "neopixel":
-            self._init_neopixel()
-        elif dev == "imu":
-            self._init_imu()
-        elif dev == "radio":
-            self._init_radio()
-        elif dev == "sun-y":
-            self._init_sun_minusy()
-        elif dev == "sun-z":
-            self._init_sun_minusz()
-        elif dev == "sun-x":
-            self._init_sun_minusx()
-        elif dev == "sun+y":
-            self._init_sun_plusy()
-        elif dev == "sun+z":
-            self._init_sun_plusz()
-        elif dev == "sun+x":
-            self._init_sun_plusx()
-        elif dev == "coildriverx":
-            self._init_coildriverx()
-        elif dev == "coildrivery":
-            self._init_coildrivery()
-        elif dev == "coildriverz":
-            self._init_coildriverz()
-        elif dev == "burnwire1":
-            self._init_burnwire1()
-        elif dev == "burnwire2":
-            self._init_burnwire2()
-        else:
-            print("Invalid Device:", device_string)
-
-    def hardwarecheck_device(self, devicestr, device):
-        """ Check if the given device is initialized
-        Check if the given device is initialized. If not,
-        attempt to reinitialized it. If reinitialization fails,
-        raise HardwareInitException (to be handled in application)
-        """
-        if device is not None:
-            return device
-        else:
-            self.reinit(devicestr)
-            if device is None:
-                raise HardwareInitException
-            else:
-                return device
-
     @hardware
     def i2c1(self):
         """ Return I2C1 bus object or raise HardwareInitException """
-        return self.hardwarecheck_device("I2C1", self._i2c1), self._init_i2c1
+        return self._i2c1, self._init_i2c1
 
     @hardware
     def i2c2(self):
         """ Return I2C2 bus object or raise HardwareInitException """
-        return self.hardwarecheck_device("I2C2", self._i2c2), self._init_i2c2
+        return self._i2c2, self._init_i2c2
 
     @hardware
     def i2c3(self):
         """ Return I2C3 bus object or raise HardwareInitException """
-        return self.hardwarecheck_device("I2C3", self._i2c3), self._init_i2c3
+        return self._i2c3, self._init_i2c3
 
     @hardware
     def spi(self):
         """ Return SPI bus object or raise HardwareInitException """
-        return self.hardwarecheck_device("SPI", self._spi), self._init_i2c3
+        return self._spi, self._init_i2c3
 
     @hardware
     def sd(self):
         """ Return SD Card object or raise HardwareInitException """
-        return self.hardwarecheck_device("SD", self._sd), self._init_i2c3
+        return self._sd, self._init_i2c3
 
     @hardware
     def neopixel(self):
@@ -604,67 +543,67 @@ class _Satellite:
     @hardware
     def imu(self):
         """ Return IMU object or raise HardwareInitException """
-        return self.hardwarecheck_device("IMU", self._imu), self._init_imu
+        return self._imu, self._init_imu
 
     @hardware
     def radio(self):
         """ Return Radio object or raise HardwareInitException """
-        return self.hardwarecheck_device("Radio", self._radio), self._init_radio
+        return self._radio, self._init_radio
 
     @hardware
     def sun_yn(self):
         """ Return Sun Sensor -Y object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun-Y", self._sun_yn), self._init_sun_minusy
+        return self._sun_yn, self._init_sun_minusy
 
     @hardware
     def sun_zn(self):
         """ Return Sun Sensor -Z object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun-Z", self._sun_zn), self._init_sun_minusz
+        return self._sun_zn, self._init_sun_minusz
 
     @hardware
     def sun_xn(self):
         """ Return Sun Sensor -X object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun-X", self._sun_xn), self._init_sun_minusx
+        return self._sun_xn, self._init_sun_minusx
 
     @hardware
     def sun_yp(self):
         """ Return Sun Sensor +Y object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun+Y", self._sun_yp), self._init_sun_plusy
+        return self._sun_yp, self._init_sun_plusy
 
     @hardware
     def sun_zp(self):
         """ Return Sun Sensor +Z object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun+Z", self._sun_zp), self._init_sun_plusz
+        return self._sun_zp, self._init_sun_plusz
 
     @hardware
     def sun_xp(self):
         """ Return Sun Sensor +X object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun+X", self._sun_xp), self._init_sun_plusx
+        return self._sun_xp, self._init_sun_plusx
 
     @hardware
     def drv_x(self):
         """ Return Coil Driver X object or raise HardwareInitException """
-        return self.hardwarecheck_device("CoilDriverX", self._drv_x), self._init_coildriverx
+        return self._drv_x, self._init_coildriverx
 
     @hardware
     def drv_y(self):
         """ Return Coil Driver Y object or raise HardwareInitException """
-        return self.hardwarecheck_device("CoilDriverY", self._drv_y), self._init_coildrivery
+        return self._drv_y, self._init_coildrivery
 
     @hardware
     def drv_z(self):
         """ Return Coil Driver Z object or raise HardwareInitException """
-        return self.hardwarecheck_device("CoilDriverZ", self._drv_z), self._init_coildriverz
+        return self._drv_z, self._init_coildriverz
 
     @hardware
     def burnwire1(self):
         """ Return Burnwire1 object or raise HardwareInitException """
-        return self.hardwarecheck_device("Burnwire1", self._burnwire1), self._init_burnwire1
+        return self._burnwire1, self._init_burnwire1
 
     @hardware
     def burnwire2(self):
         """ Return Burnwire2 object or raise HardwareInitException """
-        return self.hardwarecheck_device("Burnwire2", self._burnwire2), self._init_burnwire2
+        return self._burnwire2, self._init_burnwire2
 
 
 # initialize Satellite as cubesat
