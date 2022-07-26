@@ -143,16 +143,6 @@ def temperature_cpu():
     return _cubesat.micro.cpu.temperature
 
 
-def RGB(value=None):
-    """
-    If a value is passed, change current RGB settings to value
-    else, return the current RGB settings of the neopixel object
-    """
-    if value is not None:
-        _cubesat.neopixel[0] = value
-    return _cubesat.neopixel[0]
-
-
 def battery_voltage():
     """
     Return the battery voltage
@@ -646,3 +636,4 @@ _cubesat = _Satellite()
 # Make radio and microcontroller accessible
 radio = _cubesat.radio
 cubesat_microcontroller = _cubesat.micro
+RGB = _cubesat.neopixel[0]
