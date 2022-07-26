@@ -4,6 +4,7 @@ from Tasks.blink_task import task as blink
 from Tasks.imu_task import task as imu
 from Tasks.time_task import task as time
 from Tasks.detumble import task as detumble
+from Tasks.radio import task as radio
 
 from TransitionFunctions import announcer, low_power_on, low_power_off
 
@@ -14,6 +15,7 @@ TaskMap = {
     'IMU': imu,
     'Time': time,
     'Detumble': detumble,
+    'Radio': radio,
 }
 
 TransitionFunctionMap = {
@@ -55,6 +57,11 @@ config = {
                 'Priority': 3,
                 'ScheduleLater': False
             },
+            'Radio': {
+                'Interval': 5.0,
+                'Priority': 3,
+                'ScheduleLater': True
+            }
         },
         'StepsTo': ['LowPower', 'DeTumble']
     },

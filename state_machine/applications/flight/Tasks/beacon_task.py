@@ -1,34 +1,30 @@
 # Transmit "Hello World" beacon
 
 from lib.template_task import Task
-import cdh
+import lib.transmission_queue as tq
+from lib.message import Message
+from lib.naive import NaiveMessage
 
-ANTENNA_ATTACHED = False
-
+msg = """"Did you ever hear the tragedy of Darth Plagueis the Wise?"
+"No."
+"I thought not. It's not a story the Jedi would tell you.
+It's a Sith legend. Darth Plagueis...
+was a Dark Lord of the Sith so powerful and so wise, he could use the Force to influence the midi-chlorians...
+to create... life. He had such a knowledge of the dark side, he could even keep the ones he cared about... from dying."
+"He could actually... save people from death?"
+"The dark side of the Force is a pathway to many abilities... some consider to be unnatural."
+"Wh- What happened to him?"
+"He became so powerful, the only thing he was afraid of was... losing his power. Which eventually, of course, he did.
+Unfortunately, he taught his apprentice everything he knew.
+Then his apprentice killed him in his sleep. It's ironic. He could save others from death, but not himself."
+"Is it possible to learn this power?"
+"Not from a Jedi."
+--Darth Sidious and Anakin Skywalker"""
 
 class task(Task):
     name = 'beacon'
     color = 'teal'
-
-    schedule_later = True
-
-    # our 4 byte code to authorize commands
-    # pass-code for DEMO PURPOSES ONLY
-    super_secret_code = b'p\xba\xb8C'
-
-    cmd_dispatch = {
-        'no-op':        cdh.noop,
-        'hreset':       cdh.hreset,
-        'shutdown':     cdh.shutdown,
-        'query':        cdh.query,
-        'exec_cmd':     cdh.exec_cmd,
-    }
-
-    def __init__(self, satellite):
-        super().__init__(satellite)
-        # set our radiohead node ID so we can get ACKs
-        self.cubesat.radio.node = 0xFA  # our ID
-        self.cubesat.radio.destination = 0xAB  # target's ID
+    first_time = True
 
     async def main_task(self):
         """
@@ -36,62 +32,9 @@ class task(Task):
         set the above ANTENNA_ATTACHED variable to True
         to actually send the beacon packet
         """
-        if ANTENNA_ATTACHED:
-            self.debug("Sending beacon")
-            self.cubesat.radio.send("Hello World!", destination=0xFF, keep_listening=True)
-        else:
-            # Fake beacon since we don't know if an antenna is attached
-            print()  # blank line
-            self.debug("[WARNING]")
-            self.debug("NOT sending beacon (unknown antenna state)", 2)
-            self.debug("If you've attached an antenna, edit '/Tasks/beacon_task.py' to actually beacon", 2)
-            print()  # blank line
-            self.cubesat.radio.listen()
-
-        self.debug("Listening 10s for response (non-blocking)")
-        heard_something = await self.cubesat.radio.await_rx(timeout=10)
-
-        if heard_something:
-            # retrieve response but don't ACK back unless an antenna is attached
-            response = self.cubesat.radio.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED)
-            if response is not None:
-                self.debug("packet received")
-                self.debug('msg: {}, RSSI: {}'.format(response, self.cubesat.radio.last_rssi - 137), 2)
-
-                """
-                ########### ADVANCED ###########
-                Over-the-air commands
-                See beep-sat guide for more details
-                """
-                if len(response) >= 6:
-                    if not ANTENNA_ATTACHED:
-                        self.debug('Antenna not attached. Skipping over-the-air command handling')
-                    else:
-                        if response[:4] == self.super_secret_code:
-                            cmd = bytes(response[4:6])  # [pass-code(4 bytes)] [cmd 2 bytes] [args]
-                            cmd_args = None
-                            if len(response) > 6:
-                                self.debug('command with args', 2)
-                                try:
-                                    cmd_args = response[6:]  # arguments are everything after
-                                    self.debug(f'cmd args: {cmd_args}', 2)
-                                except Exception as e:
-                                    self.debug(f'arg decoding error: {e}', 2)
-                            if cmd in cdh.commands:
-                                try:
-                                    if cmd_args is None:
-                                        self.debug(f'running {cdh.commands[cmd]} (no args)')
-                                        self.cmd_dispatch[cdh.commands[cmd]](self)
-                                    else:
-                                        self.debug(f'running {cdh.commands[cmd]} (with args: {cmd_args})')
-                                        self.cmd_dispatch[cdh.commands[cmd]](self, cmd_args)
-                                except Exception as e:
-                                    self.debug(f'something went wrong: {e}')
-                                    self.cubesat.radio.send(str(e).encode())
-                            else:
-                                self.debug('invalid command!')
-                                self.cubesat.radio.send(b'invalid cmd' + response[4:])
-        else:
-            self.debug('no messages')
-        self.cubesat.radio.sleep()
-        self.debug('finished')
+        tq.push(Message(10, "Hello World!"))
+        if self.first_time:
+            self.first_time = False
+            self.debug("Pushing the large msg to tq")
+            tq.push(NaiveMessage(1, msg))
+        self.debug("Beacon task pushing to tq")
