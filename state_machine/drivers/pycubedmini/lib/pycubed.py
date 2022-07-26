@@ -441,9 +441,10 @@ class _Satellite:
     def _init_coildriverx(self):
         """ Initialize Coil Driver X on I2C3, set mode and voltage """
         try:
-            self._drv_x = drv8830.DRV8830(i2c_bus=self.i2c3, address=0x62)  # U7
+            self._drv_x = drv8830.DRV8830(self.i2c3, 0x62)  # U7
+            # TODO: initialization automatically sets mode to STANDBY
+            # do we want STANDBY or COAST
             self.drv_x.mode = drv8830.BridgeControl.COAST
-            self.drv_x.vout = 0x06  # minimum voltage value, DRV8830 lib
             self.hardware['CoilDriverX'] = True
         except Exception as e:
             print('[ERROR][Initializing H-Bridge U7]', e)
@@ -452,8 +453,9 @@ class _Satellite:
         """ Initialize Coil Driver Y on I2C3, set mode and voltage """
         try:
             self._drv_y = drv8830.DRV8830(self.i2c3, 0x68)  # U8
+            # TODO: initialization automatically sets mode to STANDBY
+            # do we want STANDBY or COAST
             self.drv_y.mode = drv8830.BridgeControl.COAST
-            self.drv_y.vout = 0x06  # minimum voltage value, DRV8830 lib
             self.hardware['CoilDriverY'] = True
         except Exception as e:
             print('[ERROR][Initializing H-Bridge U8]', e)
@@ -462,8 +464,9 @@ class _Satellite:
         """ Initialize Coil Driver Z on I2C3, set mode and voltage """
         try:
             self._drv_z = drv8830.DRV8830(self.i2c3, 0x60)  # U9
+            # TODO: initialization automatically sets mode to STANDBY
+            # do we want STANDBY or COAST
             self.drv_z.mode = drv8830.BridgeControl.COAST
-            self.drv_z.vout = 0x06  # minimum voltage value, DRV8830 lib
             self.hardware['CoilDriverZ'] = True
         except Exception as e:
             print('[ERROR][Initializing H-Bridge U9]', e)
