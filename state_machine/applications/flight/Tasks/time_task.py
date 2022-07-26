@@ -14,4 +14,4 @@ class task(Task):
         t_since_boot = time.monotonic() - cubesat.BOOTTIME
         self.debug('{:.3f}s since boot'.format(t_since_boot))
         gc.collect()
-        print(f"Free memory at code point 1: {gc.mem_free()} bytes")
+        self.debug(f"{gc.mem_free()} free bytes in memory")
