@@ -237,6 +237,7 @@ class _Satellite:
 
     UHF_FREQ = 433.0
 
+    instance = None
     def __new__(cls):
         """ 
         Override the built-in __new__ function
