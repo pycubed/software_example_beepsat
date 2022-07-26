@@ -525,10 +525,10 @@ class _Satellite:
             print("Invalid Device:", device_string)
 
     def hardwarecheck_device(self, devicestr, device):
-        """ 
-        Check if the given device is initialized. If not, 
+        """ Check if the given device is initialized
+        Check if the given device is initialized. If not,
         attempt to reinitialized it. If reinitialization fails,
-        raise HardwareInitException (to be handled in application) 
+        raise HardwareInitException (to be handled in application)
         """
         if device is not None:
             return device
