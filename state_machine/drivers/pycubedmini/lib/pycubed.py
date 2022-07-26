@@ -33,9 +33,6 @@ class hardware:
         self.name = name
         self._name = ''
 
-    def __set_name__(self, owner, name):
-        self._name = name
-
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
@@ -61,21 +58,6 @@ class hardware:
         if self.fdel is None:
             raise AttributeError(f"can't delete attribute {self._name}")
         self.fdel(obj)
-
-    def getter(self, fget):
-        prop = type(self)(fget, self.fset, self.fdel)
-        prop._name = self._name
-        return prop
-
-    def setter(self, fset):
-        prop = type(self)(self.fget, fset, self.fdel)
-        prop._name = self._name
-        return prop
-
-    def deleter(self, fdel):
-        prop = type(self)(self.fget, self.fset, fdel)
-        prop._name = self._name
-        return prop
 
 
 """
