@@ -15,5 +15,5 @@ class task(Task):
             cubesat.setRGB((0, 0, 0))
             self.rgb_on = False
         else:
-            cubesat.setRGB((0, 255, 0))
+            cubesat.setRGB((50, 0, 50))
             self.rgb_on = True
