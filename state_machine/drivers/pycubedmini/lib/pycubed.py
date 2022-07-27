@@ -596,3 +596,4 @@ _cubesat = _Satellite()
 # Make radio and microcontroller accessible
 radio = _cubesat.radio
 cubesat_microcontroller = _cubesat.micro
+BOOTTIME = _cubesat.BOOTTIME
