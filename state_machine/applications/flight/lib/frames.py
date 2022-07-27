@@ -17,6 +17,11 @@ def mjd(utime):
     return utime / 86400.0 + 40587
 
 def rotZ(theta):
+    """Returns the rotation matrix for a given angle around the z-axis.
+    Args:
+        - theta: Angle in radians.
+    Returns:
+        - A 3x3 numpy array. """
     return array([[cos(theta),   sin(theta),  0],
                   [-sin(theta),  cos(theta),  0],
                   [0,            0,           1]])
