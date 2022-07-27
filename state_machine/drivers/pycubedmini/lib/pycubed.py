@@ -25,7 +25,7 @@ import time
 class hardware:
     """Modified @hardware decorator.
     Based on the code from: https://docs.python.org/3/howto/descriptor.html#properties
-    Attempts to return the appropriate hardware device. 
+    Attempts to return the appropriate hardware device.
     If this fails, it will attempt to reinitialize the hardware.
     If this fails again, it will raise an exception.
     """
@@ -38,7 +38,9 @@ class hardware:
             return self
         if self.fget is None:
             raise AttributeError(f'unreadable attribute {self._name}')
+        
         device, reinit = self.fget(obj)
+        
         if device is not None:
             return device
         else:
@@ -78,18 +80,15 @@ Coil Driver Interface functions
 """
 def coildriver_vout(driver_index, projected_voltage):
     """ Set a given voltage for a given coil driver """
-    try:
-        if driver_index == "X" or driver_index == "U7":
-            _cubesat.drv_x.throttle_volts = projected_voltage
-        elif driver_index == "Y" or driver_index == "U8":
-            _cubesat.drv_y.throttle_volts = projected_voltage
-        elif driver_index == "Z" or driver_index == "U9":
-            _cubesat.drv_z.throttle_volts = projected_voltage
-        else:
-            raise HardwareInitException
-    # TODO: we can change how this is handled
-    except HardwareInitException as e:
-        print(driver_index, "is not a defined coil driver", e)
+    if driver_index == "X" or driver_index == "U7":
+        _cubesat.drv_x.throttle_volts = projected_voltage
+    elif driver_index == "Y" or driver_index == "U8":
+        _cubesat.drv_y.throttle_volts = projected_voltage
+    elif driver_index == "Z" or driver_index == "U9":
+        _cubesat.drv_z.throttle_volts = projected_voltage
+    else:
+        print(driver_index, "is not a defined coil driver")
+        return
 
 
 """
@@ -97,24 +96,21 @@ Sun Sensor Interface functions
 """
 def lux(sun_sensor_index):
     """ Return the lux reading for a given sun sensor """
-    try:
-        if sun_sensor_index == "-Y":
-            return _cubesat.sun_yn.lux
-        elif sun_sensor_index == "-Z":
-            return _cubesat.sun_zn.lux
-        elif sun_sensor_index == "-X":
-            return _cubesat.sun_xn.lux
-        elif sun_sensor_index == "+Y":
-            return _cubesat.sun_yp.lux
-        elif sun_sensor_index == "+Z":
-            return _cubesat.sun_zp.lux
-        elif sun_sensor_index == "+X":
-            return _cubesat.sun_xp.lux
-        else:
-            raise HardwareInitException
-    # TODO: we can change how this is handled
-    except HardwareInitException as e:
-        print(sun_sensor_index, "is not a defined sun sensor.", e)
+    if sun_sensor_index == "-Y":
+        return _cubesat.sun_yn.lux
+    elif sun_sensor_index == "-Z":
+        return _cubesat.sun_zn.lux
+    elif sun_sensor_index == "-X":
+        return _cubesat.sun_xn.lux
+    elif sun_sensor_index == "+Y":
+        return _cubesat.sun_yp.lux
+    elif sun_sensor_index == "+Z":
+        return _cubesat.sun_zp.lux
+    elif sun_sensor_index == "+X":
+        return _cubesat.sun_xp.lux
+    else:
+        print(sun_sensor_index, "is not a defined sun sensor.")
+        return
 
 
 """
@@ -132,19 +128,15 @@ def burn(burn_num='1', dutycycle=0, duration=1):
     # BURN1 = -Z,BURN2 = extra burnwire pin, dutycycle ~0.13%
     dtycycl = int((dutycycle / 100) * (0xFFFF))
 
-    try:
-        # initialize burnwire based on the burn_num passed to the function
-        if '1' in burn_num:
-            burnwire = _cubesat.burnwire1
-        elif '2' in burn_num:
-            # because burnwire2 is not set up, will throw HardwareInitException
-            burnwire = _cubesat.burnwire2
-        else:
-            raise HardwareInitException
-    # TODO: we can change how this is handled
-    except HardwareInitException as e:
-        print("Burnwire2 IC is not set up.", e)
-        return False
+    # initialize burnwire based on the burn_num passed to the function
+    if '1' in burn_num:
+        burnwire = _cubesat.burnwire1
+    elif '2' in burn_num:
+        # because burnwire2 is not set up, will throw HardwareInitException
+        burnwire = _cubesat.burnwire2
+    else:
+        print("Burnwire2 IC is not set up.")
+    return False
 
     setRGB(255, 0, 0)  # set RGB to red
 
@@ -201,7 +193,7 @@ def battery_voltage():
 
 def timeon():
     """ return the time on a monotonic clock """
-    return int(time.monotonic())
+    return int(time.monotonic()) - _cubesat.BOOTTIME
 
 
 def reset_boot_count():
@@ -239,7 +231,6 @@ _LOGFAIL = const(5)
 
 # Satellite attributes
 vlowbatt = 3.0
-BOOTTIME = int(time.monotonic())
 data_cache = {}
 
 class _Satellite:
@@ -260,8 +251,9 @@ class _Satellite:
     UHF_FREQ = 433.0
 
     instance = None
+
     def __new__(cls):
-        """ 
+        """
         Override the built-in __new__ function
         Ensure only one instance of this class can be made per process
         """
@@ -294,9 +286,9 @@ class _Satellite:
             'Burnwire2': False,
             'WDT': False  # Watch Dog Timer pending
         }
+        self.BOOTTIME = int(time.monotonic())  # get monotonic time at initialization
         self.micro = microcontroller
         self._vbatt = analogio.AnalogIn(board.BATTERY)  # Battery voltage
-        # TODO: need self._stat = {}, self.filenumbers = {}, self.debug = True?
 
         # Define and initialize hardware
         self._init_i2c1()
