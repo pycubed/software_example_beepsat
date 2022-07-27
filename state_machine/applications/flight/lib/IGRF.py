@@ -13,11 +13,11 @@ def reset_array(input_array):
         input_array[i] = 0.0
 
 def unix_time_to_years_since_2020(unix_time):
-    twentytwenty = 1577854800  # 2022-01-01 00:00:00 time stamp
+    twentytwenty = 1577854800  #  1/1/2020 unix timestamp
     t = (unix_time - twentytwenty) / 31557600  # seconds in a Julian astronomical year
     return t
 
-def igrf13_5(gh, date, latitude_degrees, elongitude_degrees, r_norm_km, cl, sl, p, q):
+def _igrf13_5(gh, date, latitude_degrees, elongitude_degrees, r_norm_km, cl, sl, p, q):
 
     # reset the lists that are passed by reference
     reset_array(cl)
@@ -216,4 +216,4 @@ def igrf(date, latitude_degrees, elongitude_degrees, r_norm_km):
     Returns:
         - [x, y, z] the magnetic field in nanotesla in (North, East, Down)
     """
-    return igrf13_5(gh, date, latitude_degrees, elongitude_degrees, r_norm_km, cl, sl, p, q)
+    return _igrf13_5(gh, date, latitude_degrees, elongitude_degrees, r_norm_km, cl, sl, p, q)
