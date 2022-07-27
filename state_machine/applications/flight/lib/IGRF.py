@@ -223,6 +223,9 @@ def igrf(date, latitude_degrees, elongitude_degrees, r_norm_km):
 def igrf_eci(date, r_eci):
     """Returns the fifth order approximation from the IGRF-13 model. 
     Only contains data from 2020, so it should only be accurate from 2020-2025.
+    IGRF-13 Takes in geocentric coordinates, and outputs in NED (North, East, Down).
+    We solve this by applying the following conversions: ECI->ECEF->GEOC=>[IGRF]=>NED->ECEF->ECI
+
     Args:
         - date: A unix timestamp.
         - r_eci: Earth Centered Interital frame position (km)
