@@ -91,10 +91,9 @@ def ned_to_ecef(lon, lat):
     Returns:
         - A 3x3 numpy array.
     """
-
-    return array([[-sin(lat) * cos(lon), -sin(lon), -cos(lat) * cos(lon)],
-                  [-sin(lat) * sin(lon),  cos(lon), -cos(lat) * sin(lon)],
-                  [cos(lat),              0.0,      -sin(lat)]])
+    return array([[-sin(lat) * cos(lon),  -sin(lon), -cos(lat) * cos(lon)],
+                  [-sin(lat) * sin(lon),   cos(lon), -cos(lat) * sin(lon)],
+                  [cos(lat),               0.0,      -sin(lat)]])
 
 def convert_ecef_to_geoc(ecef, degrees=False):
     """Converts from ECEF (Earth Centered Earth Fixed) to geocentric coordinates.

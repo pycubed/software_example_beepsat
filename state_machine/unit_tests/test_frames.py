@@ -218,6 +218,24 @@ class TestECEFtoGEOC(unittest.TestCase):
             array([0.6610431688506868, 0.6118300867286255, 7.550251277184119e3])
         )
 
+class TestNEDtoECEF(unittest.TestCase):
+
+    def test_equal_to_GN(self):
+        """Checks that the results are almost equal to GravNav's ecef_Q_ned_mat.
+        Source: https://github.com/RoboticExplorationLab/GravNav/blob/main/simple_sim/mag_field.jl#L257"""
+        testing.assert_array_almost_equal(
+            frames.ned_to_ecef(12, 123),
+            array([[0.388091,  0.536573,  0.749316],
+                   [-0.246772, 0.843854, -0.47646],
+                   [-0.887969, 0.0,       0.459903]])
+        )
+        testing.assert_array_almost_equal(
+            frames.ned_to_ecef(0.23, -0.76),
+            array([[0.67078,  -0.227978, -0.705748],
+                   [0.157059,  0.973666, -0.165246],
+                   [0.724836,  0.0,       0.688921]])
+        )
+
 def np_arr_to_py(arr):
     def format_row(row):
         return f"[{', '.join(map(str, row))}]"
