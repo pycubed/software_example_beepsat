@@ -38,9 +38,9 @@ class hardware:
             return self
         if self.fget is None:
             raise AttributeError(f'unreadable attribute {self._name}')
-        
+
         device, reinit = self.fget(obj)
-        
+
         if device is not None:
             return device
         else:
