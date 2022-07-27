@@ -214,7 +214,7 @@ def igrf(date, latitude_degrees, elongitude_degrees, r_norm_km):
         - date: A unix timestamp.
         - latitude_degrees: Latitude in degrees (geocentric)
         - elongitude_degrees: Longitude in degrees (geocentric)
-        - r_norm_km: Distance from the center of the earth in kilometers
+        - r_norm_km: Distance from the center of the earth (km)
     Returns:
         - [x, y, z] the magnetic field in nanotesla in (North, East, Down)
     """
@@ -225,7 +225,7 @@ def igrf_eci(date, r_eci):
     Only contains data from 2020, so it should only be accurate from 2020-2025.
     Args:
         - date: A unix timestamp.
-        - r_eci: Earth Centered Interital frame position in kiloemeters
+        - r_eci: Earth Centered Interital frame position (km)
     Returns:
         - [x, y, z] the magnetic field in nanotesla in ECI (Earth Centered Inertial)
     """
