@@ -36,4 +36,4 @@ jobs:
         run: pip install flake8
 
       - name: Run emulated flight software
-        run: sh .github/workflows/scripts/emulation.sh
+        run: ./.github/workflows/scripts/emulation.sh
