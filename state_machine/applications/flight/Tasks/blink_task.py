@@ -12,8 +12,8 @@ class task(Task):
 
     async def main_task(self):
         if self.rgb_on:
-            cubesat.set_RGB((0, 0, 0))
+            cubesat.setRGB((0, 0, 0))
             self.rgb_on = False
         else:
-            cubesat.set_RGB((0, 255, 0))
+            cubesat.setRGB((0, 255, 0))
             self.rgb_on = True

@@ -80,6 +80,14 @@ def temperature_imu():
 """
 Misc Functions
 """
+RGB = (0, 0, 0)
+def setRGB(v):
+    global RGB
+    RGB = v
+
+def getRGB():
+    return RGB
+
 
 vlowbatt = 4.0
 BOOTTIME = time.monotonic()
