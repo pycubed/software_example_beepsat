@@ -1,9 +1,5 @@
-# Task to obtain IMU sensor readings
-
 from lib.template_task import Task
 import lib.pycubed as cubesat
-import msgpack
-from os import stat
 
 SEND_DATA = False  # make sure you have an antenna attached!
 
@@ -12,11 +8,6 @@ class task(Task):
     name = 'imu'
     color = 'green'
     data_file = None
-
-    # we want to initialize the data file only once upon boot
-    # so perform our task init and use that as a chance to init the data files
-    def __init__(self, satellite):
-        super().__init__(satellite)
 
     async def main_task(self):
         # take IMU readings

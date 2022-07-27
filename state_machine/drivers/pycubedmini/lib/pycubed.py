@@ -38,9 +38,9 @@ class hardware:
             return self
         if self.fget is None:
             raise AttributeError(f'unreadable attribute {self._name}')
-        
+
         device, reinit = self.fget(obj)
-        
+
         if device is not None:
             return device
         else:
@@ -136,7 +136,7 @@ def burn(burn_num='1', dutycycle=0, duration=1):
         burnwire = _cubesat.burnwire2
     else:
         print("Burnwire2 IC is not set up.")
-    return False
+        return False
 
     setRGB(255, 0, 0)  # set RGB to red
 
