@@ -64,6 +64,7 @@ def eci_to_ecef(utime):
         - A 3x3 numpy array.
     Based on: https://github.com/sisl/SatelliteDynamics.jl/blob/f1eede2faffd2d6a6864d7ac0989a075c7d7a04f/src/reference_systems.jl#L296
     """
+    # we may choose to add bias_precession_nutation and polar motion in the future
     # rc2i = bias_precession_nutation(epc)
     r    = earth_rotation(utime)
     # rpm  = polar_motion(epc)
@@ -81,16 +82,19 @@ def ecef_to_eci(date):
     """
     return eci_to_ecef(date).transpose()
 
-def ned_to_ecef(lat, long):
+def ned_to_ecef(lon, lat):
     """ Returns the transformation matrix from NED (North East Down) to ECEF (Earth Centered Earth Fixed).
     Args:
+        - lon: Longitude in radians (geocentric)
         - lat: Latitude in radians (geocentric)
-        - long: Longitude in radians (geocentric)
 
     Returns:
         - A 3x3 numpy array.
     """
-    return None
+
+    return array([[-sin(lat) * cos(lon), -sin(lon), -cos(lat) * cos(lon)],
+                  [-sin(lat) * sin(lon),  cos(lon), -cos(lat) * sin(lon)],
+                  [cos(lat),              0.0,      -sin(lat)]])
 
 def convert_ecef_to_geoc(ecef, degrees=False):
     """Converts from ECEF (Earth Centered Earth Fixed) to geocentric coordinates.
