@@ -218,7 +218,7 @@ def igrf(date, latitude_degrees, elongitude_degrees, r_norm_km):
     Returns:
         - [x, y, z] the magnetic field in nanotesla in (North, East, Down)
     """
-    return igrf13_5(gh, date, latitude_degrees, elongitude_degrees, r_norm_km, cl, sl, p, q)
+    return _igrf13_5(gh, date, latitude_degrees, elongitude_degrees, r_norm_km, cl, sl, p, q)
 
 def igrf_eci(date, r_eci):
     """Returns the fifth order approximation from the IGRF-13 model. 
