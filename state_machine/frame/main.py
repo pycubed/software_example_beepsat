@@ -1,5 +1,5 @@
 import traceback
-from lib.pycubed import pocketqube as cubesat
+import lib.pycubed as cubesat
 import state_machine
 
 

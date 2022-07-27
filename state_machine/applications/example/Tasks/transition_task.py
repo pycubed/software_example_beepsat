@@ -1,4 +1,5 @@
 from lib.template_task import Task
+import lib.pycubed as cubesat
 
 
 class task(Task):
@@ -6,9 +7,9 @@ class task(Task):
     color = 'blue'
 
     async def main_task(self):
-        if self.cubesat.state_machine.state == 'Normal':
+        if cubesat.state_machine.state == 'Normal':
             self.debug('Switching to Special mode')
-            self.cubesat.state_machine.switch_to('Special')
+            cubesat.state_machine.switch_to('Special')
         else:
             self.debug('Switching to Normal mode')
-            self.cubesat.state_machine.switch_to('Normal')
+            cubesat.state_machine.switch_to('Normal')

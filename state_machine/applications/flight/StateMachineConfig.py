@@ -5,8 +5,8 @@ from Tasks.imu_task import task as imu
 from Tasks.time_task import task as time
 from Tasks.detumble import task as detumble
 from Tasks.radio import task as radio
-
 from TransitionFunctions import announcer, low_power_on, low_power_off
+from config import config  # noqa: F401
 
 TaskMap = {
     'Battery': battery,

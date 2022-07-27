@@ -22,6 +22,33 @@ from micropython import const
 import adafruit_tsl2561
 import time
 
+class hardware:
+    """Modified @hardware decorator.
+    Based on the code from: https://docs.python.org/3/howto/descriptor.html#properties
+    Attempts to return the appropriate hardware device. 
+    If this fails, it will attempt to reinitialize the hardware.
+    If this fails again, it will raise an exception.
+    """
+
+    def __init__(self, fget=None):
+        self.fget = fget
+
+    def __get__(self, obj, objtype=None):
+        if obj is None:
+            return self
+        if self.fget is None:
+            raise AttributeError(f'unreadable attribute {self._name}')
+        device, reinit = self.fget(obj)
+        if device is not None:
+            return device
+        else:
+            reinit()
+            device, _ = self.fget(obj)
+            if device is None:
+                raise HardwareInitException
+            else:
+                return device
+
 
 """
 IMU Interface functions
@@ -119,7 +146,7 @@ def burn(burn_num='1', dutycycle=0, duration=1):
         print("Burnwire2 IC is not set up.", e)
         return False
 
-    RGB(255, 0, 0)  # set RGB to red
+    setRGB(255, 0, 0)  # set RGB to red
 
     # set the burnwire's dutycycle; begins the burn
     burnwire.duty_cycle = dtycycl
@@ -127,7 +154,7 @@ def burn(burn_num='1', dutycycle=0, duration=1):
 
     # set burnwire's dutycycle back to 0; ends the burn
     burnwire.duty_cycle = 0
-    RGB(0, 0, 0)  # set RGB to no color
+    setRGB(0, 0, 0)  # set RGB to no color
 
     _cubesat._deployA = True  # sets deployment variable to true
     burnwire.deinit()  # deinitialize burnwire
@@ -142,23 +169,18 @@ def temperature_cpu():
     """ return the temperature reading from the CPU in celsius """
     return _cubesat.micro.cpu.temperature
 
+def setRGB(v):
+    _cubesat.neopixel[0] = v
 
-def RGB(value=None):
-    """
-    If a value is passed, change current RGB settings to value
-    else, return the current RGB settings of the neopixel object
-    """
-    if value is not None:
-        _cubesat.neopixel[0] = value
+def getRGB():
     return _cubesat.neopixel[0]
-
 
 def battery_voltage():
     """
     Return the battery voltage
-    _cubesat._vbatt.value converts the analog value of the 
-    board.BATTERY pin to a digital one. We read this value 50 
-    times and then later average it to get as close as possible 
+    _cubesat._vbatt.value converts the analog value of the
+    board.BATTERY pin to a digital one. We read this value 50
+    times and then later average it to get as close as possible
     to a reliable battery voltage value
     """
     # initialize vbat
@@ -489,161 +511,100 @@ class _Satellite:
         except Exception as e:
             print('[ERROR][Initializing Burn Wire IC2]', e)
 
-    def reinit(self, device_string):
-        """ Reinit: reinitialize the given device in device_string """
-        # dev is a string of all lowercase letters,
-        dev = device_string.lower()
-
-        if dev == "i2c1":
-            self._init_i2c1()
-        elif dev == "i2c2":
-            self._init_i2c2()
-        elif dev == "i2c3":
-            self._init_i2c3()
-        elif dev == "spi":
-            self._init_spi()
-        elif dev == "sd":
-            self._init_sdcard()
-        elif dev == "neopixel":
-            self._init_neopixel()
-        elif dev == "imu":
-            self._init_imu()
-        elif dev == "radio":
-            self._init_radio()
-        elif dev == "sun-y":
-            self._init_sun_minusy()
-        elif dev == "sun-z":
-            self._init_sun_minusz()
-        elif dev == "sun-x":
-            self._init_sun_minusx()
-        elif dev == "sun+y":
-            self._init_sun_plusy()
-        elif dev == "sun+z":
-            self._init_sun_plusz()
-        elif dev == "sun+x":
-            self._init_sun_plusx()
-        elif dev == "coildriverx":
-            self._init_coildriverx()
-        elif dev == "coildrivery":
-            self._init_coildrivery()
-        elif dev == "coildriverz":
-            self._init_coildriverz()
-        elif dev == "burnwire1":
-            self._init_burnwire1()
-        elif dev == "burnwire2":
-            self._init_burnwire2()
-        else:
-            print("Invalid Device:", device_string)
-
-    def hardwarecheck_device(self, devicestr, device):
-        """ 
-        Check if the given device is initialized. If not, 
-        attempt to reinitialized it. If reinitialization fails,
-        raise HardwareInitException (to be handled in application) 
-        """
-        if device is not None:
-            return device
-        else:
-            self.reinit(devicestr)
-            if device is None:
-                raise HardwareInitException
-            else:
-                return device
-
-    @property
+    @hardware
     def i2c1(self):
-        """ Return I2C1 bus object or raise HardwareInitException """
-        return self.hardwarecheck_device("I2C1", self._i2c1)
+        """ Return I2C1 bus and init function"""
+        return self._i2c1, self._init_i2c1
 
-    @property
+    @hardware
     def i2c2(self):
-        """ Return I2C2 bus object or raise HardwareInitException """
-        return self.hardwarecheck_device("I2C2", self._i2c2)
+        """ Return I2C2 bus object and init function"""
+        return self._i2c2, self._init_i2c2
 
-    @property
+    @hardware
     def i2c3(self):
-        """ Return I2C3 bus object or raise HardwareInitException """
-        return self.hardwarecheck_device("I2C3", self._i2c3)
+        """ Return I2C3 bus object and init function"""
+        return self._i2c3, self._init_i2c3
 
-    @property
+    @hardware
     def spi(self):
-        """ Return SPI bus object or raise HardwareInitException """
-        return self.hardwarecheck_device("SPI", self._spi)
+        """ Return SPI bus object and init function"""
+        return self._spi, self._init_i2c3
 
-    @property
+    @hardware
     def sd(self):
-        """ Return SD Card object or raise HardwareInitException """
-        return self.hardwarecheck_device("SD", self._sd)
+        """ Return SD Card object and init function"""
+        return self._sd, self._init_i2c3
 
-    @property
+    @hardware
     def neopixel(self):
-        """ Return Neopixel object or raise HardwareInitException """
-        return self.hardwarecheck_device("Neopixel", self._neopixel)
+        """Return neopixel and its init function"""
+        return self._neopixel, self._init_neopixel
 
-    @property
+    @hardware
     def imu(self):
-        """ Return IMU object or raise HardwareInitException """
-        return self.hardwarecheck_device("IMU", self._imu)
+        """ Return IMU object and init function"""
+        return self._imu, self._init_imu
 
-    @property
+    @hardware
     def radio(self):
-        """ Return Radio object or raise HardwareInitException """
-        return self.hardwarecheck_device("Radio", self._radio)
+        """ Return Radio and init function"""
+        return self._radio, self._init_radio
 
-    @property
+    @hardware
     def sun_yn(self):
-        """ Return Sun Sensor -Y object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun-Y", self._sun_yn)
+        """ Return Sun Sensor -Y and init function"""
+        return self._sun_yn, self._init_sun_minusy
 
-    @property
+    @hardware
     def sun_zn(self):
-        """ Return Sun Sensor -Z object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun-Z", self._sun_zn)
+        """ Return Sun Sensor -Z and init function"""
+        return self._sun_zn, self._init_sun_minusz
 
-    @property
+    @hardware
     def sun_xn(self):
-        """ Return Sun Sensor -X object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun-X", self._sun_xn)
+        """ Return Sun Sensor -X and init function"""
+        return self._sun_xn, self._init_sun_minusx
 
-    @property
+    @hardware
     def sun_yp(self):
-        """ Return Sun Sensor +Y object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun+Y", self._sun_yp)
+        """ Return Sun Sensor +Y and init function"""
+        return self._sun_yp, self._init_sun_plusy
 
-    @property
+    @hardware
     def sun_zp(self):
-        """ Return Sun Sensor +Z object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun+Z", self._sun_zp)
+        """ Return Sun Sensor +Z and init function"""
+        return self._sun_zp, self._init_sun_plusz
 
-    @property
+    @hardware
     def sun_xp(self):
-        """ Return Sun Sensor +X object or raise HardwareInitException """
-        return self.hardwarecheck_device("Sun+X", self._sun_xp)
+        """ Return Sun Sensor +X and init function"""
+        return self._sun_xp, self._init_sun_plusx
 
-    @property
+    @hardware
     def drv_x(self):
-        """ Return Coil Driver X object or raise HardwareInitException """
-        return self.hardwarecheck_device("CoilDriverX", self._drv_x)
+        """ Return Coil Driver X and init function"""
+        return self._drv_x, self._init_coildriverx
 
-    @property
+    @hardware
     def drv_y(self):
-        """ Return Coil Driver Y object or raise HardwareInitException """
-        return self.hardwarecheck_device("CoilDriverY", self._drv_y)
+        """ Return Coil Driver Y and init function"""
+        return self._drv_y, self._init_coildrivery
 
-    @property
+    @hardware
     def drv_z(self):
-        """ Return Coil Driver Z object or raise HardwareInitException """
-        return self.hardwarecheck_device("CoilDriverZ", self._drv_z)
+        """ Return Coil Driver Z and init function"""
+        return self._drv_z, self._init_coildriverz
 
-    @property
+    @hardware
     def burnwire1(self):
-        """ Return Burnwire1 object or raise HardwareInitException """
-        return self.hardwarecheck_device("Burnwire1", self._burnwire1)
+        """ Return Burnwire1 object and init function"""
+        return self._burnwire1, self._init_burnwire1
 
-    @property
+    @hardware
     def burnwire2(self):
-        """ Return Burnwire2 object or raise HardwareInitException """
-        return self.hardwarecheck_device("Burnwire2", self._burnwire2)
+        """ Return Burnwire2 object and init function"""
+        return self._burnwire2, self._init_burnwire2
 
 
 # initialize Satellite as cubesat
