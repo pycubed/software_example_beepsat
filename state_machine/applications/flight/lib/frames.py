@@ -1,24 +1,25 @@
 try:
     import ulab.numpy as np
-    from ulab.numpy import cos, sin
+    from ulab.numpy import cos, sin, pi, arctan2, sqrt, array
 except ImportError:
     import numpy as np
-    from numpy import cos, sin
+    from numpy import cos, sin, pi, arctan2, sqrt, array
 
 J2000 = 946684800  # unix timestamp for the Julian date 2000-01-01
 MJD_ZERO = 2400000.5  # Offset of Modified Julian Days representation with respect to Julian Days.
 JD2000 = 2451545.0  # Reference epoch (J2000.0), Julian Date
 MJD2000 = 51544.5  # MJD at J2000.0
 PI2 = 2 * np.pi
+EARTH_RADIUS = 6378137.0  # in meters
 
 def mjd(utime):
     """Returns the Modified Julian Date (MJD) for a given unix timestamp."""
     return utime / 86400.0 + 40587
 
 def rotZ(theta):
-    return np.array([[cos(theta),   sin(theta), 0],
-                     [-sin(theta),  cos(theta), 0],
-                     [0,            0,          1]])
+    return array([[cos(theta),   sin(theta),  0],
+                  [-sin(theta),  cos(theta),  0],
+                  [0,            0,           1]])
 
 def ERA(utime):
     """Returns the the ERA (Earth Rotation Angle) at a certain unix time stamp.
@@ -85,3 +86,22 @@ def ned_to_ecef(lat, long):
         - A 3x3 numpy array.
     """
     return None
+
+def convert_ecef_to_geoc(ecef, degrees=False):
+    """Converts from ECEF (Earth Centered Earth Fixed) to geocentric coordinates.
+
+    Args:
+        - ecef: A 3x1 numpy array containing the ECEF coordinates (km).
+    Returns:
+        - A 3x1 numpy array containing the geocentric coordinates long, lat, alt (radians, radians, km) """
+    x, y, z = ecef
+    lat = arctan2(z, sqrt(x * x + y * y))
+    lon = arctan2(y, x)
+    alt = sqrt(x * x + y * y + z * z) - (EARTH_RADIUS / 1000)
+
+    # Convert output to degrees
+    if degrees:
+        lat = lat * 180.0 / pi
+        lon = lon * 180.0 / pi
+
+    return array([lon, lat, alt])

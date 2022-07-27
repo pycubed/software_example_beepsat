@@ -205,6 +205,19 @@ class TestECIToECF(unittest.TestCase):
         testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
         print("no changes!")
 
+class TestECEFtoGEOC(unittest.TestCase):
+
+    def test_equal_to_SD(self):
+        """Checks that the results are almost equal to SatelliteDynamic's sECEFtoGEOC"""
+        testing.assert_array_almost_equal(
+            frames.convert_ecef_to_geoc(array([1, 2, 3])),
+            array([1.1071487177940904, 0.9302740141154721, -6.374395342613226e3])
+        )
+        testing.assert_array_almost_equal(
+            frames.convert_ecef_to_geoc(array([9000, 7000, 8000])),
+            array([0.6610431688506868, 0.6118300867286255, 7.550251277184119e3])
+        )
+
 def np_arr_to_py(arr):
     def format_row(row):
         return f"[{', '.join(map(str, row))}]"
@@ -212,7 +225,7 @@ def np_arr_to_py(arr):
     return f"array([{spliter.join([format_row(row) for row in arr])}])"
 
 
-def generate_no_change_tests():
+def generate_no_change_tests_ECI_to_ECEF():
     for year in range(2021, 2023):
         for month in range(1, 13):
             t = dt(year, month, 1, tzinfo=timezone.utc).timestamp()

@@ -235,7 +235,8 @@ def igrf_eci(date, r_eci):
     r_ecef = np.dot(ecef_eci, r_eci)
     long, lat, _ = frames.ecef_to_geoc(r_ecef)
 
+    b_ned = igrf(date, lat, long, np.linalg.norm(r_eci))
+
     ecef_ned = frames.ned_to_ecef(lat, long)
 
-    b_ned = igrf(date, lat, long, np.linalg.norm(r_eci))
     return np.dot(eci_ecef, np.dot(ecef_ned, b_ned))
