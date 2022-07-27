@@ -233,7 +233,7 @@ def igrf_eci(date, r_eci):
     eci_ecef = ecef_eci.transpose()
 
     r_ecef = np.dot(ecef_eci, r_eci)
-    long, lat, _ = frames.ecef_to_geoc(r_ecef)
+    long, lat, _ = frames.convert_ecef_to_geoc(r_ecef, degrees=True)
 
     b_ned = igrf(date, lat, long, np.linalg.norm(r_eci))
 
