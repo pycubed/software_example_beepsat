@@ -36,4 +36,4 @@ jobs:
         run: pip install flake8
 
       - name: Run emulated flight software
-        run: cd state_machine && timeout 5s sh run.sh || echo {{$?}}
+        run: sh .github/workflows/scripts/emulation.sh
