@@ -362,7 +362,7 @@ class _Satellite:
             self.neopixel[0] = (0, 0, 0)
             self.hardware['Neopixel'] = True
         except Exception as e:
-            print('[WARNING][Initializing Neopixel]', e)
+            print('[ERROR][Initializing Neopixel]', e)
 
     def _init_imu(self):
         """ Define IMU parameters and initialize """
@@ -451,9 +451,6 @@ class _Satellite:
         """ Initialize Coil Driver X on I2C3, set mode and voltage """
         try:
             self._drv_x = drv8830.DRV8830(self.i2c3, 0x62)  # U7
-            # TODO: initialization automatically sets mode to STANDBY
-            # do we want STANDBY or COAST
-            self.drv_x.mode = drv8830.BridgeControl.COAST
             self.hardware['CoilDriverX'] = True
         except Exception as e:
             print('[ERROR][Initializing H-Bridge U7]', e)
@@ -462,9 +459,6 @@ class _Satellite:
         """ Initialize Coil Driver Y on I2C3, set mode and voltage """
         try:
             self._drv_y = drv8830.DRV8830(self.i2c3, 0x68)  # U8
-            # TODO: initialization automatically sets mode to STANDBY
-            # do we want STANDBY or COAST
-            self.drv_y.mode = drv8830.BridgeControl.COAST
             self.hardware['CoilDriverY'] = True
         except Exception as e:
             print('[ERROR][Initializing H-Bridge U8]', e)
@@ -473,9 +467,6 @@ class _Satellite:
         """ Initialize Coil Driver Z on I2C3, set mode and voltage """
         try:
             self._drv_z = drv8830.DRV8830(self.i2c3, 0x60)  # U9
-            # TODO: initialization automatically sets mode to STANDBY
-            # do we want STANDBY or COAST
-            self.drv_z.mode = drv8830.BridgeControl.COAST
             self.hardware['CoilDriverZ'] = True
         except Exception as e:
             print('[ERROR][Initializing H-Bridge U9]', e)
