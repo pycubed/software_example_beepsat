@@ -62,7 +62,7 @@ def eci_to_ecef(utime):
 
     Returns:
         - A 3x3 numpy array.
-    Based on: https://github.com/sisl/SatelliteDynamics.jl/blob/f1eede2faffd2d6a6864d7ac0989a075c7d7a04f/src/reference_systems.jl#L296
+    Based on SatelliteDynamic's rECItoECEF
     """
     # we may choose to add bias_precession_nutation and polar motion in the future
     # rc2i = bias_precession_nutation(epc)
