@@ -1,5 +1,3 @@
-import json
-
 from config import config
 
 def format(v):
