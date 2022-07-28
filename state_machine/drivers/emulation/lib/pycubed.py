@@ -2,6 +2,10 @@ import time
 import tasko
 
 import lib.reader as reader
+try:
+    from ulab.numpy import array
+except ImportError:
+    from numpy import array
 
 class Radio:
     def __init__(self):
@@ -117,7 +121,7 @@ Sun Sensor Functions
 
 def sun_vector():
     """Returns the sun pointing vector in the body frame"""
-    return [0, 0, 0]
+    return array([0, 0, 0])
 
 
 """
