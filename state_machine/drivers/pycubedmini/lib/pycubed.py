@@ -95,24 +95,6 @@ def coildriver_vout(driver_index, projected_voltage):
 """
 Sun Sensor Interface functions
 """
-def lux(sun_sensor_index):
-    """ Return the lux reading for a given sun sensor """
-    if sun_sensor_index == "-Y":
-        return _cubesat.sun_yn.lux
-    elif sun_sensor_index == "-Z":
-        return _cubesat.sun_zn.lux
-    elif sun_sensor_index == "-X":
-        return _cubesat.sun_xn.lux
-    elif sun_sensor_index == "+Y":
-        return _cubesat.sun_yp.lux
-    elif sun_sensor_index == "+Z":
-        return _cubesat.sun_zp.lux
-    elif sun_sensor_index == "+X":
-        return _cubesat.sun_xp.lux
-    else:
-        print(sun_sensor_index, "is not a defined sun sensor.")
-        return
-
 def sun_vector():
     """Returns the sun pointing vector in the body frame"""
     return array(
