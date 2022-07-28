@@ -1,8 +1,6 @@
 from lib.template_task import Task
 import lib.pycubed as cubesat
 
-SEND_DATA = False  # make sure you have an antenna attached!
-
 
 class task(Task):
     name = 'imu'
