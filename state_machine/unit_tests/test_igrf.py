@@ -1,14 +1,11 @@
 import unittest
 import sys
-from datetime import datetime as dt, timezone
 import numpy as np
+from testutils import timestamp
 
 sys.path.insert(0, './state_machine/applications/flight')
 
 from lib.IGRF import igrf, igrf_eci
-
-def timestamp(year, month, day, hour=0, minute=0, second=0):
-    return dt(year, month, day, hour, minute, second, tzinfo=timezone.utc).timestamp()
 
 def assert_vector_almost_equal(a, b, assertLessEqual, angle_tolerance=5, nt_tolerance=3000):
     ua = a / np.linalg.norm(a)
@@ -31,28 +28,28 @@ class IGRF(unittest.TestCase):
         # using pyIGRF.py
         # Note that we use geocentric coordinates
         # We are comparing the results with the IGRF13 results
-        t = dt(2020, 4, 19, 15, tzinfo=timezone.utc).timestamp()  # time is about 2020.3
+        t = timestamp(2020, 4, 19, 15)  # time is about 2020.3
         assert_vector_almost_equal(
             igrf(t, 34.567, 45.678, 6697.043115),
             [24354.4, 1908.4, 32051.6],
             self.assertLessEqual
         )
 
-        t = dt(2023, 1, 1, tzinfo=timezone.utc).timestamp()
+        t = timestamp(2023, 1, 1)
         assert_vector_almost_equal(
             igrf(t, -12, 37, 6700),
             [20274.2, -1994.6, -18852.8],
             self.assertLessEqual
         )
 
-        t = dt(2022, 7, 2, 22, tzinfo=timezone.utc).timestamp()
+        t = timestamp(2022, 7, 2, 22)
         assert_vector_almost_equal(
             igrf(t, 25, 35, EARTH_RADIUS + 400),  # about the ISS altitude
             [28295.864360612726, 1850.2071187341612, 21436.550334577572],
             self.assertLessEqual,
         )
 
-        t = dt(2023, 1, 1, tzinfo=timezone.utc).timestamp()
+        t = timestamp(2023, 1, 1)
         assert_vector_almost_equal(
             igrf(t, -79, 48, EARTH_RADIUS + 700),
             [4650.9, -10831.9, -34896.3],
@@ -63,14 +60,14 @@ class IGRF(unittest.TestCase):
         """Test that our changes to the IGRF model do not change the results."""
         equal = np.testing.assert_array_almost_equal
 
-        t = dt(2020, 4, 19, 15, tzinfo=timezone.utc).timestamp()
+        t = timestamp(2020, 4, 19, 15)
         equal(
             igrf(t, 34.567, 45.678, 6697.043115),
             [24694.17511877, 2125.5475454, 32160.37154219],
             decimal=1
         )
 
-        t = dt(2021, 7, 28, 2, tzinfo=timezone.utc).timestamp()
+        t = timestamp(2021, 7, 28, 2)
         equal(
             igrf(t, -12, 127, 6873),
             [28092.523258, 1432.59565072, -22804.66673182],
