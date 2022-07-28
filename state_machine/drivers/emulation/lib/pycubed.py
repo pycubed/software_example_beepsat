@@ -112,6 +112,15 @@ def log(self, str):
 
 
 """
+Sun Sensor Functions
+"""
+
+def sun_vector():
+    """Returns the sun pointing vector in the body frame"""
+    return [0, 0, 0]
+
+
+"""
 Radio related functions
 """
 # send = _cubesat.radio.send
