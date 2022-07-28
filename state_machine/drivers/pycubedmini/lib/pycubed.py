@@ -21,6 +21,7 @@ from bitflags import bitFlag, multiBitFlag
 from micropython import const
 import adafruit_tsl2561
 import time
+from ulab.numpy import array
 
 class hardware:
     """Modified @hardware decorator.
@@ -111,6 +112,13 @@ def lux(sun_sensor_index):
     else:
         print(sun_sensor_index, "is not a defined sun sensor.")
         return
+
+def sun_vector():
+    """Returns the sun pointing vector in the body frame"""
+    return array(
+        [_cubesat.sun_xp.lux - _cubesat.sun_xn.lux,
+         _cubesat.sun_yp.lux - _cubesat.sun_yn.lux,
+         _cubesat.sun_zp.lux - _cubesat.sun_zn.lux])
 
 
 """
