@@ -11,9 +11,9 @@ The important features of this MEKF are:
     - The gyro bias (β) is estimated.
 """
 try:
-    from ulab.numpy import dot as matmul, eye as I, zeros, array, linalg, concatenate as concat  # noqa: E741 (I is not ambiguous)
+    from ulab.numpy import dot as matmul, eye as I, zeros, array, linalg, concatenate as concat  # noqa: E741
 except Exception:
-    from numpy import linalg, matmul, eye as I, zeros, array, concatenate as concat  # noqa: E741 (I is not ambiguous)
+    from numpy import linalg, matmul, eye as I, zeros, array, concatenate as concat  # noqa: E741
 from lib.mathutils import quaternion_mul, quaternion_to_left_matrix, hat, block, quaternion_to_rotation_matrix
 from math import cos, sin
 
