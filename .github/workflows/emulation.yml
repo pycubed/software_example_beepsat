@@ -1,4 +1,4 @@
-name: Lint
+name: Run Emulated Flight Software
 
 on:
   # Trigger the workflow on all pull requests, and pushes to main
@@ -12,21 +12,11 @@ on:
       - '**'        # matches every branch
 
 jobs:
-  run-linters:
-    name: Run linters
+  build-and-run:
+    name: Build And Run
     runs-on: ubuntu-latest
 
     steps:
-      - name: Get file changes
-        id: get_file_changes
-        uses: trilom/file-changes-action@v1.2.4
-        with:
-          output: ' '
-
-      - name: Echo file changes
-        run: |
-          echo Changed files: ${{ steps.get_file_changes.outputs.files_modified }} ${{steps.get_file_changes.outputs.files_added}}
-
       - name: Check out Git repository
         uses: actions/checkout@v2
 
@@ -35,11 +25,15 @@ jobs:
         with:
           python-version: 3.8
 
+      - name: Install dependencies
+        run: pip install -r state_machine/requirements.txt 
+
+      - name: Build and run
+        id: build_and_run
+        run: cd state_machine && sh build.sh drivers/emulation applications/flight
+
       - name: Install Python dependencies
         run: pip install flake8
 
-      - name: Run linters
-        uses: wearerequired/lint-action@v2
-        with:
-          flake8: true
-          flake8_args: ${{ steps.get_file_changes.outputs.files_modified }} ${{steps.get_file_changes.outputs.files_added}}
+      - name: Run emulated flight software
+        run: ./.github/workflows/scripts/emulation.sh

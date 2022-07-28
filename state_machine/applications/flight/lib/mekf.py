@@ -1,23 +1,38 @@
-# Multiplicative Extended Kalman Filter
-# Based on Zac Manchester's Formulation
-# Writen by Aleksei Seletskiy
+"""Multiplicative Extended Kalman Filter
+Based on Zac Manchester's Formulation
+Writen by Aleksei Seletskiy
+
+A Multiplicative Extended Kalman filter (MEKF) is a variant of an Extended Kalman Filter (EKF).
+The important features of this MEKF are:
+    - We eliminate rigibody dynamics by assuming we have a near perfect gyro (after the bias β is removed).
+    - We assume our gyro sample is rate is high enough that ω is essentialy constant over a sample period.
+    - Thus we treat ω (angular velocity) as a the control.
+    - We are running an EKF with a local axis-angle error vector, but the global state is stored using a quaternion.
+    - The gyro bias (β) is estimated.
+"""
 try:
     from ulab.numpy import dot as matmul, eye as I, zeros, array, linalg  # noqa: E741 (I is not ambiguous)
 except Exception:
     from numpy import linalg, matmul, eye as I, zeros, array  # noqa: E741 (I is not ambiguous)
-from lib.mathutils import quaternion_to_left_matrix, hat, block
+from lib.mathutils import quaternion_mul, quaternion_to_left_matrix, hat, block, quaternion_to_rotation_matrix
 from math import cos, sin
 
-q = array([[0], [0], [0]])  # Quaternion attitude vector
+q = array([[0], [0], [0], [0]])  # Quaternion attitude vector
 β = array([[0], [0], [0]])  # Gyro bias vector
 P = I(6)  # Covariance matrix
 
 def propagate_state(q, β, ω, δt):
-    """State propogation function"""
+    """State propogation function
+    args:
+        q: Quaternion attitude vector
+        β: Gyro bias axis-angle vector
+        ω: Measured angular velocity
+        δt: Time step
+    """
     θ = linalg.norm(ω - β) * δt
     r = (ω - β) / linalg.norm(ω - β)
-    return matmul(quaternion_to_left_matrix(q), block([[array([[cos(θ / 2)]])],
-                                                       [r * sin(θ / 2)]]))
+    return quaternion_mul(q, block([[array([[cos(θ / 2)]])],
+                                    [r * sin(θ / 2)]]))
 
 def step(
     ω,
@@ -27,12 +42,22 @@ def step(
     br_mag,
     br_sun
 ):
+    """Updates the state of the MEKF by one itteration of sensor readings.
+    args:
+        ω: Gyroscope reading
+        δt: Time step
+        nr_mag: Inertial frame magnetic field vector
+        nr_sun: Inertial frame sun pointing vector
+        br_mag: Measured body frame magnetic field vector
+        br_sun: Measured body frame sun pointing vector
+    """
     global q
     global β
     global P
 
     W = I(6) * 1e-6
     V = I(6) * 1e-6
+
     # Predict
     q_p = propagate_state(q, β, ω, δt)  # β remains constant
 
@@ -46,31 +71,28 @@ def step(
     A = block([
         [R,              (-δt * I(3))],
         [zeros((3, 3)),  I(3)]])
-    P_p = matmul(A, matmul(P, A.tranpose())) + W
+    P_p = matmul(A, matmul(P, A.transpose())) + W
 
     # Innovation
-
-    Q = quaternion_to_left_matrix(q_p).transpose()
+    Q = quaternion_to_rotation_matrix(q_p).transpose()
     body_measurements = block([[br_mag],
                                [br_sun]])
     inertial_measurements = block([[nr_mag],
                                    [nr_sun]])
-    inertial_to_body = block([[Q,            zeros(3, 3)],
-                              [zeros(3, 3),  Q]])
+    inertial_to_body = block([[Q,              zeros((3, 3))],
+                              [zeros((3, 3)),  Q]])
     Z = body_measurements - matmul(inertial_to_body, inertial_measurements)
-    C = block([[hat(ᵇr_mag), zeros(3, 3)],
-               [hat(ᵇr_sun), zeros(3, 3)]])
-    S = C * P_p * C.transpose() + V
+    C = block([[hat(ᵇr_mag), zeros((3, 3))],
+               [hat(ᵇr_sun), zeros((3, 3))]])
+    S = matmul(C, matmul(P_p, C.transpose())) + V  # CP_PC' + V
 
     # Kalman Gain
-
-    L = P_p * C.transpose() * linalg.inv(S)
+    L = matmul(P_p, matmul(C.transpose(), linalg.inv(S)))  # P_pC'S^-1
 
     # Update
-
-    δx = L * Z
-    ϕ = δx[1:3]
-    δβ = δx[4:6]
+    δx = matmul(L, Z)
+    ϕ = δx[0:3]
+    δβ = δx[3:]
     θ = linalg.norm(ϕ)
     r = ϕ / θ
     q_u = matmul(quaternion_to_left_matrix(q_p), block([[array([[cos(θ / 2)]])],
