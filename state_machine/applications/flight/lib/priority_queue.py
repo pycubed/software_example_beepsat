@@ -18,6 +18,7 @@ def push(heap, item):
     """Push item onto heap, maintaining the heap invariant.
 
     :param heap: The heap to push the item onto
+    :type heap: list
     :param item: Any well ordered item
     """
     heap.append(item)
@@ -26,7 +27,9 @@ def push(heap, item):
 def pop(heap):
     """Pop the largest item off the heap, maintaining the heap invariant.
 
-    :param heap: The heap to pop the item from"""
+    :param heap: The heap to pop the item from
+    :type heap: list
+    """
     lastelt = heap.pop()    # raises appropriate IndexError if heap is empty
     if heap:
         returnitem = heap[0]
@@ -38,7 +41,9 @@ def pop(heap):
 def heapify(heap):
     """Transform list into a maxheap, in-place, in O(len(x)) time.
 
-    :param x: The list to heapify"""
+    :param heap: The list to heapify
+    :type heap: list
+    """
     n = len(heap)
     for i in reversed(range(n // 2)):
         _siftup_max(heap, i)
