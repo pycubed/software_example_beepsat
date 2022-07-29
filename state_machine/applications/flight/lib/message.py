@@ -1,4 +1,5 @@
 class Message:
+    """The most basic message type. This supports ascii messages no longer than 251 bytes"""
     def __init__(self, priority, str):
         self.priority = priority
         self.header = 0x00
