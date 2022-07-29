@@ -36,6 +36,7 @@ class task(Task):
         # set our radiohead node ID so we can get ACKs
         self.cubesat.radio.node = 0xAB  # our ID
         self.cubesat.radio.destination = 0xBA  # target's ID
+        self.msg = ''
 
     async def main_task(self):
         if tq.empty():

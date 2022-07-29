@@ -1,4 +1,4 @@
-DEFAULT = b'\0x00'
-NAIVE_START = b'\0xff'
-NAIVE_MID = b']0xfe'
-NAIVE_END = b'\0xfd'
+DEFAULT = 0x00
+NAIVE_START = 0xff
+NAIVE_MID = 0xfe
+NAIVE_END = 0xfd
