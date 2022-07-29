@@ -1,5 +1,5 @@
 class Message:
-    """The most basic message type. This supports ascii messages no longer than 251 bytes
+    """The most basic message type. Supports ascii messages no longer than 251 bytes.
 
     :param priority: The priority of the message (higher is better)
     :type priority: int
