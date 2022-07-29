@@ -2,7 +2,9 @@ class Message:
     """The most basic message type. This supports ascii messages no longer than 251 bytes
 
     :param priority: The priority of the message (higher is better)
+    :type priority: int
     :param str: The message to send
+    :type str: str
     """
 
     def __init__(self, priority, str):
