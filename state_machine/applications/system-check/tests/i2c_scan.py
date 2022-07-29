@@ -24,5 +24,4 @@ def run():
           [hex(x) for x in cubesat.i2c3.scan()])
     cubesat.i2c3.unlock()
 
-    print("I2C Scan Complete.")
-    print("")
+    print("I2C Scan Complete.\n")
