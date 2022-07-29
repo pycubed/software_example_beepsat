@@ -35,14 +35,14 @@ def pop(heap):
         return returnitem
     return lastelt
 
-def heapify(x):
+def heapify(heap):
     """Transform list into a maxheap, in-place, in O(len(x)) time.
 
     :param x: The list to heapify"""
-    n = len(x)
+    n = len(heap)
     for i in reversed(range(n // 2)):
-        _siftup_max(x, i)
-    return x
+        _siftup_max(heap, i)
+    return heap
 
 def _siftdown_max(heap, startpos, pos):
     'Maxheap variant of _siftdown'
