@@ -3,10 +3,11 @@ import lib.radio_headers as headers
 
 class NaiveMessage(Message):
 
+    packet_len = 249  # not 251 because for some reason packet loss is extremely high at this threshold
+
     def __init__(self, priority, str):
         super().__init__(priority, str)
         self.cursor = 0
-        self.packet_len = 249  # not 251 because for some reason packet loss is extremely high at this threshold
 
     def packet(self):
         strng = self.str[self.cursor:self.cursor + self.packet_len]
