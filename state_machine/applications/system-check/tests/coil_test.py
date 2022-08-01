@@ -7,7 +7,7 @@ Torque Driver Test
 
 import time
 from lib import pycubed as cubesat
-from math import sqrt
+from ulab.numpy.linalg import norm
 
 # voltage level constants; set between -1 and 1
 v1 = 0.25
@@ -32,15 +32,16 @@ def user_test(coil_index):
     driver_time = 3
 
     # set up the test
-    print("Testing Coil", str(coil_index),
-          "for the following voltage levels: " + str(projected_voltage1) +
-          ", " + str(projected_voltage2) + ", " + str(projected_voltage3))
+    print(('Testing Coil Driver {} for the following voltage levels' +
+           'levels: {}, {}, {}.').format(
+            coil_index, projected_voltage1, projected_voltage2,
+            projected_voltage3))
     print("Waiting", str(wait_time), "seconds.")
     time.sleep(wait_time)
 
     # conduct the test
-    print("Beginning the test now. Testing for", str(driver_time * 3),
-          "seconds.")
+    print("Beginning the test now. Testing for {} seconds.".format(
+          driver_time * 3))
 
     # test each voltage level
     cubesat.coildriver_vout(coil_index, projected_voltage1)
@@ -57,12 +58,9 @@ def user_test(coil_index):
 
     # calculate total magnetic reading
     print("Data Collection Complete")
-    mag_total1 = sqrt(
-        mag_reading1[0] ** 2 + mag_reading1[1] ** 2 + mag_reading1[2] ** 2)
-    mag_total2 = sqrt(
-        mag_reading2[0] ** 2 + mag_reading2[1] ** 2 + mag_reading2[2] ** 2)
-    mag_total3 = sqrt(
-        mag_reading3[0] ** 2 + mag_reading3[1] ** 2 + mag_reading3[2] ** 2)
+    mag_total1 = norm(mag_reading1)
+    mag_total2 = norm(mag_reading2)
+    mag_total3 = norm(mag_reading3)
 
     # if magnetometer readings are increasing over time, return true
     return (mag_total3 > mag_total2 and mag_total2 > mag_total1)
@@ -79,16 +77,10 @@ def voltage_levelx(result_dict, coil_index):
 
     # get user test result values, process and print results
     result = user_test(coil_index)
-    result_val_string = ('Tested Coil Driver ' + str(coil_index) +
-                         ' at the following voltage levels: ' +
-                         str(projected_voltage1) + ', ' +
-                         str(projected_voltage2) + ', ' +
-                         str(projected_voltage3) + '.')
-    if result:
-        result_val_string += 'Magnetometer readings changed as expected.'
-    else:
-        result_val_string += ('Magnetometer readings did not change as' +
-                              'expected.')
+    result_val_string = (('Tested Coil Driver {} at the following voltage' +
+                         'levels: {}, {}, {}.').format(coil_index,
+                         projected_voltage1, projected_voltage2,
+                         projected_voltage3))
 
     # update result dictionary
     result_dict[result_key] = (result_val_string, result)
@@ -106,8 +98,7 @@ def run(hardware_dict, result_dict):
     else:  # Coil X detected, run tests
         print("Starting Coil Driver X test...")
         voltage_levelx(result_dict, 'X')
-        print("Coil Driver X Test complete.")
-        print("")
+        print("Coil Driver X Test complete.\n")
 
     # if no Coil Y detected, update result dictionary
     if not hardware_dict['CoilDriverY']:
@@ -115,8 +106,7 @@ def run(hardware_dict, result_dict):
     else:  # Coil X detected, run tests
         print("Starting Coil Driver Y test...")
         voltage_levelx(result_dict, 'Y')
-        print("Coil Driver Y Test complete.")
-        print("")
+        print("Coil Driver Y Test complete.\n")
 
     # if no Coil Z detected, update result dictionary
     if not hardware_dict['CoilDriverZ']:
@@ -124,7 +114,6 @@ def run(hardware_dict, result_dict):
     else:  # Coil X detected, run tests
         print("Starting Coil Driver Z test...")
         voltage_levelx(result_dict, 'Z')
-        print("Coil Driver Z Test complete.")
-        print("")
+        print("Coil Driver Z Test complete.\n")
 
     return result_dict
