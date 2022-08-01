@@ -32,11 +32,10 @@ def user_test(coil_index):
     driver_time = 3
 
     # set up the test
-    print(('Testing Coil Driver {} for the following voltage levels' +
-           'levels: {}, {}, {}.').format(
-            coil_index, projected_voltage1, projected_voltage2,
-            projected_voltage3))
-    print("Waiting", str(wait_time), "seconds.")
+    print('Testing Coil Driver {coil_index} for the following voltage levels' +
+          'levels: {projected_voltage1}, {projected_voltage2}, ' +
+          '{projected_voltage3}.')
+    print("Waiting {wait_time} seconds.")
     time.sleep(wait_time)
 
     # conduct the test
@@ -63,7 +62,12 @@ def user_test(coil_index):
     mag_total3 = norm(mag_reading3)
 
     # if magnetometer readings are increasing over time, return true
-    return (mag_total3 > mag_total2 and mag_total2 > mag_total1)
+    result_val_bool = (mag_total3 > mag_total2 and mag_total2 > mag_total1)
+    if not result_val_bool:
+        print("Magnetometer results should have been increasing but were" +
+              "not. reading 1: {mag_total1}, reading 2: {mag_total2}," +
+              "reading 3: {mag_total3}")
+    return result_val_bool
 
 
 def voltage_levelx(result_dict, coil_index):
@@ -77,10 +81,9 @@ def voltage_levelx(result_dict, coil_index):
 
     # get user test result values, process and print results
     result = user_test(coil_index)
-    result_val_string = (('Tested Coil Driver {} at the following voltage' +
-                         'levels: {}, {}, {}.').format(coil_index,
-                         projected_voltage1, projected_voltage2,
-                         projected_voltage3))
+    result_val_string = ('Tested Coil Driver {coil_index} at the following' +
+                         'voltage levels: {projected_voltage1}, ' +
+                         '{projected_voltage2}, {projected_voltage3}.')
 
     # update result dictionary
     result_dict[result_key] = (result_val_string, result)
