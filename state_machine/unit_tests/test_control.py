@@ -5,7 +5,7 @@ from numpy import testing
 sys.path.insert(0, './state_machine/applications/flight')
 sys.path.insert(0, './state_machine/frame')
 
-from lib.control import bcross  # noqa: E402
+from lib.control import bcross
 
 
 class BCrossTest(unittest.TestCase):
