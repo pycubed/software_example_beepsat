@@ -9,7 +9,7 @@ import time
 from lib import pycubed as cubesat
 
 
-def user_test():
+def get_user_input():
     """
     All user interaction happens in this function
     Prompt users, get user inputs for voltage level and duration and return
@@ -28,7 +28,7 @@ def user_test():
         "At what voltage do you want to run the burnwire IC? (up to 3.3V): "))
     burn_time = int(input(
         "For how long do you want to run the burnwire test? "))
-    print("Test starting in {wait_time} seconds.")
+    print(f"Test starting in {wait_time} seconds.")
     time.sleep(wait_time)
     return voltage, burn_time
 
@@ -41,7 +41,7 @@ def burnwire_test(result_dict, burnnum):
     """
 
     # get user input for voltage and duration
-    voltage, burn_time = user_test()
+    voltage, burn_time = get_user_input()
 
     # calculate voltage level and conduct the test
     voltage_level = voltage / 3.3
@@ -56,8 +56,8 @@ def burnwire_test(result_dict, burnnum):
         success = True
 
     # process results
-    result_key = 'Burnwire {burnnum}'
-    result_val_string = 'Tested burnwire {burnnum} at {voltage} V'
+    result_key = f'Burnwire {burnnum}'
+    result_val_string = f'Tested burnwire {burnnum} at {voltage} V'
     result_dict[result_key] = (result_val_string, success)
     return result_dict
 
