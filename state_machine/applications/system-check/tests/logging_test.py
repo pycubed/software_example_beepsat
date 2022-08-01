@@ -16,48 +16,50 @@ def sd_test():
     """
 
     # create filepaths
-    fp = "test.txt"
-    test_fp = "/sd/" + fp
+    filepath = "test.txt"
+    filepath_directory = "/sd/test.txt"
 
     # try to create a file with the test filepath
     try:
-        test_file = open(test_fp, "x")
+        test_file = open(filepath_directory, "x")
     except OSError:
         # if the file already exists, remove it and create a new file
-        os.remove(test_fp)
-        test_file = open(test_fp, "x")
+        os.remove(filepath_directory)
+        test_file = open(filepath_directory, "x")
 
-    print("Directory after test.txt was created: ", os.listdir("/sd/"))
-    if fp not in os.listdir("/sd/"):
-        return ("File creation failed. ", False)
+    print("Directory after test.txt was created: {}".format(
+          os.listdir("/sd/")))
+    if filepath not in os.listdir("/sd/"):
+        return ("File creation failed.", False)
 
     # write to file
     test_string = "Hello World! This is a test file.\n"
     try:
         test_file.write(test_string)
     except OSError as e:
-        print("Unable to write to file. " + str(e))
-        return ("Unable to write to file. " + str(e), False)
+        print("Unable to write to file. {}".format(e))
+        return ("Unable to write to file. {}".format(e), False)
     test_file.close()
 
     # read from file
     try:
-        test_file_read = open(test_fp, "r")
+        test_file_read = open(filepath_directory, "r")
         test_string_read = test_file_read.read()
     except OSError as e:
-        print("Unable to read from file. " + str(e))
-        return ("Unable to read from file. " + str(e), False)
+        print("Unable to read from file. {}".format(e))
+        return ("Unable to read from file. {}".format(e), False)
 
     if test_string_read != test_string:
         print("File not written to or read from correctly.")
         return ("File not written to or read from correctly.", False)
 
     # delete file
-    os.remove(test_fp)
-    print("Directory after test.txt was removed: ", os.listdir("/sd/"))
+    os.remove(filepath_directory)
+    print("Directory after test.txt was removed: {}".format(
+          os.listdir("/sd/")))
 
-    if fp in os.listdir("/sd/"):
-        return ("File deletion failed. ", False)
+    if filepath in os.listdir("/sd/"):
+        return ("File deletion failed.", False)
 
     # if nothing has failed so far, return success
     return ("SD Card passed all tests: Created, wrote to, " +
@@ -79,7 +81,6 @@ def run(hardware_dict, result_dict):
     print("Starting logging test...")
     result_val_string, result_val_bool = sd_test()
     result_dict['SDcard_Logging'] = (result_val_string, result_val_bool)
-    print("Logging test complete.")
-    print("")
+    print("Logging test complete.\n")
 
     return result_dict
