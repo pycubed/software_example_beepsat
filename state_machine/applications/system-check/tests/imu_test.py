@@ -20,8 +20,8 @@ def still_user_test():
     Set wait times, prompt the users and gather IMU data and input
     """
     # print user prompts
-    print(("Please leave the cubesat flat on a table." +
-           "Waiting {} seconds.").format(wait_time))
+    print("Please leave the cubesat flat on a table." +
+          "Waiting {wait_time} seconds.")
     time.sleep(wait_time)
     print("Collecting IMU data...")
 
@@ -41,9 +41,9 @@ def still_imu_test(result_dict):
     # record acceleration
     acc, gyro, mag = still_user_test()
     result_val_string_acc = ("Testing IMU when cubesat is still." +
-                             "Acc: {}").format(acc)
+                             "Acc: {acc}")
     result_val_string_gyro = ("Testing IMU when cubesat is still." +
-                              "Gyro: {}").format(gyro)
+                              "Gyro: {gyro}")
 
     # if total acceleration ~= 9.8 m/s^2 and gyro ~= 0 deg/s, true
     result_val_bool_acc = 9.8 - norm(acc) < 0.2
@@ -60,10 +60,10 @@ def moving_user_test():
     Set wait times, prompt the users and gather IMU data and input
     """
     # print user prompts
-    print("Starting the moving test in {} seconds.".format(wait_time))
+    print("Starting the moving test in {wait_time} seconds.")
     time.sleep(wait_time)
-    print(("Please move the cubesat around for the next {} " +
-           "seconds, starting now.").format(wait_time))
+    print("Please move the cubesat around for the next {wait_time} " +
+          "seconds, starting now.")
     print("Collecting IMU data...")
 
     # at some random time, collect acc and gyro readings, return 0.0 mag
@@ -84,7 +84,7 @@ def moving_imu_test(result_dict):
     # record acceleration
     acc, gyro, mag = moving_user_test()
     result_val_string = ("Testing IMU when cubesat is being moved." +
-                         "Acc: {}").format(acc)
+                         "Acc: {acc}")
 
     # if absolute value of each acceleration component is more than 0, true
     result_val_bool = norm(acc) >= 0.1
@@ -97,8 +97,8 @@ def rotating_user_test():
     Set wait times, prompt the users and gather IMU data and input
     """
     # print user prompts
-    print(("Please rotate the cubesat as best as possible." +
-           "Waiting {} seconds.").format(wait_time))
+    print("Please rotate the cubesat as best as possible." +
+          "Waiting {wait_time} seconds.")
     time.sleep(wait_time)
     print("Collecting IMU data...")
 
@@ -120,7 +120,7 @@ def rotating_imu_test(result_dict):
     # record gyro reading
     acc, gyro, mag = rotating_user_test()
     result_val_string = ("Testing IMU when cubesat is rotating." +
-                         "Gyro: {}").format(gyro)
+                         "Gyro: {gyro}")
 
     # if total gyro reading when rotating is greater than 0, true
     result_val_bool = norm(gyro) >= 0.2
@@ -133,11 +133,11 @@ def magnet_user_test():
     Set wait times, prompt the users and gather IMU data and input
     """
     # print user prompts
-    print(("Please leave the cubesat flat on a table and retrieve a " +
-           "magnet. Waiting {} seconds.").format(wait_time))
+    print("Please leave the cubesat flat on a table and retrieve a " +
+          "magnet. Waiting {wait_time} seconds.")
     time.sleep(wait_time)
-    print(("Please slowly move the magnet closer to the cubesat " +
-           "for {} seconds.").format(wait_time))
+    print("Please slowly move the magnet closer to the cubesat " +
+          "for {wait_time} seconds.")
     print("Collecting IMU data...")
 
     # collect acc, gyro, mag at the start, and mag at end
@@ -159,9 +159,9 @@ def magnet_imu_test(result_dict):
     """
     # record magnetometer reading
     acc, gyro, mag = magnet_user_test()
-    result_val_string = (
-        ("Testing IMU when cubesat is subject to an external magnetic" +
-         "field. Change in Mag Reading: {}").format(mag))
+    result_val_string = ("Testing IMU when cubesat is subject to an " +
+                         "external magnetic field. Change in Mag Reading:" +
+                         "{mag}")
 
     # if change in magnetometer reading is more than 0, true
     result_val_bool = mag >= 0.2
@@ -182,7 +182,7 @@ def temp_imu_test(result_dict):
     result_val_bool = False
     if res == "Y":
         result_val_bool = True
-    result_dict['IMU_Temp'] = ("IMU Temperature Reading: {}".format(temp),
+    result_dict['IMU_Temp'] = ("IMU Temperature Reading: {temp}",
                                result_val_bool)
 
 
@@ -215,7 +215,6 @@ def run(hardware_dict, result_dict):
         rotating_imu_test(result_dict)
         magnet_imu_test(result_dict)
         temp_imu_test(result_dict)
-        print("IMU Test complete.")
-        print("")
+        print("IMU Test complete.\n")
 
     return result_dict
