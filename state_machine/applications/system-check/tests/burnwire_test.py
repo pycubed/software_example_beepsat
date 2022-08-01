@@ -24,11 +24,11 @@ def user_test():
           "ground pin (GND) and burnwire pin on the -Z solar board.")
 
     # get user input for voltage level and duration
-    voltage = float(input(
-        "At what voltage do you want to run the burnwire IC? (up to 3.3V): "))
-    burn_time = int(input(
-        "For how long do you want to run the burnwire test? "))
-    print("Test starting in", str(wait_time), "seconds.")
+    voltage = abs(float(input(
+        "At what voltage do you want to run the burnwire IC? (up to 3.3V): ")))
+    burn_time = abs(int(input(
+        "For how long do you want to run the burnwire test? ")))
+    print("Test starting in {} seconds.".format(wait_time))
     time.sleep(wait_time)
     return voltage, burn_time
 
@@ -52,13 +52,12 @@ def burnwire_test(result_dict, burnnum):
     print("Burnwire Test Complete")
     success_input = input("Did the test work as expected? (Y/N): ")
     success = False
-    if success_input == "Y":
+    if success_input.lower() == "y":
         success = True
 
     # process results
-    result_key = 'Burnwire' + str(burnnum)
-    result_val_string = ('Tested burnwire ' + str(burnnum) + ' at ' +
-                         str(voltage) + ' V')
+    result_key = 'Burnwire {}'.format(burnnum)
+    result_val_string = ('Tested burnwire {} at {} V'.format(burnnum, voltage))
     result_dict[result_key] = (result_val_string, success)
     return result_dict
 
@@ -74,8 +73,7 @@ def run(hardware_dict, result_dict):
     else:  # Burn Wire 1 detected, run tests
         print("Starting Burnwire1 test...")
         burnwire_test(result_dict, 1)
-        print("Burnwire1 Test complete.")
-        print("")
+        print("Burnwire1 Test complete.\n")
 
     # if no Burn Wire 2 detected, update result dictionary
     if not hardware_dict['Burnwire2']:
@@ -83,7 +81,6 @@ def run(hardware_dict, result_dict):
     else:  # Burn Wire 2 detected, run tests
         print("Starting Burnwire2 test...")
         burnwire_test(result_dict, 2)
-        print("Burnwire2 Test complete.")
-        print("")
+        print("Burnwire2 Test complete.\n")
 
     return result_dict
