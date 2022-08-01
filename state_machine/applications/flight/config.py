@@ -30,7 +30,12 @@ config = {
                 "Interval": 0.1,
                 "Priority": 3,
                 "ScheduleLater": False
-            }
+            },
+            "Radio": {
+                "Interval": 3,
+                "Priority": 2,
+                "ScheduleLater": True
+            },
         },
         "StepsTo": [
             "LowPower",
