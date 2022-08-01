@@ -2,6 +2,10 @@ import time
 import tasko
 
 import lib.reader as reader
+try:
+    from ulab.numpy import array
+except ImportError:
+    from numpy import array
 
 class Radio:
     def __init__(self):
@@ -109,6 +113,15 @@ def log(self, str):
     """Logs to sd card"""
     str = (str[:20] + '...') if len(str) > 23 else str
     print(f'log not implemented, tried to log: {str}')
+
+
+"""
+Sun Sensor Functions
+"""
+
+def sun_vector():
+    """Returns the sun pointing vector in the body frame"""
+    return array([0, 0, 0])
 
 
 """
