@@ -10,8 +10,8 @@ class NaiveMessage(Message):
         self.cursor = 0
 
     def packet(self):
-        strng = self.str[self.cursor:self.cursor + self.packet_len]
-        pkt = bytearray(len(strng) + 1)
+        payload = self.str[self.cursor:self.cursor + self.packet_len]
+        pkt = bytearray(len(payload) + 1)
         if len(self.str) <= self.cursor + self.packet_len:  # last packet
             pkt[0] = headers.NAIVE_END
         elif self.cursor == 0:
@@ -19,7 +19,7 @@ class NaiveMessage(Message):
         else:
             pkt[0] = headers.NAIVE_MID
 
-        pkt[1:] = strng
+        pkt[1:] = payload
         return pkt, True
 
     def done(self):
