@@ -24,11 +24,11 @@ def user_test():
           "ground pin (GND) and burnwire pin on the -Z solar board.")
 
     # get user input for voltage level and duration
-    voltage = abs(float(input(
-        "At what voltage do you want to run the burnwire IC? (up to 3.3V): ")))
-    burn_time = abs(int(input(
-        "For how long do you want to run the burnwire test? ")))
-    print("Test starting in {} seconds.".format(wait_time))
+    voltage = float(input(
+        "At what voltage do you want to run the burnwire IC? (up to 3.3V): "))
+    burn_time = int(input(
+        "For how long do you want to run the burnwire test? "))
+    print("Test starting in {wait_time} seconds.")
     time.sleep(wait_time)
     return voltage, burn_time
 
@@ -56,8 +56,8 @@ def burnwire_test(result_dict, burnnum):
         success = True
 
     # process results
-    result_key = 'Burnwire {}'.format(burnnum)
-    result_val_string = ('Tested burnwire {} at {} V'.format(burnnum, voltage))
+    result_key = 'Burnwire {burnnum}'
+    result_val_string = 'Tested burnwire {burnnum} at {voltage} V'
     result_dict[result_key] = (result_val_string, success)
     return result_dict
 
