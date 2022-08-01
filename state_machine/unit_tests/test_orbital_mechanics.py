@@ -6,6 +6,8 @@ from numpy.linalg import norm
 
 sys.path.insert(0, './state_machine/applications/flight')
 
+EARTH_R = 6371.009
+
 
 from lib.orbital_mechanics import rk4, propogate
 
@@ -20,4 +22,4 @@ class TestRK4(unittest.TestCase):
         x = array([0, 0, 10000.0, 5, -5, 0])
         for _ in range(20):
             x = propogate(x, 60 * 60 * 24, integration_step=60)
-            self.assertGreaterEqual(norm(x[0:3]), 6371.009)
+            self.assertGreaterEqual(norm(x[0:3]), EARTH_R)

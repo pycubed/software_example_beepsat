@@ -24,7 +24,7 @@ def rk4(x, dt, f):
     k2 = dt * f(x + k1 / 2)
     k3 = dt * f(x + k2 / 2)
     k4 = dt * f(x + k3)
-    return x + (1 / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
+    return x + (1 / 6) * (k1 + (2 * k2) + (2 * k3) + k4)
 
 def d_state(x):
     """Time derivative of the state variable
@@ -53,8 +53,6 @@ def d_state(x):
         * pos_norm ** -5 \
         * pos[2] * (3 - 5 * pos[2] ** 2 / pos_norm ** 2)
 
-    # add together accelerations
-    # accel = accel_twobody + accel_J2
     accel = accel_twobody + accel_J2
 
     return array([vel[0], vel[1], vel[2], accel[0], accel[1], accel[2]])
