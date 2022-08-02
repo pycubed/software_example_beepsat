@@ -38,32 +38,23 @@ def hat(v):
     """Converts v to a matrix such that hat(v)w = cross(v, w)"""
     if not isinstance(v, ndarray):
         v = array(v)
-    if v.shape == (3, 1):
-        return array([
-            [0,         -v[2][0],   v[1][0]],
-            [v[2][0],    0,        -v[0][0]],
-            [-v[1][0],   v[0][0],   0]])
-    elif v.shape == (3,):
-        return array([
-            [0,      -v[2],   v[1]],
-            [v[2],    0,     -v[0]],
-            [-v[1],   v[0],   0]])
-    else:
-        raise ValueError("v must be a 3x1 numpy array")
+    return array([
+        [0,      -v[2],   v[1]],
+        [v[2],    0,     -v[0]],
+        [-v[1],   v[0],   0]])
 
 def quaternion_to_left_matrix(q):
     """Converts a scalar-first unit quaternion into the left-side matrix for quaternion multiplication"""
     if not isinstance(q, ndarray):
         q = array([q])
-    if q.shape == (4,):
-        qs, qv = q[0], array([q[1:4]]).transpose()
-    elif q.shape == (4, 1):
-        qs, qv = q[0], q[1:4]
+    qs, qv = q[0], array(q[1:4])
 
     dr = qs * I(3) + hat(qv)
+    qv = array([qv])
+
     M = block(
-        [[array([[qs]]),  -qv.transpose()],
-         [qv,              dr]])
+        [[array([[qs]]),   -qv],
+         [qv.transpose(),   dr]])
 
     return M
 
@@ -71,10 +62,7 @@ def quaternion_to_rotation_matrix(q):
     """Converts a scalar-first unit quaternion into the rotation matrix Qv = qvq+"""
     if not isinstance(q, ndarray):
         q = array([q])
-    if q.shape == (4,):
-        qs, qv = q[0], array([q[1:4]]).transpose()
-    elif q.shape == (4, 1):
-        qs, qv = q[0], q[1:4]
+    qs, qv = q[0], array(q[1:4]).transpose()
 
     return I(3) + 2 * matmul(hat(qv), (qs * I(3) + hat(qv)))
 
