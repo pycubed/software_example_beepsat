@@ -43,8 +43,8 @@ def d_state(x):
     # now we find the J2 acceleration
 
     accel_J2 = zeros(3)
-    K = -3 / 2 * J2 * MU * R ** 2 * pos_norm ** -5
-    K2 = 5 * pos[2] ** 2 / pos_norm ** 2
+    K = -(3 / 2) * J2 * MU * R ** 2 * pos_norm ** -5
+    K2 = 5 * pos[2] ** 2 / (pos_norm ** 2)
     accel_J2[0] = K * pos[0] * (1 - K2)
     accel_J2[1] = K * pos[1] * (1 - K2)
     accel_J2[2] = K * pos[2] * (3 - K2)
