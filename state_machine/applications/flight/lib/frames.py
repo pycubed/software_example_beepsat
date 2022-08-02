@@ -85,7 +85,8 @@ def ecef_to_eci(date):
     return eci_to_ecef(date).transpose()
 
 def ned_to_ecef(lon, lat):
-    """ Returns the rotation matrix from NED (North East Down) to ECEF (Earth Centered Earth Fixed).
+    """ Returns the rotation matrix for transforming coordinates in an earth-centered NED frame
+    to coordinates in an ECEF frame.
     Args:
         - lon: Longitude in radians (geocentric)
         - lat: Latitude in radians (geocentric)
