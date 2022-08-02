@@ -54,7 +54,7 @@ def earth_rotation(utime):
     return r
 
 def eci_to_ecef(utime):
-    """Returns the transformation matrix from ECI (Earth Centered Inertial) to ECEF (Earth Centered Earth Fixed).
+    """Returns the rotation matrix from ECI (Earth Centered Inertial) to ECEF (Earth Centered Earth Fixed).
     Applies correction for Earth-rotation.
     Based on: https://space.stackexchange.com/a/53569
 
@@ -74,7 +74,7 @@ def eci_to_ecef(utime):
     return R
 
 def ecef_to_eci(date):
-    """Returns the transformation matrix from ECEF (Earth Centered Earth Fixed) to ECI (Earth Centered Inertial).
+    """Returns the rotation matrix from ECEF (Earth Centered Earth Fixed) to ECI (Earth Centered Inertial).
     Args:
         - date: A unix timestamp.
 
@@ -84,7 +84,7 @@ def ecef_to_eci(date):
     return eci_to_ecef(date).transpose()
 
 def ned_to_ecef(lon, lat):
-    """ Returns the transformation matrix from NED (North East Down) to ECEF (Earth Centered Earth Fixed).
+    """ Returns the rotation matrix from NED (North East Down) to ECEF (Earth Centered Earth Fixed).
     Args:
         - lon: Longitude in radians (geocentric)
         - lat: Latitude in radians (geocentric)

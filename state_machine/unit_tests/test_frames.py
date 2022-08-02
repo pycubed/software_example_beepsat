@@ -200,7 +200,6 @@ class TestECIToECF(unittest.TestCase):
                    [-0.9369327006113504, 0.3495098203557688, 0.0],
                    [0.0, 0.0, 1.0]])
         testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
-        print("no changes!")
 
 class TestECEFtoGEOC(unittest.TestCase):
 
