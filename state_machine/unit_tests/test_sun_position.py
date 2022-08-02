@@ -6,7 +6,7 @@ sys.path.insert(0, './state_machine/applications/flight')
 
 from lib.sun_position import approx_sun_position_ECI
 
-class SunPosition(unittest.TestCase):
+class TestSunPosition(unittest.TestCase):
 
     def test_similar_to_SD(self):
         """Makes sure that the approx sun position vector is similar to the one from SatelliteDynamics.jl"""
@@ -82,7 +82,3 @@ class SunPosition(unittest.TestCase):
             sum_dif += dif
         print("Average angle error:", sum_angle / len(tests))
         print(f"Average absolute error {sum_dif / len(tests)/1e6} million km")
-
-
-x = SunPosition()
-x.test_similar_to_SD()
