@@ -80,8 +80,8 @@ class SunPosition(unittest.TestCase):
             angle, dif = similar(approx_sun_position_ECI(test["time"]), test["ref"])
             sum_angle += angle
             sum_dif += dif
-        print("Average angle:", sum_angle / len(tests))
-        print(f"Average diff of {sum_dif / len(tests)/1e6} million km")
+        print("Average angle offset:", sum_angle / len(tests))
+        print(f"Average absolute of {sum_dif / len(tests)/1e6} million km")
 
 
 x = SunPosition()
