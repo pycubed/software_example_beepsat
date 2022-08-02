@@ -33,7 +33,8 @@ class Task:
 
         """
         if level == 1:
-            print(f"{'['+co(msg=self.name,color=self.color)+'/'+self.cubesat.state_machine.state:>35}] {msg}")
+            header = f"[{co(msg=self.name,color=self.color)}/{self.cubesat.state_machine.state}]"
+            print(f"{header:>35} {msg}")
         else:
             print("\t" + f"{'   └── '}{msg}")
 
