@@ -1,24 +1,20 @@
 import time
 
-class Sattelite:
-    tasko = None
+def acceleration():
+    return (0.0, 0.0, 0.0)
 
-    def __init__(self):
-        self.battery_voltage = 6.4
-        self.vlowbatt = 4.0
-        self.BOOTTIME = time.monotonic()
+def magnetic():
+    return (0.0, 0.0, 0.0)
 
-    @property
-    def acceleration(self):
-        return (0.0, 0.0, 0.0)
+def gyro():
+    return (0.0, 0.0, 0.0)
 
-    @property
-    def magnetic(self):
-        return (0.0, 0.0, 0.0)
+def temperature_imu():
+    return 20
 
-    @property
-    def gyro(self):
-        return (0.0, 0.0, 0.0)
+def battery_voltage():
+    return 6.4
 
 
-pocketqube = Sattelite()
+BOOTTIME = time.monotonic()
+vlowbatt = 4.0
