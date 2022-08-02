@@ -10,7 +10,7 @@ def bcross(b, ω, k=7e-4):
     bbt = matmul(array([b_hat]).transpose(), array([b_hat]))
     M = - k * matmul(identity(3) - bbt, ω)
     # control
-    m = 1 / (linalg.norm(b)) * (cross(b_hat, M))
+    m = (1 / linalg.norm(b)) * cross(b_hat, M)
     if all(isfinite(m)):
         return m
     return [0, 0, 0]
