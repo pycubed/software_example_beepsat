@@ -67,7 +67,7 @@ def eci_to_ecef(utime):
     """
     # we may choose to add bias_precession_nutation and polar motion in the future
     # rc2i = bias_precession_nutation(epc)
-    R    = earth_rotation(utime)
+    R = earth_rotation(utime)
     # rpm  = polar_motion(epc)
 
     # return rpm @ r @ rc2i
