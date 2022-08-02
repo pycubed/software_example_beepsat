@@ -4,10 +4,7 @@ from numpy import testing, array, zeros, eye, ones
 
 sys.path.insert(0, './state_machine/applications/flight')
 
-from lib.mathutils import hat, quaternion_to_left_matrix, block  # noqa: E402
-
-def col(arr):
-    return array([arr]).transpose()
+from lib.mathutils import hat, quaternion_to_left_matrix, block, quaternion_to_rotation_matrix, quaternion_mul
 
 class HatTests(unittest.TestCase):
 
@@ -26,15 +23,14 @@ class HatTests(unittest.TestCase):
                  [-0.4, 0.3,  0.0]]),
             hat([0.3, 0.4, 0.6])
         )
-        self.assertRaises(ValueError, hat, [1, 2, 3, 4])
         testing.assert_equal(
             array([[0.0, 0.3982060297895143, 0.2543322132742208],
                    [-0.3982060297895143, 0.0, -0.7083212680159963],
                    [-0.2543322132742208, 0.7083212680159963, 0.0]]),
-            hat(array([[0.7083212680159963, 0.2543322132742208, -0.3982060297895143]]).transpose())
+            hat(array([0.7083212680159963, 0.2543322132742208, -0.3982060297895143]))
         )
 
-class blockTests(unittest.TestCase):
+class BlockTests(unittest.TestCase):
 
     def test(self):
         a = array([[1, 1]])
@@ -79,7 +75,7 @@ class QuaternionToLeftTests(unittest.TestCase):
                  [0.403,  -0.499,  -0.332,   0.692]]),
             quaternion_to_left_matrix(q)
         )
-        q = array([[0.5, 0.5, 0.5, 0.5]]).transpose()
+        q = array([0.5, 0.5, 0.5, 0.5])
         testing.assert_equal(
             array(
                 [[0.5,  -0.5,  -0.5,  -0.5],
@@ -88,7 +84,7 @@ class QuaternionToLeftTests(unittest.TestCase):
                  [0.5,  -0.5,   0.5,   0.5]]),
             quaternion_to_left_matrix(q)
         )
-        q = array([[-0.5244311817641283, 0.7083212680159963, 0.2543322132742208, -0.3982060297895143]]).transpose()
+        q = array([-0.5244311817641283, 0.7083212680159963, 0.2543322132742208, -0.3982060297895143])
         testing.assert_almost_equal(
             array([[-0.524431, -0.708321, -0.254332, 0.398206],
                    [0.708321, -0.524431, 0.398206, 0.254332],
@@ -96,4 +92,42 @@ class QuaternionToLeftTests(unittest.TestCase):
                    [-0.398206, -0.254332, 0.708321, -0.524431]]),
             quaternion_to_left_matrix(q),
             decimal=6
+        )
+
+class QuaternionToRotationMatrixTest(unittest.TestCase):
+
+    def test(self):
+        # Using: https://www.andre-gaschler.com/rotationconverter/ to generate test cases
+        # Test cases switched to scalar first (rather than the converter's scalar last)
+        q1 = array([0.6804138, 0.4082483, 0.5443311, 0.2721655])
+        testing.assert_almost_equal(
+            array([[0.2592593,  0.0740741,  0.9629630],
+                   [0.8148148,  0.5185185, -0.2592593],
+                   [-0.5185185,  0.8518519,  0.0740741]]),
+            quaternion_to_rotation_matrix(q1)
+        )
+        q2 = array([0.1601282, 0.3202563, 0.8006408, 0.4803845])
+        testing.assert_almost_equal(
+            array([[-0.7435898,  0.3589744,  0.5641026],
+                   [0.6666667,  0.3333333,  0.6666667],
+                   [0.0512821,  0.8717949, -0.4871795]]),
+            quaternion_to_rotation_matrix(q2)
+        )
+        # identity
+        qi = array([1, 0, 0, 0])
+        testing.assert_almost_equal(
+            eye(3),
+            quaternion_to_rotation_matrix(qi)
+        )
+
+
+class QuaternionMultiplicationTest(unittest.TestCase):
+
+    def test(self):
+        q1 = array([0.6804138, 0.4082483, 0.5443311, 0.2721655])
+        q2 = array([0.1601282, 0.3202563, 0.8006408, 0.4803845])
+        testing.assert_almost_equal(
+            array([-0.58835, 0.32686, 0.52298, 0.52298]),
+            quaternion_mul(q1, q2),
+            decimal=5
         )
