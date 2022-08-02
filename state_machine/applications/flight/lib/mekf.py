@@ -17,8 +17,8 @@ except Exception:
 from lib.mathutils import quaternion_mul, quaternion_to_left_matrix, hat, block, quaternion_to_rotation_matrix
 from math import cos, sin
 
-q = array([0, 0, 0, 0])  # Quaternion attitude vector
-β = array([0, 0, 0])  # Gyro bias vector
+q = array([0., 0., 0., 0.])  # Quaternion attitude vector
+β = array([0., 0., 0.])  # Gyro bias vector
 P = I(6)  # Covariance matrix
 
 
