@@ -1,4 +1,5 @@
 from lib.debugcolor import co
+import lib.pycubed as cubesat
 
 
 class Task:
@@ -33,7 +34,7 @@ class Task:
 
         """
         if level == 1:
-            header = f"[{co(msg=self.name,color=self.color)}/{self.cubesat.state_machine.state}]"
+            header = f"[{co(msg=self.name,color=self.color)}/{cubesat.state_machine.state}]"
             print(f"{header:>35} {msg}")
         else:
             print("\t" + f"{'   └── '}{msg}")
