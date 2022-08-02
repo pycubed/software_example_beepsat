@@ -233,6 +233,7 @@ class TestNEDtoECEF(unittest.TestCase):
         )
 
 def np_arr_to_py(arr):
+    """Converts a numpy array to a python command creating the array"""
     def format_row(row):
         return f"[{', '.join(map(str, row))}]"
     spliter = ',\n'
@@ -240,6 +241,7 @@ def np_arr_to_py(arr):
 
 
 def generate_no_change_tests_ECI_to_ECEF():
+    """Generates a bunch of tests to make sure no changes have been made for the ECEF to ECI conversion."""
     for year in range(2021, 2023):
         for month in range(1, 13):
             t = dt(year, month, 1, tzinfo=timezone.utc).timestamp()
