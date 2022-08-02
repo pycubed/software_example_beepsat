@@ -11,7 +11,8 @@ import lib.frames as frames
 EARTH_RADIUS = 6371  # Earth radius (km)
 LEO = 2000  # Low Earth Orbit Altitude Limit (km)
 
-def sphere(r, theta, phi):
+def sphere(p):
+    (r, theta, phi) = p
     return array([r * cos(phi) * sin(theta), r * sin(phi) * sin(theta), r * cos(theta)])
 
 def assert_matrices_close(A, B, limit=40):
@@ -33,14 +34,10 @@ def assert_matrices_close(A, B, limit=40):
                   0.28715487506952453, 0.04206276596303382, 0.4749591026605633, 0.599812282465087, 0.8555165321413011]
     # generate random vectors
 
-    def gen_vector(r, theta, phi):
-        return array([
-            (r / 2 + 0.5) * (EARTH_RADIUS + LEO),
-            theta * 2 * pi,
-            phi * 2 * pi
-        ])
+    def scale(r, theta, phi):
+        return (r / 2 + 0.5) * (EARTH_RADIUS + LEO), theta * 2 * pi, phi * 2 * pi
 
-    rx = [gen_vector(random_r[i], random_theta[i], random_phi[i]) for i in range(20)]
+    rx = [sphere(scale(random_r[i], random_theta[i], random_phi[i])) for i in range(20)]
 
     maxdif = 0.0
     for x in rx:
