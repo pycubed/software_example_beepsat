@@ -34,7 +34,8 @@ def ERA(utime):
         - utime: A unix timestamp.
 
     Returned (function value):
-        - ERA (Earth Rotation Angle) at this time stamp (radians)"""
+        - ERA (Earth Rotation Angle) at this time stamp (radians)
+    """
     # Days since J2000.0.
     d = mjd(utime)
     days = d - MJD2000
@@ -101,7 +102,8 @@ def convert_ecef_to_geoc(ecef, degrees=False):
     Args:
         - ecef: A 3x1 numpy array containing the ECEF coordinates (km).
     Returns:
-        - A 3x1 numpy array containing the geocentric coordinates long, lat, alt (radians, radians, km) """
+        - A 3x1 numpy array containing the geocentric coordinates long, lat, alt (radians, radians, km)
+    """
     x, y, z = ecef
     lat = arctan2(z, sqrt(x * x + y * y))
     lon = arctan2(y, x)
