@@ -5,10 +5,10 @@ from numpy import testing
 sys.path.insert(0, './state_machine/applications/flight')
 sys.path.insert(0, './state_machine/frame')
 
-from Tasks.detumble import bcross
+from lib.control import bcross
 
 
-class MiscTests(unittest.TestCase):
+class BCrossTest(unittest.TestCase):
 
     def test(self):
         b = [0, 2, 3]
