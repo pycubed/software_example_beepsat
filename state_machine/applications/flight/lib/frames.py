@@ -47,11 +47,12 @@ def ERA(utime):
     return theta
 
 def earth_rotation(utime):
+    """Computes rotation matrix based on the Earth Rotation Angle (ERA) at a certain unix time stamp."""
     # Compute Earth rotation angle
     era = ERA(utime)
     # Rotate Matrix and return
-    r = rotZ(era)
-    return r
+    R = rotZ(era)
+    return R
 
 def eci_to_ecef(utime):
     """Returns the rotation matrix from ECI (Earth Centered Inertial) to ECEF (Earth Centered Earth Fixed).
