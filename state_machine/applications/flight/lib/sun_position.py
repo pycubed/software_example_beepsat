@@ -1,5 +1,9 @@
 # Based on: https://github.com/spacecraft-design-lab-2019/flight-software/blob/master/sun-position/sun_position.py
 import math
+try:
+    from ulab.numpy import array
+except ImportError:
+    from numpy import array
 
 def unix_time_to_julian_day(unix_time):
     """Takes in a unix timestamp and returns the julian day"""
@@ -15,7 +19,7 @@ def approx_sun_position_ECI(utime):
         - utime: unix timestamp
 
     Returns:
-        - sun pointing in Earth Centered Intertial (ECI) frame
+        - sun pointing in Earth Centered Intertial (ECI) frame (km)
     """
     JD = unix_time_to_julian_day(utime)
     OplusW = 282.94  # Ω + ω
@@ -27,8 +31,8 @@ def approx_sun_position_ECI(utime):
     r_mag = (149.619 - 2.499 * math.cos(M) - 0.021 * math.cos(2 * M)) * 10**6
 
     epsilon = math.radians(23.43929111)
-    r_vec = (r_mag * math.cos(long),
-             r_mag * math.sin(long) * math.cos(epsilon),
-             r_mag * math.sin(long) * math.sin(epsilon))
+    r_vec = array([r_mag * math.cos(long),
+                   r_mag * math.sin(long) * math.cos(epsilon),
+                   r_mag * math.sin(long) * math.sin(epsilon)])
 
     return r_vec

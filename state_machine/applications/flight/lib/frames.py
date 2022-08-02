@@ -34,7 +34,8 @@ def ERA(utime):
         - utime: A unix timestamp.
 
     Returned (function value):
-        - ERA (Earth Rotation Angle) at this time stamp (radians)"""
+        - ERA (Earth Rotation Angle) at this time stamp (radians)
+    """
     # Days since J2000.0.
     d = mjd(utime)
     days = d - MJD2000
@@ -53,7 +54,7 @@ def earth_rotation(utime):
     return r
 
 def eci_to_ecef(utime):
-    """Returns the transformation matrix from ECI (Earth Centered Inertial) to ECEF (Earth Centered Earth Fixed).
+    """Returns the rotation matrix from ECI (Earth Centered Inertial) to ECEF (Earth Centered Earth Fixed).
     Applies correction for Earth-rotation.
     Based on: https://space.stackexchange.com/a/53569
 
@@ -66,14 +67,14 @@ def eci_to_ecef(utime):
     """
     # we may choose to add bias_precession_nutation and polar motion in the future
     # rc2i = bias_precession_nutation(epc)
-    r    = earth_rotation(utime)
+    R = earth_rotation(utime)
     # rpm  = polar_motion(epc)
 
     # return rpm @ r @ rc2i
-    return r
+    return R
 
 def ecef_to_eci(date):
-    """Returns the transformation matrix from ECEF (Earth Centered Earth Fixed) to ECI (Earth Centered Inertial).
+    """Returns the rotation matrix from ECEF (Earth Centered Earth Fixed) to ECI (Earth Centered Inertial).
     Args:
         - date: A unix timestamp.
 
@@ -83,7 +84,7 @@ def ecef_to_eci(date):
     return eci_to_ecef(date).transpose()
 
 def ned_to_ecef(lon, lat):
-    """ Returns the transformation matrix from NED (North East Down) to ECEF (Earth Centered Earth Fixed).
+    """ Returns the rotation matrix from NED (North East Down) to ECEF (Earth Centered Earth Fixed).
     Args:
         - lon: Longitude in radians (geocentric)
         - lat: Latitude in radians (geocentric)
@@ -101,7 +102,8 @@ def convert_ecef_to_geoc(ecef, degrees=False):
     Args:
         - ecef: A 3x1 numpy array containing the ECEF coordinates (km).
     Returns:
-        - A 3x1 numpy array containing the geocentric coordinates long, lat, alt (radians, radians, km) """
+        - A 3x1 numpy array containing the geocentric coordinates long, lat, alt (radians, radians, km)
+    """
     x, y, z = ecef
     lat = arctan2(z, sqrt(x * x + y * y))
     lon = arctan2(y, x)

@@ -11,7 +11,8 @@ import lib.frames as frames
 EARTH_RADIUS = 6371  # Earth radius (km)
 LEO = 2000  # Low Earth Orbit Altitude Limit (km)
 
-def sphere(r, theta, phi):
+def sphere(p):
+    (r, theta, phi) = p
     return array([r * cos(phi) * sin(theta), r * sin(phi) * sin(theta), r * cos(theta)])
 
 def assert_matrices_close(A, B, limit=40):
@@ -33,14 +34,10 @@ def assert_matrices_close(A, B, limit=40):
                   0.28715487506952453, 0.04206276596303382, 0.4749591026605633, 0.599812282465087, 0.8555165321413011]
     # generate random vectors
 
-    def gen_vector(r, theta, phi):
-        return array([
-            (r / 2 + 0.5) * (EARTH_RADIUS + LEO),
-            theta * 2 * pi,
-            phi * 2 * pi
-        ])
+    def scale(r, theta, phi):
+        return (r / 2 + 0.5) * (EARTH_RADIUS + LEO), theta * 2 * pi, phi * 2 * pi
 
-    rx = [gen_vector(random_r[i], random_theta[i], random_phi[i]) for i in range(20)]
+    rx = [sphere(scale(random_r[i], random_theta[i], random_phi[i])) for i in range(20)]
 
     maxdif = 0.0
     for x in rx:
@@ -203,7 +200,6 @@ class TestECIToECF(unittest.TestCase):
                    [-0.9369327006113504, 0.3495098203557688, 0.0],
                    [0.0, 0.0, 1.0]])
         testing.assert_array_almost_equal(A, frames.eci_to_ecef(t))
-        print("no changes!")
 
 class TestECEFtoGEOC(unittest.TestCase):
 
@@ -237,6 +233,7 @@ class TestNEDtoECEF(unittest.TestCase):
         )
 
 def np_arr_to_py(arr):
+    """Converts a numpy array to a python command creating the array"""
     def format_row(row):
         return f"[{', '.join(map(str, row))}]"
     spliter = ',\n'
@@ -244,6 +241,7 @@ def np_arr_to_py(arr):
 
 
 def generate_no_change_tests_ECI_to_ECEF():
+    """Generates a bunch of tests to make sure no changes have been made for the ECEF to ECI conversion."""
     for year in range(2021, 2023):
         for month in range(1, 13):
             t = dt(year, month, 1, tzinfo=timezone.utc).timestamp()
