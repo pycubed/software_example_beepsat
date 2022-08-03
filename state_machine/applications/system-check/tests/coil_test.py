@@ -20,7 +20,7 @@ projected_voltage2 = v2 * 5.06
 projected_voltage3 = v3 * 5.06
 
 
-def user_test(coil_index):
+def test_voltage_levels(coil_index):
     """
     All user interaction happens in this function
     Set wait times, prompt user, collect magnetometer data for
@@ -81,7 +81,10 @@ def coil_test(result_dict, coil_index):
     result_key = f"CoilDriver{coil_index}"
 
     # get user test result values, process and print results
-    result = user_test(coil_index)
+    result = test_voltage_levels(coil_index)
+    if result is None:
+        result_dict[result_key] = (f"{result_key} not tested.", result)
+
     result_val_string = (f'Tested Coil Driver {coil_index} at the following' +
                          f'voltage levels: {projected_voltage1}, ' +
                          f'{projected_voltage2}, {projected_voltage3}.')
