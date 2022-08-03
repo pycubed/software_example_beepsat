@@ -18,9 +18,9 @@ import tests.burnwire_test
 hardware_dict = pycubed._cubesat.hardware
 result_dict = {
     'SDcard_Logging': ('', False),
-    'IMU_AccStill': ('', False),
+    'IMU_AccStationary': ('', False),
     'IMU_AccMoving': ('', False),
-    'IMU_GyroStill': ('', False),
+    'IMU_GyroStationary': ('', False),
     'IMU_GyroRotating': ('', False),
     'IMU_MagMagnet': ('', False),
     'IMU_Temp': ('', False),
@@ -46,14 +46,24 @@ result_dict = {
 }
 
 # print acknowledgement that test has started
-print("Running System Check...")
-print("Hardware Successfully Initialized. Printing results...")
-print("")
+print("\n########## S Y S T E M C H E C K ##########\n")
+
+# print hardware initialization results
+print("Hardware initialization results:\n")
+
+print("Failed initializations:\n")
 for entry in hardware_dict.items():
-    print(str(entry[0]) + ": " + str(entry[1]))
+    if not entry[1]:
+        print(f"{entry[0]}")
+
+print("Successful initializations:\n")
+for entry in hardware_dict.items():
+    if entry[1]:
+        print(f"{entry[0]}")
+
 print("")
 
-# complete an i2c scan: return all devices connected to each i2c bus
+# complete an i2c scan: print all devices connected to each i2c bus
 tests.i2c_scan.run()
 
 # test logging
@@ -65,7 +75,7 @@ tests.imu_test.run(hardware_dict, result_dict)
 # test sun sensor
 tests.sun_sensor_test.run(hardware_dict, result_dict)
 
-# ask to test coil driver
+# test coil driver
 tests.coil_test.run(hardware_dict, result_dict)
 
 # ask to test burnwire
@@ -85,10 +95,21 @@ else:
     result_dict['Radio_ReceiveBeacon'] = ("Not tested.", False)
     result_dict['Radio_SendBeacon'] = ("Not tested.", False)
 
-# end test and print results
-print("")
-print("Test has concluded. Printing results...")
-print("")
+# print test results; failed tests first, and then passed tests
+print("\nTest has concluded. Printing results...\n")
+
+print("Failed tests:\n")
 for entry in result_dict.items():
-    print(str(entry[0]) + ": " + str(entry[1]))
+    # if the test failed
+    if not entry[1]:
+        # entry[1][0] is the string portion of the tuple
+        print(f"{entry[0]}: {entry[1][0]}")
+
+print("Passed tests:\n")
+for entry in result_dict.items():
+    # if the test passed
+    if entry[1]:
+        # entry[1][0] is the string portion of the tuple
+        print(f"{entry[0]}: {entry[1][0]}")
+
 print("")
