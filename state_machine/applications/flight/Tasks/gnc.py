@@ -42,6 +42,7 @@ class task(Task):
         # propogate ECI position
         self.r_eci = orbital_mechanics.propogate(self.r_eci, delta_t, integration_step=5)
 
+        # compute control
         m = bcross(cubesat.magnetic(), cubesat.gyro())
 
         # replace with calls to pycubed lib once it is ready
