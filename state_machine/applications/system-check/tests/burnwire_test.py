@@ -5,7 +5,6 @@ Burnwire Deployment Test
 * Author(s): Yashika Batra
 """
 
-import time
 from lib import pycubed as cubesat
 
 
@@ -14,8 +13,6 @@ def get_user_input():
     All user interaction happens in this function
     Prompt users, get user inputs for voltage level and duration and return
     """
-
-    wait_time = 10
 
     # conduct the test
     print("Initializing burnwire test...")
@@ -28,9 +25,12 @@ def get_user_input():
         "At what voltage do you want to run the burnwire IC? (up to 3.3V): "))
     burn_time = int(input(
         "For how long do you want to run the burnwire test? "))
-    print(f"Test starting in {wait_time} seconds.")
-    time.sleep(wait_time)
-    return voltage, burn_time
+
+    start_test = input("Type Y to start the test, N to cancel: ")
+    if start_test.lower() == "y":
+        return voltage, burn_time
+    else:
+        return None, None
 
 
 def burnwire_test(result_dict, burnnum):
@@ -43,7 +43,12 @@ def burnwire_test(result_dict, burnnum):
     # get user input for voltage and duration
     voltage, burn_time = get_user_input()
 
-    # calculate voltage level and conduct the test
+    # if voltage and burn_time are None, user entered "N" to cancel the test
+    if voltage is None and burn_time is None:
+        result_dict[f'Burnwire{burnnum}'] = ('Test was not run.', False)
+        return result_dict
+
+    # else, user entered "Y", calculate voltage level and conduct the test
     voltage_level = voltage / 3.3
     cubesat.burn(burn_num=str(burnnum), dutycycle=voltage_level,
                  duration=burn_time)
