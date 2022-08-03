@@ -8,6 +8,8 @@ except ImportError:
     import numpy as np
 import math
 
+import lib.frames as frames
+
 def reset_array(input_array):
     for i in range(len(input_array)):
         input_array[i] = 0.0
@@ -217,3 +219,27 @@ def igrf(date, latitude_degrees, elongitude_degrees, r_norm_km):
         - [x, y, z] the magnetic field in nanotesla in (North, East, Down)
     """
     return _igrf13_5(gh, date, latitude_degrees, elongitude_degrees, r_norm_km, cl, sl, p, q)
+
+def igrf_eci(date, r_eci):
+    """Returns the fifth order approximation from the IGRF-13 model. 
+    Only contains data from 2020, so it should only be accurate from 2020-2025.
+    IGRF-13 Takes in geocentric coordinates, and outputs in NED (North, East, Down).
+    We solve this by applying the following conversions: ECI->ECEF->GEOC=>[IGRF]=>NED->ECEF->ECI
+
+    Args:
+        - date: A unix timestamp.
+        - r_eci: Earth Centered Interital frame position (km)
+    Returns:
+        - [x, y, z] the magnetic field in nanotesla in ECI (Earth Centered Inertial)
+    """
+    ecef_eci = frames.eci_to_ecef(date)
+    eci_ecef = ecef_eci.transpose()
+
+    r_ecef = np.dot(ecef_eci, r_eci)
+    long, lat, _ = frames.convert_ecef_to_geoc(r_ecef)
+
+    b_ned = igrf(date, (lat / np.pi) * 180, (long / np.pi) * 180, np.linalg.norm(r_eci))
+
+    ecef_ned = frames.ned_to_ecef(long, lat)
+
+    return np.dot(eci_ecef, np.dot(ecef_ned, b_ned))
