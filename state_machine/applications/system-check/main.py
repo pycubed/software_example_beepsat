@@ -3,6 +3,8 @@ Python system check script for PyCubed satellite board
 PyCubed Mini mainboard-v02 for Pocketqube Mission
 * Author(s): Yashika Batra
 """
+# print acknowledgement that test has started
+print("\n#################### S Y S T E M   C H E C K ####################\n")
 
 from lib import pycubed
 import tests
@@ -45,18 +47,16 @@ result_dict = {
     'Burnwire2': ('', False),
 }
 
-# print acknowledgement that test has started
-print("\n########## S Y S T E M C H E C K ##########\n")
-
 # print hardware initialization results
 print("Hardware initialization results:\n")
 
-print("Failed initializations:\n")
+print("Failed initializations:")
 for entry in hardware_dict.items():
     if not entry[1]:
         print(f"{entry[0]}")
+print("")
 
-print("Successful initializations:\n")
+print("Successful initializations:")
 for entry in hardware_dict.items():
     if entry[1]:
         print(f"{entry[0]}")
@@ -98,18 +98,18 @@ else:
 # print test results; failed tests first, and then passed tests
 print("\nTest has concluded. Printing results...\n")
 
-print("Failed tests:\n")
+print("Failed tests:")
 for entry in result_dict.items():
     # if the test failed
-    if not entry[1]:
+    if not entry[1][1]:
         # entry[1][0] is the string portion of the tuple
         print(f"{entry[0]}: {entry[1][0]}")
+print("")
 
-print("Passed tests:\n")
+print("Passed tests:")
 for entry in result_dict.items():
     # if the test passed
-    if entry[1]:
+    if entry[1][1]:
         # entry[1][0] is the string portion of the tuple
         print(f"{entry[0]}: {entry[1][0]}")
-
 print("")
