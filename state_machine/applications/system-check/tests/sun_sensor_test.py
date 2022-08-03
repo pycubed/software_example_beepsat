@@ -41,7 +41,7 @@ def user_test(sensor_index, light_dark):
         print("Please remove all nearby light sources or cover the sensor.")
 
     # ask user input to start test. if user cancels, return None
-    start_test = input("Type Y to start the test, N to cancel: ")
+    start_test = input("Type Y to start the test, any key to cancel: ")
     if start_test.lower() != "y":
         return None
 
