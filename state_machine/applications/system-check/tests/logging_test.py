@@ -10,7 +10,7 @@ import os
 
 def sd_test():
     """
-    Run a basic test; create a file and test existence, write to and
+    Run a basic test; Create a file and test existence, write to and
     read from a file, delete file and test existence. Return result_dict
     values accordingly
     """
@@ -60,8 +60,8 @@ def sd_test():
         return ("File deletion failed.", False)
 
     # if nothing has failed so far, return success
-    return ("SD Card passed all tests: Created, wrote to, " +
-            "read from, and deleted a file successfully.", True)
+    return ("SD Card passed all tests: New file was created, wrote to, " +
+            "read from, and deleted successfully.", True)
 
 
 def run(hardware_dict, result_dict):
