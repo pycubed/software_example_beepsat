@@ -10,7 +10,7 @@ MJD_ZERO = 2400000.5  # Offset of Modified Julian Days representation with respe
 JD2000 = 2451545.0  # Reference epoch (J2000.0), Julian Date
 MJD2000 = 51544.5  # MJD at J2000.0
 PI2 = 2 * np.pi
-EARTH_RADIUS = 6378137.0  # in meters
+EQUATORIAL_RADIUS = 6378.137  # Equatorial raduis of the Earth (km)
 
 def mjd(utime):
     """Returns the Modified Julian Date (MJD) for a given unix timestamp."""
@@ -109,7 +109,7 @@ def convert_ecef_to_geoc(ecef, degrees=False):
     x, y, z = ecef
     lat = arctan2(z, sqrt(x * x + y * y))
     lon = arctan2(y, x)
-    alt = sqrt(x * x + y * y + z * z) - (EARTH_RADIUS / 1000)
+    alt = sqrt(x * x + y * y + z * z) - EQUATORIAL_RADIUS
 
     # Convert output to degrees
     if degrees:
