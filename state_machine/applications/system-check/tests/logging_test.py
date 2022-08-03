@@ -27,8 +27,7 @@ def sd_test():
         os.remove(filepath_directory)
         test_file = open(filepath_directory, "x")
 
-    print("Directory after test.txt was created: {}".format(
-          os.listdir("/sd/")))
+    print(f"Directory after test.txt was created:\n{os.listdir('/sd/')}")
     if filepath not in os.listdir("/sd/"):
         return ("File creation failed.", False)
 
@@ -37,8 +36,8 @@ def sd_test():
     try:
         test_file.write(test_string)
     except OSError as e:
-        print("Unable to write to file. {}".format(e))
-        return ("Unable to write to file. {}".format(e), False)
+        print(f"Unable to write to file. {e}")
+        return (f"Unable to write to file. {e}", False)
     test_file.close()
 
     # read from file
@@ -46,8 +45,8 @@ def sd_test():
         test_file_read = open(filepath_directory, "r")
         test_string_read = test_file_read.read()
     except OSError as e:
-        print("Unable to read from file. {}".format(e))
-        return ("Unable to read from file. {}".format(e), False)
+        print(f"Unable to read from file. {e}")
+        return (f"Unable to read from file. {e}", False)
 
     if test_string_read != test_string:
         print("File not written to or read from correctly.")
@@ -55,8 +54,7 @@ def sd_test():
 
     # delete file
     os.remove(filepath_directory)
-    print("Directory after test.txt was removed: {}".format(
-          os.listdir("/sd/")))
+    print(f"Directory after test.txt was removed:\n{os.listdir('/sd/')}")
 
     if filepath in os.listdir("/sd/"):
         return ("File deletion failed.", False)
