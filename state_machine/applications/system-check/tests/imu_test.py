@@ -6,11 +6,12 @@ IMU Sensor Test
 """
 
 import time
-from ulab.numpy.linalg import norm
+from ulab import numpy
 from lib import pycubed as cubesat
 
 
-wait_time = 10
+wait_time = 2
+norm = numpy.linalg.norm
 
 
 def stationary_user_test():
@@ -20,7 +21,8 @@ def stationary_user_test():
     """
     # print user prompts
     print("Please leave the cubesat stationary on a table.")
-    start_test = input("Type Y to start the stationary test, N to cancel: ")
+    start_test = input("Type Y to start the stationary test, any key" +
+                       " to cancel: ")
 
     # if user opts to cancel the test, return None, handle in the next function
     if start_test.lower() != "y":
@@ -70,7 +72,7 @@ def moving_user_test():
     Set wait times, prompt the users and gather IMU data and input
     """
     # print user prompts
-    start_test = input("Type Y to start the moving test, N to cancel: ")
+    start_test = input("Type Y to start the moving test, any key to cancel: ")
 
     # if user opts to cancel the test, return None, handle in the next function
     if start_test.lower() != "y":
@@ -114,7 +116,8 @@ def rotating_user_test():
     Set wait times, prompt the users and gather IMU data and input
     """
     # print user prompts
-    start_test = input("Type Y to start the rotating test, N to cancel: ")
+    start_test = input("Type Y to start the rotating test, any key" +
+                       " to cancel: ")
 
     # if user opts to cancel the test, return None, handle in the next function
     if start_test.lower() != "y":
@@ -160,7 +163,7 @@ def magnet_user_test():
     """
     # print user prompts
     print("Please leave the cubesat flat on a table and retrieve a magnet.")
-    start_test = input("Type Y to start the rotating test, N to cancel: ")
+    start_test = input("Type Y to start the magnet test, any key to cancel: ")
 
     # if user opts to cancel the test, return None, handle in the next function
     if start_test.lower() != "y":
@@ -177,7 +180,9 @@ def magnet_user_test():
     ending_mag = cubesat.magnetic()
 
     # calculate the change in the total magnetometer reading
-    mag = norm(starting_mag - ending_mag)
+    sub_mag = tuple(map(
+        lambda end, start: end - start, ending_mag, starting_mag))
+    mag = norm(sub_mag)
     print("Data Collection Complete")
     return acc, gyro, mag
 
@@ -210,7 +215,7 @@ def temp_imu_test(result_dict):
     temp = cubesat.temperature_imu()
     print(f"IMU Temperature Reading: {temp}")
     print(f"Generally, room temperature is between {20} and {27}" +
-          "degrees celsius.")
+          " degrees celsius.")
 
     # get user input on the correctness of the result
     res = input("Does the temperature reading look correct? (Y/N): ")
