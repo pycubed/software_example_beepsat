@@ -1,9 +1,8 @@
 # Based on: https://github.com/spacecraft-design-lab-2019/flight-software/blob/master/sun-position/sun_position.py
-import math
 try:
-    from ulab.numpy import array
+    from ulab.numpy import array, degrees, radians, cos, sin
 except ImportError:
-    from numpy import array
+    from numpy import array, degrees, radians, cos, sin
 
 def unix_time_to_julian_day(unix_time):
     """Takes in a unix timestamp and returns the julian day"""
@@ -25,14 +24,14 @@ def approx_sun_position_ECI(utime):
     OplusW = 282.94  # Ω + ω
     T = (JD - 2451545.0) / 36525
 
-    M = math.radians(357.5256 + 35999.049 * T)
+    M = radians(357.5256 + 35999.049 * T)
 
-    long = math.radians(OplusW + math.degrees(M) + (6892 / 3600) * math.sin(M) + (72 / 3600) * math.sin(2 * M))
-    r_mag = (149.619 - 2.499 * math.cos(M) - 0.021 * math.cos(2 * M)) * 10**6
+    long = radians(OplusW + degrees(M) + (6892 / 3600) * sin(M) + (72 / 3600) * sin(2 * M))
+    r_mag = (149.619 - 2.499 * cos(M) - 0.021 * cos(2 * M)) * 10**6
 
-    epsilon = math.radians(23.43929111)
-    r_vec = array([r_mag * math.cos(long),
-                   r_mag * math.sin(long) * math.cos(epsilon),
-                   r_mag * math.sin(long) * math.sin(epsilon)])
+    epsilon = radians(23.43929111)
+    r_vec = array([r_mag * cos(long),
+                   r_mag * sin(long) * cos(epsilon),
+                   r_mag * sin(long) * sin(epsilon)])
 
     return r_vec
