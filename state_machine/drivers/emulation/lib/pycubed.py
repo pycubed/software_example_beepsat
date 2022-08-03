@@ -55,7 +55,7 @@ class Satellite:
         # to provide more interesting output from the b-cross controller.
         self._accel = [1.0, 2.0, 3.0]
         self._mag = [4.0, 3.0, 1.0]
-        self._gyro = [1.0, -0.3, 3.0]
+        self._gyro = [0.0, 0.0, 0.0]
         self._torque = [0, 0, 0]
         self.sim = False
 

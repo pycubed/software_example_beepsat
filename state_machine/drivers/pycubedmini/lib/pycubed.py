@@ -238,12 +238,6 @@ class _Satellite:
     c_downlink = multiBitFlag(register=_DWNLINK, lowest_bit=0, num_bits=8)
     c_logfail = multiBitFlag(register=_LOGFAIL, lowest_bit=0, num_bits=8)
 
-    # Set hardware attributes to None
-    _i2c1, _i2c2, _i2c3, _spi, _sd, _neopixel = None, None, None, None, None, None
-    _imu, _radio, _sun_yn, _sun_zn, _sun_xn = None, None, None, None, None, None
-    _sun_yp, _sun_zp, _sun_xp, _drv_x, _drv_y = None, None, None, None, None
-    _drv_z, _burnwire1, _burnwire2 = None, None, None
-
     UHF_FREQ = 433.0
 
     instance = None
@@ -287,17 +281,17 @@ class _Satellite:
         self._vbatt = analogio.AnalogIn(board.BATTERY)  # Battery voltage
 
         # Define and initialize hardware
-        self._i2c1 = self._init_i2c1()
-        self._i2c2 = self._init_i2c2()
-        self._i2c3 = self._init_i2c3()
-        self._spi = self._init_spi()
-        self._sd, self._vfs = self._init_sdcard()
-        self._neopixel = self._init_neopixel()
-        self._imu = self._init_imu()
-        self._radio = self._init_radio()
-        self._sun_yn = self._init_sun_minusy()
-        self._sun_zn = self._init_sun_minusz()
-        self._sun_xn = self._init_sun_minusx()
+        self._init_i2c1()
+        self._init_i2c2()
+        self._init_i2c3()
+        self._init_spi()
+        self._init_sdcard()
+        self._init_neopixel()
+        self._init_imu()
+        self._init_radio()
+        self._init_sun_minusy()
+        self._init_sun_minusz()
+        self._init_sun_minusx()
         self._init_sun_plusy()
         self._init_sun_plusz()
         self._init_sun_plusx()
