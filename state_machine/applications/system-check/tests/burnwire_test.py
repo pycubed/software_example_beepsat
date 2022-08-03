@@ -29,7 +29,7 @@ def get_user_input():
     start_test = input("Type Y to start the test, any key to cancel: ")
     if start_test.lower() != "y":
         return None, None
-    
+
     return voltage, burn_time
 
 
