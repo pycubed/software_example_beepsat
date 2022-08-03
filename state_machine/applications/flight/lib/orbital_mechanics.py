@@ -7,7 +7,7 @@ except ImportError:
     from numpy.linalg import norm
 
 MU = 3.986004418E5
-MR = 6371.009  # Earth's Mean Radius (km)
+MEAN_RADIUS = 6371.009  # Earth's Mean Radius (km)
 J2 = 1.08262668E-3  # J2 Value
 
 def rk4(x, dt, f):
@@ -43,7 +43,7 @@ def d_state(x):
     # now we find the J2 acceleration
 
     accel_J2 = zeros(3)
-    K = -(3 / 2) * J2 * MU * MR ** 2 * pos_norm ** -5
+    K = -(3 / 2) * J2 * MU * MEAN_RADIUS ** 2 * pos_norm ** -5
     K2 = 5 * pos[2] ** 2 / (pos_norm ** 2)
     accel_J2[0] = K * pos[0] * (1 - K2)
     accel_J2[1] = K * pos[1] * (1 - K2)
