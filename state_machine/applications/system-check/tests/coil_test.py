@@ -7,7 +7,7 @@ Torque Driver Test
 
 import time
 from lib import pycubed as cubesat
-from ulab.numpy.linalg import norm
+from ulab import numpy
 
 # voltage level constants; set between -1 and 1
 v1 = 0.25
@@ -18,6 +18,9 @@ v3 = 0.75
 projected_voltage1 = v1 * 5.06
 projected_voltage2 = v2 * 5.06
 projected_voltage3 = v3 * 5.06
+
+# alias norm
+norm = numpy.linalg.norm
 
 
 def test_voltage_levels(coil_index):
@@ -39,8 +42,8 @@ def test_voltage_levels(coil_index):
     time.sleep(wait_time)
 
     # conduct the test
-    start_test = input("Type Y to start the test, N to cancel: ")
-    if start_test.lower() == "n":
+    start_test = input("Type Y to start the test, any key to cancel: ")
+    if start_test.lower() != "y":
         return None
 
     # else, test each voltage level
@@ -66,8 +69,8 @@ def test_voltage_levels(coil_index):
     result_val_bool = (mag_total3 > mag_total2 and mag_total2 > mag_total1)
     if not result_val_bool:
         print("Magnetometer results should have been increasing but were" +
-              f"not. reading 1: {mag_total1}, reading 2: {mag_total2}," +
-              f"reading 3: {mag_total3}")
+              f" not. reading 1: {mag_total1}, reading 2: {mag_total2}," +
+              f" reading 3: {mag_total3}")
     return result_val_bool
 
 
@@ -87,7 +90,7 @@ def coil_test(result_dict, coil_index):
         return result_dict
 
     result_val_string = (f'Tested Coil Driver {coil_index} at the following' +
-                         f'voltage levels: {projected_voltage1}, ' +
+                         f' voltage levels: {projected_voltage1}, ' +
                          f'{projected_voltage2}, {projected_voltage3}.')
 
     # update result dictionary
