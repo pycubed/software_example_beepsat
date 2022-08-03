@@ -84,6 +84,7 @@ def coil_test(result_dict, coil_index):
     result = test_voltage_levels(coil_index)
     if result is None:
         result_dict[result_key] = (f"{result_key} not tested.", result)
+        return result_dict
 
     result_val_string = (f'Tested Coil Driver {coil_index} at the following' +
                          f'voltage levels: {projected_voltage1}, ' +
