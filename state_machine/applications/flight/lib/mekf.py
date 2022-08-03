@@ -31,6 +31,8 @@ def propagate_state(q, β, ω, δt):
         δt: Time step
     """
     θ = linalg.norm(ω - β) * δt
+    if linalg.norm(ω - β) == 0:
+        return q
     r = (ω - β) / linalg.norm(ω - β)
     return quaternion_mul(q, concat([[cos(θ / 2)], r * sin(θ / 2)]))
 
