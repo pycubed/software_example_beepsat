@@ -26,11 +26,11 @@ def get_user_input():
     burn_time = int(input(
         "For how long do you want to run the burnwire test? "))
 
-    start_test = input("Type Y to start the test, N to cancel: ")
-    if start_test.lower() == "y":
-        return voltage, burn_time
-    else:
+    start_test = input("Type Y to start the test, any key to cancel: ")
+    if start_test.lower() != "y":
         return None, None
+    
+    return voltage, burn_time
 
 
 def burnwire_test(result_dict, burnnum):
