@@ -27,7 +27,7 @@ def approx_sun_position_ECI(utime):
 
     M = math.radians(357.5256 + 35999.049 * T)
 
-    long = math.radians(OplusW + math.degrees(M) + 6892 / 3600 * math.sin(M) + 72 / 3600 * math.sin(2 * M))
+    long = math.radians(OplusW + math.degrees(M) + (6892 / 3600) * math.sin(M) + (72 / 3600) * math.sin(2 * M))
     r_mag = (149.619 - 2.499 * math.cos(M) - 0.021 * math.cos(2 * M)) * 10**6
 
     epsilon = math.radians(23.43929111)
