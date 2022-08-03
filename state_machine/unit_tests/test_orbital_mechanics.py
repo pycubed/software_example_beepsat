@@ -6,7 +6,7 @@ from numpy.linalg import norm
 
 sys.path.insert(0, './state_machine/applications/flight')
 
-from lib.orbital_mechanics import rk4, propogate, d_state, R
+from lib.orbital_mechanics import rk4, propogate, d_state, MEAN_RADIUS
 
 class TestRK4(unittest.TestCase):
 
@@ -19,7 +19,7 @@ class TestRK4(unittest.TestCase):
         x = array([0, 0, 10000.0, 5, -5, 0])
         for _ in range(20):
             x = propogate(x, 60 * 60 * 24, integration_step=60)
-            self.assertGreaterEqual(norm(x[0:3]), R)
+            self.assertGreaterEqual(norm(x[0:3]), MEAN_RADIUS)
 
 class TestDState(unittest.TestCase):
 
