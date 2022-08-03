@@ -3,7 +3,7 @@ import sys
 
 sys.path.insert(0, './state_machine/frame')
 
-from lib.state_machine_utils import validate_config  # noqa: E402
+from lib.state_machine_utils import validate_config
 
 basicTM = {
     't1': True,

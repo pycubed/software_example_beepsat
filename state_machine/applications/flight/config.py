@@ -26,7 +26,7 @@ config = {
                 "Priority": 4,
                 "ScheduleLater": False
             },
-            "Detumble": {
+            "GNC": {
                 "Interval": 0.1,
                 "Priority": 3,
                 "ScheduleLater": False
