@@ -32,17 +32,18 @@ def user_test(coil_index):
     driver_time = 3
 
     # set up the test
-    print('Testing Coil Driver {coil_index} for the following voltage levels' +
-          'levels: {projected_voltage1}, {projected_voltage2}, ' +
-          '{projected_voltage3}.')
-    print("Waiting {wait_time} seconds.")
+    print(f'Testing Coil Driver {coil_index} for the following voltage ' +
+          f'levels: {projected_voltage1}, {projected_voltage2}, ' +
+          f'{projected_voltage3}.')
+    print(f"Waiting {wait_time} seconds.")
     time.sleep(wait_time)
 
     # conduct the test
-    print("Beginning the test now. Testing for {} seconds.".format(
-          driver_time * 3))
+    start_test = input("Type Y to start the test, N to cancel: ")
+    if start_test.lower() == "n":
+        return None
 
-    # test each voltage level
+    # else, test each voltage level
     cubesat.coildriver_vout(coil_index, projected_voltage1)
     time.sleep(driver_time)
     mag_reading1 = cubesat.magnetic()
@@ -65,25 +66,25 @@ def user_test(coil_index):
     result_val_bool = (mag_total3 > mag_total2 and mag_total2 > mag_total1)
     if not result_val_bool:
         print("Magnetometer results should have been increasing but were" +
-              "not. reading 1: {mag_total1}, reading 2: {mag_total2}," +
-              "reading 3: {mag_total3}")
+              f"not. reading 1: {mag_total1}, reading 2: {mag_total2}," +
+              f"reading 3: {mag_total3}")
     return result_val_bool
 
 
-def voltage_levelx(result_dict, coil_index):
+def coil_test(result_dict, coil_index):
     """
     All automation happens in this function
     Process user test results and update the result dictionary accordingly
     """
 
     # set string constant
-    result_key = 'CoilDriver' + str(coil_index)
+    result_key = f"CoilDriver{coil_index}"
 
     # get user test result values, process and print results
     result = user_test(coil_index)
-    result_val_string = ('Tested Coil Driver {coil_index} at the following' +
-                         'voltage levels: {projected_voltage1}, ' +
-                         '{projected_voltage2}, {projected_voltage3}.')
+    result_val_string = (f'Tested Coil Driver {coil_index} at the following' +
+                         f'voltage levels: {projected_voltage1}, ' +
+                         f'{projected_voltage2}, {projected_voltage3}.')
 
     # update result dictionary
     result_dict[result_key] = (result_val_string, result)
@@ -100,23 +101,23 @@ def run(hardware_dict, result_dict):
         result_dict['CoilDriverX'] = ('No Coil Driver X detected', False)
     else:  # Coil X detected, run tests
         print("Starting Coil Driver X test...")
-        voltage_levelx(result_dict, 'X')
+        coil_test(result_dict, 'X')
         print("Coil Driver X Test complete.\n")
 
     # if no Coil Y detected, update result dictionary
     if not hardware_dict['CoilDriverY']:
         result_dict['CoilDriverY'] = ('No Coil Driver Y detected', False)
-    else:  # Coil X detected, run tests
+    else:  # Coil Y detected, run tests
         print("Starting Coil Driver Y test...")
-        voltage_levelx(result_dict, 'Y')
+        coil_test(result_dict, 'Y')
         print("Coil Driver Y Test complete.\n")
 
     # if no Coil Z detected, update result dictionary
     if not hardware_dict['CoilDriverZ']:
         result_dict['CoilDriverZ'] = ('No Coil Driver Z detected', False)
-    else:  # Coil X detected, run tests
+    else:  # Coil Z detected, run tests
         print("Starting Coil Driver Z test...")
-        voltage_levelx(result_dict, 'Z')
+        coil_test(result_dict, 'Z')
         print("Coil Driver Z Test complete.\n")
 
     return result_dict
