@@ -238,6 +238,8 @@ class _Satellite:
                 self.spi, self._rf_cs, self._rf_rst,
                 self.UHF_FREQ, rfm95pw=True)
             self.radio.dio0 = self.radio_DIO0
+            self._radio.node = 0xAB  # our ID
+            self._radio.destination = 0xBA  # target's ID
             self.radio.sleep()
             self.hardware['Radio'] = True
         except Exception as e:

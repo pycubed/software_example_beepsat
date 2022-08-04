@@ -7,6 +7,7 @@ from lib.template_task import Task
 import lib.transmission_queue as tq
 import cdh
 import lib.radio_headers as headers
+from lib.pycubed import cubesat, HardwareInitException
 
 ANTENNA_ATTACHED = False
 
@@ -34,19 +35,23 @@ class task(Task):
         # Or if we need it for our protocol.
         super().__init__(satellite)
         # set our radiohead node ID so we can get ACKs
-        self.cubesat.radio.node = 0xAB  # our ID
-        self.cubesat.radio.destination = 0xBA  # target's ID
         self.msg = ''
 
     async def main_task(self):
+        try:
+            _ = cubesat.radio
+        except HardwareInitException:
+            self.debug('No radio attached, skipping radio task')
+            return
+
         if tq.empty():
             self.debug("No packets to send")
-            self.cubesat.radio.listen()
-            heard_something = await self.cubesat.radio.await_rx(timeout=10)
+            cubesat.radio.listen()
+            heard_something = await cubesat.radio.await_rx(timeout=10)
             if heard_something:
-                response = self.cubesat.radio.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED)
+                response = cubesat.radio.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED)
                 if response is not None:
-                    self.debug(f'Recieved msg "{response}", RSSI: {self.cubesat.radio.last_rssi - 137}')
+                    self.debug(f'Recieved msg "{response}", RSSI: {cubesat.radio.last_rssi - 137}')
                     # Processing recieved messages goes here
                     #  - Execute commands
                     #  - Mark messages as received (and remove from tq)
@@ -98,10 +103,10 @@ class task(Task):
                                             self.cmd_dispatch[cdh.commands[cmd]](self, cmd_args)
                                     except Exception as e:
                                         self.debug(f'something went wrong: {e}')
-                                        self.cubesat.radio.send(str(e).encode())
+                                        cubesat.radio.send(str(e).encode())
                                 else:
                                     self.debug('invalid command!')
-                                    self.cubesat.radio.send(b'invalid cmd' + response[4:])
+                                    cubesat.radio.send(b'invalid cmd' + response[4:])
                     # End Old Beacon Task Code
             else:
                 self.debug('No packets received')
@@ -114,13 +119,13 @@ class task(Task):
             self.debug(f"Sending packet: {debug_packet}")
 
             if with_ack:
-                if self.cubesat.radio.send_with_ack(packet):
+                if cubesat.radio.send_with_ack(packet):
                     msg.ack()
                 else:
                     msg.no_ack()
             else:
-                self.cubesat.radio.send(packet, keep_listening=True)
+                cubesat.radio.send(packet, keep_listening=True)
 
             if tq.peek().done():
                 tq.pop()
-        self.cubesat.radio.sleep()
+        cubesat.radio.sleep()
