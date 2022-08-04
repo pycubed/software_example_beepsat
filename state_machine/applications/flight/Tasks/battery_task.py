@@ -1,5 +1,5 @@
 from lib.template_task import Task
-import lib.pycubed as cubesat
+from lib.pycubed import cubesat
 
 
 class task(Task):

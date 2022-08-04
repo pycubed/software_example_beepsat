@@ -1,10 +1,6 @@
 from lib.template_task import Task
 from lib.control import bcross
 import lib.pycubed as cubesat
-from lib.IGRF import igrf_eci
-from lib.sun_position import approx_sun_position_ECI
-import lib.orbital_mechanics as orbital_mechanics
-import lib.mekf as mekf
 import time
 try:
     from ulab.numpy import array
