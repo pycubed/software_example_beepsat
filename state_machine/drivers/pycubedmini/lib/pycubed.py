@@ -238,6 +238,13 @@ class _Satellite:
     c_downlink = multiBitFlag(register=_DWNLINK, lowest_bit=0, num_bits=8)
     c_logfail = multiBitFlag(register=_LOGFAIL, lowest_bit=0, num_bits=8)
 
+    # Set hardware attributes to None
+    # Needed for things not to crash
+    _i2c1, _i2c2, _i2c3, _spi, _sd, _neopixel = None, None, None, None, None, None
+    _imu, _radio, _sun_yn, _sun_zn, _sun_xn = None, None, None, None, None
+    _sun_yp, _sun_zp, _sun_xp, _drv_x, _drv_y = None, None, None, None, None
+    _drv_z, _burnwire1, _burnwire2 = None, None, None
+
     UHF_FREQ = 433.0
 
     instance = None
