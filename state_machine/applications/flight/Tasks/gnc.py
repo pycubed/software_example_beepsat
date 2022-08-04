@@ -24,23 +24,6 @@ class task(Task):
     r_eci = array([6871, -6571, -7071])
 
     async def main_task(self):
-        if self.last is None:
-            self.last = time.monotonic()
-            return
-
-        t = time.monotonic()
-        delta_t = t - self.last
-
-        # update mekf
-        w = cubesat.gyro()
-        br_mag = cubesat.magnetic()
-        br_sun = cubesat.sun_vector()
-        nr_mag = igrf_eci(t, self.r_eci)
-        nr_sun = approx_sun_position_ECI(t)
-        mekf.step(w, delta_t, nr_mag, nr_sun, br_mag, br_sun)
-
-        # propogate ECI position
-        self.r_eci = orbital_mechanics.propogate(self.r_eci, delta_t, integration_step=5)
 
         # compute control
         m = bcross(cubesat.magnetic(), cubesat.gyro())
