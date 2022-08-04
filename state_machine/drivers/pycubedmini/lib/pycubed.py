@@ -543,11 +543,13 @@ class _Satellite:
         """ return the temperature reading from the CPU in celsius """
         return self.micro.cpu.temperature
 
-    def setRGB(self, v):
-        self.neopixel[0] = v
-
-    def getRGB(self):
+    @property
+    def RGB(self):
         return self.neopixel[0]
+
+    @RGB.setter
+    def RGB(self, v):
+        self.neopixel[0] = v
 
     def timeon(self):
         """ return the time on a monotonic clock """

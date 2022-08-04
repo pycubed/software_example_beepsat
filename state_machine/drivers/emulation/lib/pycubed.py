@@ -48,7 +48,7 @@ class HardwareInitException(Exception):
 
 class Satellite:
     tasko = None
-    RGB = (0, 0, 0)
+    _RGB = (0, 0, 0)
     vlowbatt = 4.0
     BOOTTIME = time.monotonic()
     data_cache = {}
@@ -94,12 +94,13 @@ class Satellite:
         reader.read(self)
         return 20  # Celsius
 
-    def setRGB(self, v):
-        global RGB
-        RGB = v
+    @property
+    def RGB(self):
+        return self._RGB
 
-    def getRGB(self):
-        return RGB
+    @RGB.setter
+    def RGB(self, v):
+        self._RGB = v
 
     def battery_voltage(self):
         return 6.4
