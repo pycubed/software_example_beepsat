@@ -39,6 +39,13 @@ class Radio:
         return True
 
 
+"""
+Define HardwareInitException
+"""
+class HardwareInitException(Exception):
+    pass
+
+
 class Satellite:
     tasko = None
     RGB = (0, 0, 0)
