@@ -54,154 +54,6 @@ class hardware:
 
 
 """
-IMU Interface functions
-"""
-def acceleration():
-    """ return the accelerometer reading from the IMU in m/s^2 """
-    return _cubesat.imu.accel
-
-
-def magnetic():
-    """ return the magnetometer reading from the IMU in µT """
-    return _cubesat.imu.mag
-
-
-def gyro():
-    """ return the gyroscope reading from the IMU in deg/s """
-    return _cubesat.imu.gyro
-
-
-def temperature_imu():
-    """ return the thermometer reading from the IMU in celsius """
-    return _cubesat.imu.temperature
-
-
-"""
-Coil Driver Interface functions
-"""
-def coildriver_vout(driver_index, projected_voltage):
-    """ Set a given voltage for a given coil driver """
-    if driver_index == "X" or driver_index == "U7":
-        _cubesat.drv_x.throttle_volts = projected_voltage
-    elif driver_index == "Y" or driver_index == "U8":
-        _cubesat.drv_y.throttle_volts = projected_voltage
-    elif driver_index == "Z" or driver_index == "U9":
-        _cubesat.drv_z.throttle_volts = projected_voltage
-    else:
-        print(driver_index, "is not a defined coil driver")
-        return
-
-
-"""
-Sun Sensor Interface functions
-"""
-def sun_vector():
-    """Returns the sun pointing vector in the body frame"""
-    return array(
-        [_cubesat.sun_xp.lux - _cubesat.sun_xn.lux,
-         _cubesat.sun_yp.lux - _cubesat.sun_yn.lux,
-         _cubesat.sun_zp.lux - _cubesat.sun_zn.lux])
-
-
-"""
-Burnwire Interface functions
-"""
-def burn(burn_num='1', dutycycle=0, duration=1):
-    """
-    Given a burn wire num, a dutycycle, and a burn duration, control
-    the voltage of the corresponding burnwire IC
-    "dutycycle" tells us the proportion of total voltage we will
-    run the IC at (ex. if "dtycycl" = 0.5, we burn at 1.65 volts)
-
-    initialize with default burn_num = '1' ; burnwire 2 IC is not set up
-    """
-    # BURN1 = -Z,BURN2 = extra burnwire pin, dutycycle ~0.13%
-    dtycycl = int((dutycycle / 100) * (0xFFFF))
-
-    # initialize burnwire based on the burn_num passed to the function
-    if '1' in burn_num:
-        burnwire = _cubesat.burnwire1
-    elif '2' in burn_num:
-        # because burnwire2 is not set up, will throw HardwareInitException
-        burnwire = _cubesat.burnwire2
-    else:
-        print("Burnwire2 IC is not set up.")
-        return False
-
-    setRGB(255, 0, 0)  # set RGB to red
-
-    # set the burnwire's dutycycle; begins the burn
-    burnwire.duty_cycle = dtycycl
-    time.sleep(duration)  # wait for given duration
-
-    # set burnwire's dutycycle back to 0; ends the burn
-    burnwire.duty_cycle = 0
-    setRGB(0, 0, 0)  # set RGB to no color
-
-    _cubesat._deployA = True  # sets deployment variable to true
-    burnwire.deinit()  # deinitialize burnwire
-
-    return _cubesat._deployA  # return true
-
-
-"""
-Miscellaneous Interface functions
-"""
-def temperature_cpu():
-    """ return the temperature reading from the CPU in celsius """
-    return _cubesat.micro.cpu.temperature
-
-def setRGB(v):
-    _cubesat.neopixel[0] = v
-
-def getRGB():
-    return _cubesat.neopixel[0]
-
-def battery_voltage():
-    """
-    Return the battery voltage
-    _cubesat._vbatt.value converts the analog value of the
-    board.BATTERY pin to a digital one. We read this value 50
-    times and then later average it to get as close as possible
-    to a reliable battery voltage value
-    """
-    # initialize vbat
-    vbat = 0
-
-    # get the battery value 50 times
-    for _ in range(50):
-        # 65536 = 2^16, number of increments we can have to voltage
-        vbat += _cubesat._vbatt.value * 3.3 / 65536
-
-    # vbat / 50 = average of all battery voltage values read
-    # 100k/100k voltage divider
-    voltage = (vbat / 50) * (100 + 100) / 100
-
-    # volts
-    return voltage
-
-
-def timeon():
-    """ return the time on a monotonic clock """
-    return int(time.monotonic()) - _cubesat.BOOTTIME
-
-
-def reset_boot_count():
-    """ reset boot count in non-volatile memory (nvm) """
-    _cubesat.c_boot = 0
-
-
-def incr_logfail_count():
-    """ increment logfail count in non-volatile memory (nvm) """
-    _cubesat.c_logfail += 1
-
-
-def reset_logfail_count():
-    """ reset logfail count in non-volatile memory (nvm) """
-    _cubesat.c_logfail = 0
-
-
-"""
 Define HardwareInitException
 """
 class HardwareInitException(Exception):
@@ -371,14 +223,17 @@ class _Satellite:
 
     def _init_radio(self):
         """ Define radio parameters and initialize UHF radio """
-        self._rf_cs = digitalio.DigitalInOut(board.RF_CS)
-        self._rf_rst = digitalio.DigitalInOut(board.RF_RST)
-        self.radio_DIO0 = digitalio.DigitalInOut(board.RF_IO0)
-        self.radio_DIO0.switch_to_input()
-        self.radio_DIO1 = digitalio.DigitalInOut(board.RF_IO1)
-        self.radio_DIO1.switch_to_input()
-        self._rf_cs.switch_to_output(value=True)
-        self._rf_rst.switch_to_output(value=True)
+        try:
+            self._rf_cs = digitalio.DigitalInOut(board.RF_CS)
+            self._rf_rst = digitalio.DigitalInOut(board.RF_RST)
+            self.radio_DIO0 = digitalio.DigitalInOut(board.RF_IO0)
+            self.radio_DIO0.switch_to_input()
+            self.radio_DIO1 = digitalio.DigitalInOut(board.RF_IO1)
+            self.radio_DIO1.switch_to_input()
+            self._rf_cs.switch_to_output(value=True)
+            self._rf_rst.switch_to_output(value=True)
+        except Exception as e:
+            print('[ERROR][Initializing Radio]', e)
 
         try:
             self._radio = pycubed_rfm9x.RFM9x(
@@ -586,11 +441,125 @@ class _Satellite:
         """ Return Burnwire2 object and init function"""
         return self._burnwire2, self._init_burnwire2
 
+    def acceleration(self):
+        """ return the accelerometer reading from the IMU in m/s^2 """
+        return self.imu.accel
+
+    def magnetic(self):
+        """ return the magnetometer reading from the IMU in µT """
+        return self.imu.mag
+
+    def gyro(self):
+        """ return the gyroscope reading from the IMU in deg/s """
+        return self.imu.gyro
+
+    def temperature_imu(self):
+        """ return the thermometer reading from the IMU in celsius """
+        return self.imu.temperature
+
+    def coildriver_vout(self, driver_index, projected_voltage):
+        """ Set a given voltage for a given coil driver """
+        if driver_index == "X" or driver_index == "U7":
+            self.drv_x.throttle_volts = projected_voltage
+        elif driver_index == "Y" or driver_index == "U8":
+            self.drv_y.throttle_volts = projected_voltage
+        elif driver_index == "Z" or driver_index == "U9":
+            self.drv_z.throttle_volts = projected_voltage
+        else:
+            print(driver_index, "is not a defined coil driver")
+
+    def battery_voltage(self):
+        """
+        Return the battery voltage
+        _cubesat._vbatt.value converts the analog value of the
+        board.BATTERY pin to a digital one. We read this value 50
+        times and then later average it to get as close as possible
+        to a reliable battery voltage value
+        """
+        # initialize vbat
+        vbat = 0
+
+        # get the battery value 50 times
+        for _ in range(50):
+            # 65536 = 2^16, number of increments we can have to voltage
+            vbat += self._vbatt.value * 3.3 / 65536
+
+        # vbat / 50 = average of all battery voltage values read
+        # 100k/100k voltage divider
+        voltage = (vbat / 50) * (100 + 100) / 100
+
+        # volts
+        return voltage
+
+    def sun_vector(self):
+        """Returns the sun pointing vector in the body frame"""
+        return array(
+            [self.sun_xp.lux - self.sun_xn.lux,
+             self.sun_yp.lux - self.sun_yn.lux,
+             self.sun_zp.lux - self.sun_zn.lux])
+
+    def burn(self, burn_num='1', dutycycle=0, duration=1):
+        """
+        Given a burn wire num, a dutycycle, and a burn duration, control
+        the voltage of the corresponding burnwire IC
+        "dutycycle" tells us the proportion of total voltage we will
+        run the IC at (ex. if "dtycycl" = 0.5, we burn at 1.65 volts)
+        initialize with default burn_num = '1' ; burnwire 2 IC is not set up
+        """
+        # BURN1 = -Z,BURN2 = extra burnwire pin, dutycycle ~0.13%
+        dtycycl = int((dutycycle / 100) * (0xFFFF))
+
+        # initialize burnwire based on the burn_num passed to the function
+        if '1' in burn_num:
+            burnwire = self.burnwire1
+        elif '2' in burn_num:
+            # because burnwire2 is not set up, will throw HardwareInitException
+            burnwire = self.burnwire2
+        else:
+            print("Burnwire2 IC is not set up.")
+            return False
+
+        self.setRGB(255, 0, 0)  # set RGB to red
+
+        # set the burnwire's dutycycle; begins the burn
+        burnwire.duty_cycle = dtycycl
+        time.sleep(duration)  # wait for given duration
+
+        # set burnwire's dutycycle back to 0; ends the burn
+        burnwire.duty_cycle = 0
+        self.setRGB(0, 0, 0)  # set RGB to no color
+
+        self._deployA = True  # sets deployment variable to true
+        burnwire.deinit()  # deinitialize burnwire
+
+        return self._deployA  # return true
+
+    def temperature_cpu(self):
+        """ return the temperature reading from the CPU in celsius """
+        return self.micro.cpu.temperature
+
+    def setRGB(self, v):
+        self.neopixel[0] = v
+
+    def getRGB(self):
+        return self.neopixel[0]
+
+    def timeon(self):
+        """ return the time on a monotonic clock """
+        return int(time.monotonic()) - self.BOOTTIME
+
+    def reset_boot_count(self):
+        """ reset boot count in non-volatile memory (nvm) """
+        self.c_boot = 0
+
+    def incr_logfail_count(self):
+        """ increment logfail count in non-volatile memory (nvm) """
+        self.c_logfail += 1
+
+    def reset_logfail_count(self):
+        """ reset logfail count in non-volatile memory (nvm) """
+        self.c_logfail = 0
+
 
 # initialize Satellite as cubesat
-_cubesat = _Satellite()
-
-# Make radio and microcontroller accessible
-radio = _cubesat.radio
-cubesat_microcontroller = _cubesat.micro
-BOOTTIME = _cubesat.BOOTTIME
+cubesat = _Satellite()
