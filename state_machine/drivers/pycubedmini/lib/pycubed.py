@@ -71,10 +71,6 @@ _RSTERRS = const(2)
 _BOOTCNT = const(0)
 _LOGFAIL = const(5)
 
-# Satellite attributes
-vlowbatt = 3.0
-data_cache = {}
-
 class _Satellite:
     # Define NVM flags
     f_deploy = bitFlag(register=_FLAG, bit=1)
@@ -100,6 +96,8 @@ class _Satellite:
     UHF_FREQ = 433.0
 
     instance = None
+    vlowbatt = 3.0
+    data_cache = {}
 
     def __new__(cls):
         """
@@ -441,18 +439,22 @@ class _Satellite:
         """ Return Burnwire2 object and init function"""
         return self._burnwire2, self._init_burnwire2
 
+    @property
     def acceleration(self):
         """ return the accelerometer reading from the IMU in m/s^2 """
         return self.imu.accel
 
+    @property
     def magnetic(self):
         """ return the magnetometer reading from the IMU in µT """
         return self.imu.mag
 
+    @property
     def gyro(self):
         """ return the gyroscope reading from the IMU in deg/s """
         return self.imu.gyro
 
+    @property
     def temperature_imu(self):
         """ return the thermometer reading from the IMU in celsius """
         return self.imu.temperature
@@ -491,6 +493,7 @@ class _Satellite:
         # volts
         return voltage
 
+    @property
     def sun_vector(self):
         """Returns the sun pointing vector in the body frame"""
         return array(

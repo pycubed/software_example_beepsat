@@ -1,6 +1,6 @@
 from lib.template_task import Task
 from lib.control import bcross
-import lib.pycubed as cubesat
+from lib.pycubed import cubesat
 import time
 try:
     from ulab.numpy import array
@@ -22,10 +22,10 @@ class task(Task):
     async def main_task(self):
 
         # compute control
-        m = bcross(cubesat.magnetic(), cubesat.gyro())
+        m = bcross(cubesat.magnetic, cubesat.gyro)
 
         # replace with calls to pycubed lib once it is ready
-        if hasattr(cubesat, 'sim') and cubesat.sim():  # detects if we are hooked up to simulator
+        if hasattr(cubesat, 'sim') and cubesat.sim:  # detects if we are hooked up to simulator
             print(f">>>m{toStr(m)}")
             print(f">>>t{time.monotonic_ns()}")
 

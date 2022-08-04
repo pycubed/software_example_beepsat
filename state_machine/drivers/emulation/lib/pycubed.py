@@ -41,6 +41,10 @@ class Radio:
 
 class Satellite:
     tasko = None
+    RGB = (0, 0, 0)
+    vlowbatt = 4.0
+    BOOTTIME = time.monotonic()
+    data_cache = {}
 
     def __init__(self):
         self.task = None
@@ -59,77 +63,49 @@ class Satellite:
         self._torque = [0, 0, 0]
         self.sim = False
 
+    @property
+    def acceleration(self):
+        """ return the accelerometer reading from the IMU """
+        reader.read(self)
+        return self._accel
 
-_cubesat = Satellite()
+    @property
+    def magnetic(self):
+        """ return the magnetometer reading from the IMU """
+        reader.read(self)
+        return self._mag
 
-"""
-IMU-related functions
-"""
+    @property
+    def gyro(self):
+        """ return the gyroscope reading from the IMU """
+        reader.read(self)
+        return self._gyro
 
-def acceleration():
-    """ return the accelerometer reading from the IMU """
-    reader.read(_cubesat)
-    return _cubesat._accel
+    @property
+    def temperature_imu(self):
+        """ return the thermometer reading from the IMU """
+        reader.read(self)
+        return 20  # Celsius
 
-def magnetic():
-    """ return the magnetometer reading from the IMU """
-    reader.read(_cubesat)
-    return _cubesat._mag
+    def setRGB(self, v):
+        global RGB
+        RGB = v
 
-def gyro():
-    """ return the gyroscope reading from the IMU """
-    reader.read(_cubesat)
-    return _cubesat._gyro
+    def getRGB(self):
+        return RGB
 
-def temperature_imu():
-    """ return the thermometer reading from the IMU """
-    reader.read(_cubesat)
-    return 20  # Celsius
+    def battery_voltage(self):
+        return 6.4
 
+    def log(self, str):
+        """Logs to sd card"""
+        str = (str[:20] + '...') if len(str) > 23 else str
+        print(f'log not implemented, tried to log: {str}')
 
-"""
-Misc Functions
-"""
-RGB = (0, 0, 0)
-def setRGB(v):
-    global RGB
-    RGB = v
-
-def getRGB():
-    return RGB
-
-
-vlowbatt = 4.0
-BOOTTIME = time.monotonic()
-data_cache = {}
-def battery_voltage():
-    return 6.4
+    @property
+    def sun_vector():
+        """Returns the sun pointing vector in the body frame"""
+        return array([0, 0, 0])
 
 
-def sim():
-    return _cubesat.sim
-
-def log(self, str):
-    """Logs to sd card"""
-    str = (str[:20] + '...') if len(str) > 23 else str
-    print(f'log not implemented, tried to log: {str}')
-
-
-"""
-Sun Sensor Functions
-"""
-
-def sun_vector():
-    """Returns the sun pointing vector in the body frame"""
-    return array([0, 0, 0])
-
-
-"""
-Radio related functions
-"""
-# send = _cubesat.radio.send
-# listen = _cubesat.radio.listen
-await_rx = _cubesat.radio.await_rx
-receive = _cubesat.radio.receive
-sleep = _cubesat.radio.sleep
-radio = _cubesat.radio
+cubesat = Satellite()
