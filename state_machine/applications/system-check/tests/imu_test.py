@@ -10,212 +10,216 @@ from ulab import numpy
 from lib import pycubed as cubesat
 
 
-wait_time = 2
+wait_time = 3
 norm = numpy.linalg.norm
 
 
-def stationary_user_test():
+def request_imu_data(prompt):
     """
-    All user interaction for the stationary test happens in this function
-    Set wait times, prompt the users and gather IMU data and input
+    Ask the user to type y/any key to start/cancel the test
+    If y, gather IMU data
+    Accelerometer and Gyroscope readings are collected 10 times
+    in wait_time seconds
+    Magnetometer readings are collected at the start and end
+    of wait_time seconds
+    If any other key, return None for all readings
     """
-    # print user prompts
-    print("Please leave the cubesat stationary on a table.")
-    start_test = input("Type Y to start the stationary test, any key" +
-                       " to cancel: ")
+    # ask user whether or not to start the test
+    print(prompt, end="")
+    start_test = input("Type Y to start the test, any key to cancel: ")
 
     # if user opts to cancel the test, return None, handle in the next function
     if start_test.lower() != "y":
         return None, None, None
+
+    # else proceed with the test
+    time.sleep(0.5)
     print("Collecting IMU data...")
 
-    # collect acceleration and gyroscope readings, return None mag default
-    time.sleep(wait_time)
-    acc = cubesat.acceleration()
-    gyro = cubesat.gyro()
+    # collect magnetometer reading at the start of wait time
+    start_mag = cubesat.magnetic()
+
+    # collect average accelerometer and gyroscope readings
+    # do 10 reads over wait_time
+    acc_total = [0, 0, 0]
+    gyro_total = [0, 0, 0]
+    for i in range(10):
+        acc = cubesat.acceleration()
+        gyro = cubesat.gyro()
+        acc_total[0] += acc[0]
+        acc_total[1] += acc[1]
+        acc_total[2] += acc[2]
+        gyro_total[0] += gyro[0]
+        gyro_total[1] += gyro[1]
+        gyro_total[2] += gyro[2]
+        time.sleep(wait_time / 10)
+
+    # collect magnetometer reading at the end of wait time
+    end_mag = cubesat.magnetic()
+
+    # calculate the average acc and gyro readings
+    acc_final = tuple(val / 10 for val in acc_total)
+    gyro_final = tuple(val / 10 for val in gyro_total)
+
+    # calculate the change in the total magnetometer reading
+    sub_mag = tuple(map(lambda end, start: end - start, end_mag, start_mag))
+    mag = norm(sub_mag)
+
+    # return acc, gyro, change in mag
     print("Data Collection Complete")
-    return acc, gyro, None
+    return acc_final, gyro_final, mag
 
 
 def stationary_imu_test(result_dict):
     """
-    All stationary test automation happens in this function
-    Process user test results and update the result dictionary accordingly
+    Return acceleration, gyro, and magnetic readings from request_imu_data
+    If None, update result dictionary that test was not run
+    Else, check that the norms of the average accelerometer and gyroscope
+    readings are near 0 and update result dictionary
     """
-    # record acceleration
-    acc, gyro, mag = stationary_user_test()
+    # prompt user and get imu data
+    prompt = "Please leave the cubesat stationary on a table.\n"
+    acc, gyro, mag = request_imu_data(prompt)
+
     if acc is None and gyro is None:
-        # user entered "n", cancel the test
-        result_dict['IMU_AccStationary'] = (
-            "Stationary test not completed.", False)
-        result_dict['IMU_GyroStationary'] = (
-            "Stationary test not completed.", False)
+        # user did not enter "y", cancel the test
+        result_dict["IMU_AccStationary"] = (
+            "Stationary test not completed.", None)
+        result_dict["IMU_GyroStationary"] = (
+            "Stationary test not completed.", None)
         return result_dict
 
     # else continue running the test
-    result_val_string_acc = f"Acc: {acc}"
-    result_val_string_gyro = f"Gyro: {gyro}"
+    acc_string = f"Acc: {acc} (m/s^2)"
+    gyro_string = f"Gyro: {gyro} (deg/s)"
 
     # if total acceleration ~= 9.8 m/s^2 and gyro ~= 0 deg/s, true
-    result_val_bool_acc = 9.8 - norm(acc) < 0.2
-    result_val_bool_gyro = norm(gyro) < 0.2
-    result_dict['IMU_AccStationary'] = (
-        result_val_string_acc, result_val_bool_acc)
-    result_dict['IMU_GyroStationary'] = (
-        result_val_string_gyro, result_val_bool_gyro)
+    acc_is_stationary = 9.8 - norm(acc) < 0.5
+    gyro_is_stationary = norm(gyro) < 0.5
+
+    # print result to user
+    if acc_is_stationary:
+        print("Stationary acceleration is near g m/s^2.")
+    else:
+        print("Stationary acceleration is not near g m/s^2.")
+
+    if gyro_is_stationary:
+        print("Stationary gyroscope reading is near 0 deg/s.")
+    else:
+        print("Stationary gyroscope reading is not near 0 deg/s.")
+
+    # update result dictionary
+    result_dict["IMU_AccStationary"] = (acc_string, acc_is_stationary)
+    result_dict["IMU_GyroStationary"] = (gyro_string, gyro_is_stationary)
     return result_dict
-
-
-def moving_user_test():
-    """
-    All user interaction for the moving test happens in this function
-    Set wait times, prompt the users and gather IMU data and input
-    """
-    # print user prompts
-    start_test = input("Type Y to start the moving test, any key to cancel: ")
-
-    # if user opts to cancel the test, return None, handle in the next function
-    if start_test.lower() != "y":
-        return None, None, None
-
-    # collect acc and gyro readings, return None mag
-    print(f"Please move the cubesat around for the next {wait_time} " +
-          "seconds, starting now.")
-    print("Collecting IMU data...")
-    time.sleep(wait_time // 2)
-    acc = cubesat.acceleration()
-    gyro = cubesat.gyro()
-    time.sleep(wait_time - wait_time // 2)
-    print("Data Collection Complete")
-    return acc, gyro, None
 
 
 def moving_imu_test(result_dict):
     """
-    All moving test automation happens in this function
-    Process user test results and update the result dictionary accordingly
+    Return acceleration, gyro, and magnetic readings from request_imu_data
+    If None, update result dictionary that test was not run
+    Else, check that the norm of the average acceleration reading is positive
+    and update result dictionary
     """
     # record acceleration
-    acc, gyro, mag = moving_user_test()
+    prompt = f"""Please move the cubesat around for {wait_time} seconds once
+you start the test.\n"""
+    acc, gyro, mag = request_imu_data(prompt)
 
     if acc is None:
         # user entered "n", cancel the test
-        result_dict['IMU_AccMoving'] = ("Moving test not completed.", False)
+        result_dict["IMU_AccMoving"] = ("Moving test not completed.", None)
         return result_dict
 
     # else continue running the test
-    result_val_string = (f"Acc: {acc}")
-    result_val_bool = norm(acc) >= 0.1
-    result_dict['IMU_AccMoving'] = (result_val_string, result_val_bool)
+    acc_string = (f"Acc: {acc} (m/s^2)")
+    acc_is_moving = norm(acc) >= 0.5
+
+    # print result to user
+    if acc_is_moving:
+        print("Moving acceleration is greater than g m/s^2.")
+    else:
+        print("Moving acceleration is less than g m/s^2.")
+
+    # update result dictionary
+    result_dict["IMU_AccMoving"] = (acc_string, acc_is_moving)
     return result_dict
-
-
-def rotating_user_test():
-    """
-    All user interaction for the rotating test happens in this function
-    Set wait times, prompt the users and gather IMU data and input
-    """
-    # print user prompts
-    start_test = input("Type Y to start the rotating test, any key" +
-                       " to cancel: ")
-
-    # if user opts to cancel the test, return None, handle in the next function
-    if start_test.lower() != "y":
-        return None, None, None
-
-    # collect acc and gyro readings, return None mag
-    print("Please rotate the cubesat as best as possible for " +
-          f"{wait_time} seconds.")
-    time.sleep(wait_time)
-    print("Collecting IMU data...")
-    time.sleep(wait_time // 2)
-    acc = cubesat.acceleration()
-    gyro = cubesat.gyro()
-    time.sleep(wait_time - wait_time // 2)
-    print("Data Collection Complete")
-    return acc, gyro, None
 
 
 def rotating_imu_test(result_dict):
     """
-    All rotating test automation happens in this function
-    Process user test results and update the result dictionary accordingly
+    Return acceleration, gyro, and magnetic readings from request_imu_data
+    If None, update result dictionary that test was not run
+    Else, check that the norm of the average gyroscope reading is positive
+    and update result dictionary
     """
     # record gyro reading
-    acc, gyro, mag = rotating_user_test()
+    prompt = f"""Please rotate the cubesat as best as possible for {wait_time}
+seconds once you start the test.\n"""
+    acc, gyro, mag = request_imu_data(prompt)
     if gyro is None:
         # user entered "n", cancel the test
         result_dict["IMU_GyroRotating"] = (
-            "Rotating test not completed.", False)
+            "Rotating test not completed.", None)
         return result_dict
 
     # else continue running the test
-    result_val_string = (f"Gyro: {gyro}")
-    result_val_bool = norm(gyro) >= 0.2
-    result_dict['IMU_GyroRotating'] = (result_val_string, result_val_bool)
+    gyro_string = (f"Gyro: {gyro} (deg/s)")
+    gyro_is_rotating = norm(gyro) >= 0.5
+
+    # print result to user
+    if gyro_is_rotating:
+        print("Rotating gyroscope reading is approx. greater than 0 deg/s.")
+    else:
+        print("Rotating gyroscope reading is near 0 deg/s.")
+
+    # update result dictionary
+    result_dict["IMU_GyroRotating"] = (gyro_string, gyro_is_rotating)
     return result_dict
-
-
-def magnet_user_test():
-    """
-    All user interaction for the magnet test happens in this function
-    Set wait times, prompt the users and gather IMU data and input
-    """
-    # print user prompts
-    print("Please leave the cubesat flat on a table and retrieve a magnet.")
-    start_test = input("Type Y to start the magnet test, any key to cancel: ")
-
-    # if user opts to cancel the test, return None, handle in the next function
-    if start_test.lower() != "y":
-        return None, None, None
-
-    # collect acc, gyro, mag at the start, and mag at end
-    print("Please slowly move the magnet closer to the cubesat " +
-          f"for {wait_time} seconds.")
-    print("Collecting IMU data...")
-    acc = cubesat.acceleration()
-    gyro = cubesat.gyro()
-    starting_mag = cubesat.magnetic()
-    time.sleep(wait_time)
-    ending_mag = cubesat.magnetic()
-
-    # calculate the change in the total magnetometer reading
-    sub_mag = tuple(map(
-        lambda end, start: end - start, ending_mag, starting_mag))
-    mag = norm(sub_mag)
-    print("Data Collection Complete")
-    return acc, gyro, mag
 
 
 def magnet_imu_test(result_dict):
     """
-    All magnet test automation happens in this function
-    Process user test results and update the result dictionary accordingly
+    Return acceleration, gyro, and magnetic readings from request_imu_data
+    If None, update result dictionary that test was not run
+    Else, check that the magnetometer reading increased as the magnet
+    moved closer, and update result dictionary
     """
     # record magnetometer reading
-    acc, gyro, mag = magnet_user_test()
+    prompt = f"""Please slowly move the magnet closer to the cubesat for
+{wait_time} seconds once you start the test.\n"""
+    acc, gyro, mag = request_imu_data(prompt)
     if mag is None:
         # user entered "n", cancel the test
-        result_dict["IMU_MagMagnet"] = ("Magnet test not completed.", False)
+        result_dict["IMU_MagMagnet"] = ("Magnet test not completed.", None)
         return result_dict
 
     # else continue running the test
-    result_val_string = (f"Change in Mag Reading: {mag}")
-    result_val_bool = mag >= 0.2
-    result_dict['IMU_MagMagnet'] = (result_val_string, result_val_bool)
+    mag_string = (f"Change in Mag Reading: {mag} (µT)")
+    # for reference, an average fridge magnet has a force of around 1000 µT
+    mag_is_increasing = mag >= 1000
+
+    # print result to user
+    if mag_is_increasing:
+        print("Magnetometer reading is increasing.")
+    else:
+        print("Magnetometer reading is not increasing.")
+
+    # update result dictionary
+    result_dict["IMU_MagMagnet"] = (mag_string, mag_is_increasing)
     return result_dict
 
 
 def temp_imu_test(result_dict):
     """
-    All temperature test functions happen in this function
-    Update the result dictionary accordingly
+    Get temperature reading from IMU and ask the user to verify that
+    this reading is correct. Give users a general range for room temperature
+    to help verify, and update result dictionary as per user response
     """
     # collect temperature reading, ask user to confirm
     temp = cubesat.temperature_imu()
-    print(f"IMU Temperature Reading: {temp}")
-    print(f"Generally, room temperature is between {20} and {27}" +
-          " degrees celsius.")
+    print(f"IMU Temperature Reading: {temp} degrees Celsius")
+    print(f"Room temperature is generally between {20} and {27} deg Celsius.")
 
     # get user input on the correctness of the result
     res = input("Does the temperature reading look correct? (Y/N): ")
@@ -224,39 +228,54 @@ def temp_imu_test(result_dict):
         result_val_bool = True
 
     # update result dict based on user input
-    result_dict['IMU_Temp'] = (f"Temperature: {temp}", result_val_bool)
+    result_dict["IMU_Temp"] = (f"Temperature: {temp}", result_val_bool)
     return result_dict
 
 
 def run(hardware_dict, result_dict):
     """
-    Check that the correct hardware is initialized and run tests
+    Check the IMU when the cubesat is stationary, moving, rotating,
+    and around a magnetic field. Also check the IMU temperature sensor
+    If initialized correctly, run test and update result dictionary
+    If not initialized, update result dictionary
     """
 
     # if no IMU detected, update result dictionary and return
-    if not hardware_dict['IMU']:
-        result_dict['IMU_AccStationary'] = (
-            'Cannot test accelerometer; no IMU detected', False)
-        result_dict['IMU_AccMoving'] = (
-            'Cannot test accelerometer; no IMU detected', False)
-        result_dict['IMU_GyroStationary'] = (
-            'Cannot test gyroscope; no IMU detected', False)
-        result_dict['IMU_GyroRotating'] = (
-            'Cannot test gyroscope; no IMU detected', False)
-        result_dict['IMU_MagMagnet'] = (
-            'Cannot test magnetometer; no IMU detected', False)
-        result_dict['IMU_Temp'] = (
-            'Cannot test temperature sensor; no IMU detected', False)
+    if not hardware_dict["IMU"]:
+        result_dict["IMU_AccStationary"] = (
+            "Cannot test accelerometer; no IMU detected", None)
+        result_dict["IMU_AccMoving"] = (
+            "Cannot test accelerometer; no IMU detected", None)
+        result_dict["IMU_GyroStationary"] = (
+            "Cannot test gyroscope; no IMU detected", None)
+        result_dict["IMU_GyroRotating"] = (
+            "Cannot test gyroscope; no IMU detected", None)
+        result_dict["IMU_MagMagnet"] = (
+            "Cannot test magnetometer; no IMU detected", None)
+        result_dict["IMU_Temp"] = (
+            "Cannot test temperature sensor; no IMU detected", None)
         return result_dict
 
     # if IMU detected, run other tests
     else:
-        print("Starting IMU test...")
+        print("Starting IMU Stationary Test...")
         stationary_imu_test(result_dict)
+        print("IMU Stationary Test complete.\n")
+
+        print("Starting IMU Moving Test...")
         moving_imu_test(result_dict)
+        print("IMU Moving Test complete.\n")
+
+        print("Starting IMU Rotating Test...")
         rotating_imu_test(result_dict)
+        print("IMU Rotating Test complete.\n")
+
+        print("Starting IMU Magnet Test...")
         magnet_imu_test(result_dict)
+        print("IMU Magnet Test complete.\n")
+
+        print("Starting IMU Temperature Test...")
         temp_imu_test(result_dict)
-        print("IMU Test complete.\n")
+        print("IMU Temperature Test complete.\n")
 
     return result_dict
