@@ -60,25 +60,28 @@ def sd_test():
         return ("File deletion failed.", False)
 
     # if nothing has failed so far, return success
-    return ("SD Card passed all tests: New file was created, wrote to, " +
-            "read from, and deleted successfully.", True)
+    return ("""SD Card passed all tests: New file was created, wrote to,
+read from, and deleted successfully.""", True)
 
 
 def run(hardware_dict, result_dict):
     """
-    Check that the correct hardware is initialized and run tests
+    Check SD card
+    If initialized correctly, run test and update result dictionary
+    through sd_test
+    If not initialized, update result dictionary
     """
 
     # if no SD Card detected, update result dictionary and return
-    if not hardware_dict['SDcard']:
-        result_dict['SDcard_Logging'] = (
-            'Cannot test logging; no SD Card detected', False)
+    if not hardware_dict["SDcard"]:
+        result_dict["SDcard_Logging"] = (
+            "Cannot test logging; no SD Card detected", None)
         return result_dict
 
     # if SD Card detected, run other tests
     print("Starting logging test...")
     result_val_string, result_val_bool = sd_test()
-    result_dict['SDcard_Logging'] = (result_val_string, result_val_bool)
+    result_dict["SDcard_Logging"] = (result_val_string, result_val_bool)
     print("Logging test complete.\n")
 
     return result_dict
