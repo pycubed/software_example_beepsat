@@ -25,21 +25,19 @@ norm = numpy.linalg.norm
 
 def test_voltage_levels(coil_index):
     """
-    All user interaction happens in this function
-    Set wait times, prompt user, collect magnetometer data for
-    different voltage levels
+    Ask the user to type y/any key to start/cancel the test
+    If y, collect IMU magnetometer data for different voltage levels,
+    and return if the magnetometer readings are increasing as voltage
+    levels are increasing.
+    If any other key, return  None
     """
 
     # wait times
-    wait_time = 3
-    driver_time = 3
+    driver_time = 1
 
     # set up the test
-    print(f'Testing Coil Driver {coil_index} for the following voltage ' +
-          f'levels: {projected_voltage1}, {projected_voltage2}, ' +
-          f'{projected_voltage3}.')
-    print(f"Waiting {wait_time} seconds.")
-    time.sleep(wait_time)
+    print(f"""Testing Coil Driver {coil_index} for the following voltage
+levels: {projected_voltage1} V, {projected_voltage2} V, {projected_voltage3} V.""")
 
     # conduct the test
     start_test = input("Type Y to start the test, any key to cancel: ")
@@ -66,18 +64,22 @@ def test_voltage_levels(coil_index):
     mag_total3 = norm(mag_reading3)
 
     # if magnetometer readings are increasing over time, return true
-    result_val_bool = (mag_total3 > mag_total2 and mag_total2 > mag_total1)
+    # for reference, an average fridge magnet has a force of around 1000 µT
+    mag3_greater_mag2 = (mag_total3 - mag_total2) >= 100
+    mag2_greater_mag1 = (mag_total2 - mag_total1) >= 100
+    result_val_bool = mag3_greater_mag2 and mag2_greater_mag1
     if not result_val_bool:
-        print("Magnetometer results should have been increasing but were" +
-              f" not. reading 1: {mag_total1}, reading 2: {mag_total2}," +
-              f" reading 3: {mag_total3}")
+        print(f"""Magnetometer results should have been increasing but were
+not. reading 1: {mag_total1} µT, reading 2: {mag_total2} µT, reading 3: {mag_total3} µT""")
     return result_val_bool
 
 
 def coil_test(result_dict, coil_index):
     """
-    All automation happens in this function
-    Process user test results and update the result dictionary accordingly
+    Get boolean result of test_voltage_levels, which tells us
+    if magnetometer readings are increasing correctly
+    If result is None, update the result dictionary that the test was not run
+    Else, process user inputted test results and update the result dictionary
     """
 
     # set string constant
@@ -86,12 +88,11 @@ def coil_test(result_dict, coil_index):
     # get user test result values, process and print results
     result = test_voltage_levels(coil_index)
     if result is None:
-        result_dict[result_key] = (f"{result_key} not tested.", result)
+        result_dict[result_key] = (f"{result_key} not tested.", None)
         return result_dict
 
-    result_val_string = (f'Tested Coil Driver {coil_index} at the following' +
-                         f' voltage levels: {projected_voltage1}, ' +
-                         f'{projected_voltage2}, {projected_voltage3}.')
+    result_val_string = (f"""Tested Coil Driver {coil_index} at the following
+voltage levels: {projected_voltage1} V, {projected_voltage2} V, {projected_voltage3} V""")
 
     # update result dictionary
     result_dict[result_key] = (result_val_string, result)
@@ -100,28 +101,31 @@ def coil_test(result_dict, coil_index):
 
 def run(hardware_dict, result_dict):
     """
-    Check that the correct hardware is initialized and run tests
+    Check coil driver X, Y, and Z
+    If initialized correctly, run test and update result dictionary
+    through coil_test
+    If not initialized, update result dictionary
     """
 
     # if no Coil X detected, update result dictionary
-    if not hardware_dict['CoilDriverX']:
-        result_dict['CoilDriverX'] = ('No Coil Driver X detected', False)
+    if not hardware_dict["CoilDriverX"]:
+        result_dict["CoilDriverX"] = ("No Coil Driver X detected", None)
     else:  # Coil X detected, run tests
         print("Starting Coil Driver X test...")
         coil_test(result_dict, 'X')
         print("Coil Driver X Test complete.\n")
 
     # if no Coil Y detected, update result dictionary
-    if not hardware_dict['CoilDriverY']:
-        result_dict['CoilDriverY'] = ('No Coil Driver Y detected', False)
+    if not hardware_dict["CoilDriverY"]:
+        result_dict["CoilDriverY"] = ("No Coil Driver Y detected", None)
     else:  # Coil Y detected, run tests
         print("Starting Coil Driver Y test...")
         coil_test(result_dict, 'Y')
         print("Coil Driver Y Test complete.\n")
 
     # if no Coil Z detected, update result dictionary
-    if not hardware_dict['CoilDriverZ']:
-        result_dict['CoilDriverZ'] = ('No Coil Driver Z detected', False)
+    if not hardware_dict["CoilDriverZ"]:
+        result_dict["CoilDriverZ"] = ("No Coil Driver Z detected", None)
     else:  # Coil Z detected, run tests
         print("Starting Coil Driver Z test...")
         coil_test(result_dict, 'Z')
