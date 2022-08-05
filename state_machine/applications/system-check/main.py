@@ -19,32 +19,32 @@ import tests.burnwire_test
 # initialize hardware_dict and result_dict
 hardware_dict = pycubed._cubesat.hardware
 result_dict = {
-    'SDcard_Logging': ('', False),
-    'IMU_AccStationary': ('', False),
-    'IMU_AccMoving': ('', False),
-    'IMU_GyroStationary': ('', False),
-    'IMU_GyroRotating': ('', False),
-    'IMU_MagMagnet': ('', False),
-    'IMU_Temp': ('', False),
-    'Radio_ReceiveBeacon': ('', False),
-    'Radio_SendBeacon': ('', False),
-    'Sun-Y_Dark': ('', False),
-    'Sun-Y_Light': ('', False),
-    'Sun-Z_Dark': ('', False),
-    'Sun-Z_Light': ('', False),
-    'Sun-X_Dark': ('', False),
-    'Sun-X_Light': ('', False),
-    'Sun+Y_Dark': ('', False),
-    'Sun+Y_Light': ('', False),
-    'Sun+Z_Dark': ('', False),
-    'Sun+Z_Light': ('', False),
-    'Sun+X_Dark': ('', False),
-    'Sun+X_Light': ('', False),
-    'CoilDriverX': ('', False),
-    'CoilDriverY': ('', False),
-    'CoilDriverZ': ('', False),
-    'Burnwire1': ('', False),
-    'Burnwire2': ('', False),
+    "SDcard_Logging": ("", False),
+    "IMU_AccStationary": ("", False),
+    "IMU_AccMoving": ("", False),
+    "IMU_GyroStationary": ("", False),
+    "IMU_GyroRotating": ("", False),
+    "IMU_MagMagnet": ("", False),
+    "IMU_Temp": ("", False),
+    "Radio_ReceiveBeacon": ("", False),
+    "Radio_SendBeacon": ("", False),
+    "Sun-Y_Dark": ("", False),
+    "Sun-Y_Light": ("", False),
+    "Sun-Z_Dark": ("", False),
+    "Sun-Z_Light": ("", False),
+    "Sun-X_Dark": ("", False),
+    "Sun-X_Light": ("", False),
+    "Sun+Y_Dark": ("", False),
+    "Sun+Y_Light": ("", False),
+    "Sun+Z_Dark": ("", False),
+    "Sun+Z_Light": ("", False),
+    "Sun+X_Dark": ("", False),
+    "Sun+X_Light": ("", False),
+    "CoilDriverX": ("", False),
+    "CoilDriverY": ("", False),
+    "CoilDriverZ": ("", False),
+    "Burnwire1": ("", False),
+    "Burnwire2": ("", False),
 }
 
 # print hardware initialization results
@@ -79,29 +79,36 @@ tests.sun_sensor_test.run(hardware_dict, result_dict)
 tests.coil_test.run(hardware_dict, result_dict)
 
 # ask to test burnwire
-burnwire_input = input("Would you like to test the burnwires? (Y/N): ")
-if burnwire_input == "Y":
+burnwire_input = input("Type Y to start the burnwire test, any key to cancel: ")
+if burnwire_input.lower() == "y":
     tests.burnwire_test.run(hardware_dict, result_dict)
 else:
-    result_dict['Burnwire1'] = ("Not tested.", False)
-    result_dict['Burnwire2'] = ("Not tested.", False)
+    result_dict["Burnwire1"] = ("Test was not run.", None)
+    result_dict["Burnwire2"] = ("Test was not run.", None)
 
 # ask to test radio
-radio_input = input("Would you like to test the radio? (Y/N): ")
-if radio_input == "Y":
+radio_input = input("Type Y to start the radio test, any key to cancel: ")
+if radio_input.lower() == "y":
     antenna_attached = input("Is an antenna attached to the radio? (Y/N): ")
     tests.radio_test.run(hardware_dict, result_dict, antenna_attached)
 else:
-    result_dict['Radio_ReceiveBeacon'] = ("Not tested.", False)
-    result_dict['Radio_SendBeacon'] = ("Not tested.", False)
+    result_dict["Radio_ReceiveBeacon"] = ("Test was not run.", None)
+    result_dict["Radio_SendBeacon"] = ("Test was not run.", None)
 
 # print test results; failed tests first, and then passed tests
 print("\nTest has concluded. Printing results...\n")
 
+print("Tests not run:")
+for entry in result_dict.items():
+    if entry[1][1] is None:
+        # entry[1][0] is the string portion of the tuple
+        print(f"{entry[0]}")
+print("")
+
 print("Failed tests:")
 for entry in result_dict.items():
     # if the test failed
-    if not entry[1][1]:
+    if entry[1][1] is not None and not entry[1][1]:
         # entry[1][0] is the string portion of the tuple
         print(f"{entry[0]}: {entry[1][0]}")
 print("")
@@ -109,7 +116,7 @@ print("")
 print("Passed tests:")
 for entry in result_dict.items():
     # if the test passed
-    if entry[1][1]:
+    if entry[1][1] is not None and entry[1][1]:
         # entry[1][0] is the string portion of the tuple
         print(f"{entry[0]}: {entry[1][0]}")
 print("")
