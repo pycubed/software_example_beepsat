@@ -18,7 +18,7 @@ def get_user_input():
     # conduct the test
     print("Initializing burnwire test...")
     print("You can test using a multimeter or fishing line.")
-    print("""If using a multimeter, please read the voltage between the ground pin 
+    print("""If using a multimeter, please read the voltage between the ground pin
 (GND) and burnwire pin on the -Z solar board.""")
 
     # get user input for voltage level and duration
