@@ -75,7 +75,7 @@ def test_individual_sun_sensor(result_dict, sensor_index, light_dark):
         return result_dict
 
     # else continue
-    result_val_string = (f"""Testing Sun Sensor {sensor_index} in the {light_dark} resulted 
+    result_val_string = (f"""Testing Sun Sensor {sensor_index} in the {light_dark} resulted
     in a lux value of {lux_val}""")
 
     if light_dark == "Light":
