@@ -42,7 +42,7 @@ levels: {projected_voltage1} V, {projected_voltage2} V, {projected_voltage3} V."
     # conduct the test
     start_test = input("Type Y to start the test, any key to cancel: ")
     if start_test.lower() != "y":
-        return None
+        return None, None
 
     # else, test each voltage level
     cubesat.coildriver_vout(coil_index, projected_voltage1)
@@ -68,10 +68,23 @@ levels: {projected_voltage1} V, {projected_voltage2} V, {projected_voltage3} V."
     mag3_greater_mag2 = (mag_total3 - mag_total2) >= 100
     mag2_greater_mag1 = (mag_total2 - mag_total1) >= 100
     result_val_bool = mag3_greater_mag2 and mag2_greater_mag1
+
+    # store the voltage levels tested and mag readings in a string
+    mag_reading_string = f"""Coil Driver {coil_index} (voltage level, mag reading):
+({projected_voltage1} V, {mag_total1} uT),
+({projected_voltage2} V, {mag_total2} uT),
+({projected_voltage3} V, {mag_total3} uT)"""
+
+    # if the test failed, print that the test failed, as well as the readings
     if not result_val_bool:
-        print(f"""Magnetometer results should have been increasing but were
-not. reading 1: {mag_total1} µT, reading 2: {mag_total2} µT, reading 3: {mag_total3} µT""")
-    return result_val_bool
+        print(f"""Magnetometer results should have been increasing but were not.
+{mag_reading_string}""")
+    # if the test passed, print the readings
+    else:
+        print(mag_reading_string)
+
+    # return pass/fail and the readings in string form
+    return result_val_bool, mag_reading_string
 
 
 def coil_test(result_dict, coil_index):
@@ -86,16 +99,15 @@ def coil_test(result_dict, coil_index):
     result_key = f"CoilDriver{coil_index}"
 
     # get user test result values, process and print results
-    result = test_voltage_levels(coil_index)
-    if result is None:
+    result, mag_reading_string = test_voltage_levels(coil_index)
+
+    # user cancelled the test, update result dictionary
+    if result is None and mag_reading_string is None:
         result_dict[result_key] = (f"{result_key} not tested.", None)
         return result_dict
 
-    result_val_string = (f"""Tested Coil Driver {coil_index} at the following
-voltage levels: {projected_voltage1} V, {projected_voltage2} V, {projected_voltage3} V""")
-
-    # update result dictionary
-    result_dict[result_key] = (result_val_string, result)
+    # user proceeded with test, update result dictionary
+    result_dict[result_key] = (mag_reading_string, result)
     return result_dict
 
 
