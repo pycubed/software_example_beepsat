@@ -37,33 +37,26 @@ def request_imu_data(prompt):
     print("Collecting IMU data...")
 
     # collect magnetometer reading at the start of wait time
-    start_mag = cubesat.magnetic()
+    start_mag = numpy.array(cubesat.magnetic())
 
-    # collect average accelerometer and gyroscope readings
+    # collect total accelerometer and gyroscope readings
     # do 10 reads over wait_time
-    acc_total = [0, 0, 0]
-    gyro_total = [0, 0, 0]
+    acc_total = numpy.array([0., 0., 0.])
+    gyro_total = numpy.array([0., 0., 0.])
     for i in range(10):
-        acc = cubesat.acceleration()
-        gyro = cubesat.gyro()
-        acc_total[0] += acc[0]
-        acc_total[1] += acc[1]
-        acc_total[2] += acc[2]
-        gyro_total[0] += gyro[0]
-        gyro_total[1] += gyro[1]
-        gyro_total[2] += gyro[2]
+        acc_total += numpy.array(cubesat.acceleration())
+        gyro_total += numpy.array(cubesat.gyro())
         time.sleep(wait_time / 10)
 
     # collect magnetometer reading at the end of wait time
-    end_mag = cubesat.magnetic()
+    end_mag = numpy.array(cubesat.magnetic())
 
     # calculate the average acc and gyro readings
-    acc_final = tuple(val / 10 for val in acc_total)
-    gyro_final = tuple(val / 10 for val in gyro_total)
+    acc_final = acc_total / 10
+    gyro_final = gyro_total / 10
 
     # calculate the change in the total magnetometer reading
-    sub_mag = tuple(map(lambda end, start: end - start, end_mag, start_mag))
-    mag = norm(sub_mag)
+    mag = norm(end_mag - start_mag)
 
     # return acc, gyro, change in mag
     print("Data Collection Complete")
@@ -90,8 +83,8 @@ def stationary_imu_test(result_dict):
         return result_dict
 
     # else continue running the test
-    acc_string = f"Acc: {acc} (m/s^2)"
-    gyro_string = f"Gyro: {gyro} (deg/s)"
+    acc_string = f"Acc: {tuple(acc)} (m/s^2)"
+    gyro_string = f"Gyro: {tuple(gyro)} (deg/s)"
 
     # if total acceleration ~= 9.8 m/s^2 and gyro ~= 0 deg/s, true
     acc_is_stationary = 9.8 - norm(acc) < 0.5
@@ -132,8 +125,8 @@ you start the test.\n"""
         return result_dict
 
     # else continue running the test
-    acc_string = (f"Acc: {acc} (m/s^2)")
-    acc_is_moving = norm(acc) >= 0.5
+    acc_string = (f"Acc: {tuple(acc)} (m/s^2)")
+    acc_is_moving = norm(acc) >= 9.8
 
     # print result to user
     if acc_is_moving:
@@ -164,7 +157,7 @@ seconds once you start the test.\n"""
         return result_dict
 
     # else continue running the test
-    gyro_string = (f"Gyro: {gyro} (deg/s)")
+    gyro_string = (f"Gyro: {tuple(gyro)} (deg/s)")
     gyro_is_rotating = norm(gyro) >= 0.5
 
     # print result to user
@@ -219,13 +212,9 @@ def temp_imu_test(result_dict):
     # collect temperature reading, ask user to confirm
     temp = cubesat.temperature_imu()
     print(f"IMU Temperature Reading: {temp} degrees Celsius")
-    print(f"Room temperature is generally between {20} and {27} deg Celsius.")
 
-    # get user input on the correctness of the result
-    res = input("Does the temperature reading look correct? (Y/N): ")
-    result_val_bool = False
-    if res.lower() == "y":
-        result_val_bool = True
+    # check that temperature is between 20 and 80 degrees Celsius
+    result_val_bool = temp >= 20 and temp <= 80
 
     # update result dict based on user input
     result_dict["IMU_Temp"] = (f"Temperature: {temp}", result_val_bool)
