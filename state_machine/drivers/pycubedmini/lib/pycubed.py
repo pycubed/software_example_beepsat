@@ -364,16 +364,16 @@ class _Satellite:
 
     def _init_radio(self):
         """ Define radio parameters and initialize UHF radio """
-        self._rf_cs = digitalio.DigitalInOut(board.RF_CS)
-        self._rf_rst = digitalio.DigitalInOut(board.RF_RST)
-        self.radio_DIO0 = digitalio.DigitalInOut(board.RF_IO0)
-        self.radio_DIO0.switch_to_input()
-        self.radio_DIO1 = digitalio.DigitalInOut(board.RF_IO1)
-        self.radio_DIO1.switch_to_input()
-        self._rf_cs.switch_to_output(value=True)
-        self._rf_rst.switch_to_output(value=True)
-
         try:
+            self._rf_cs = digitalio.DigitalInOut(board.RF_CS)
+            self._rf_rst = digitalio.DigitalInOut(board.RF_RST)
+            self.radio_DIO0 = digitalio.DigitalInOut(board.RF_IO0)
+            self.radio_DIO0.switch_to_input()
+            self.radio_DIO1 = digitalio.DigitalInOut(board.RF_IO1)
+            self.radio_DIO1.switch_to_input()
+            self._rf_cs.switch_to_output(value=True)
+            self._rf_rst.switch_to_output(value=True)
+
             self._radio = pycubed_rfm9x.RFM9x(
                 self.spi, self._rf_cs, self._rf_rst,
                 self.UHF_FREQ, rfm95pw=True)
