@@ -1,4 +1,8 @@
-from lib.logging import get_logfile_name, clear_storage, log
+import sys
+
+sys.path.insert(0, './state_machine/drivers/pycubedmini/lib')
+
+from logging import get_logfile_name, clear_storage, log
 from os import listdir
 
 def test():
