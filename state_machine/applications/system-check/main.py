@@ -9,7 +9,8 @@ print("\n#################### S Y S T E M   C H E C K ####################\n")
 from lib import pycubed
 import tests
 import tests.i2c_scan
-import tests.logging_test
+import tests.sd_test
+import tests.logging_infrastructure_test
 import tests.imu_test
 import tests.radio_test
 import tests.sun_sensor_test
@@ -19,7 +20,8 @@ import tests.burnwire_test
 # initialize hardware_dict and result_dict
 hardware_dict = pycubed._cubesat.hardware
 result_dict = {
-    "SDcard_Logging": ("", False),
+    "LoggingInfrastructure_Test": ("", False),
+    "Basic_SDCard_Test": ("", False),
     "IMU_AccStationary": ("", False),
     "IMU_AccMoving": ("", False),
     "IMU_GyroStationary": ("", False),
@@ -66,8 +68,11 @@ print("")
 # complete an i2c scan: print all devices connected to each i2c bus
 tests.i2c_scan.run()
 
-# test logging
-tests.logging_test.run(hardware_dict, result_dict)
+# test sd card
+tests.sd_test.run(hardware_dict, result_dict)
+
+# test logging infrastructure
+tests.logging_infrastructure_test.run(hardware_dict, result_dict)
 
 # test imu
 tests.imu_test.run(hardware_dict, result_dict)
@@ -79,7 +84,7 @@ tests.sun_sensor_test.run(hardware_dict, result_dict)
 tests.coil_test.run(hardware_dict, result_dict)
 
 # ask to test burnwire
-burnwire_input = input("Type Y to start the burnwire test, any key to cancel: ")
+burnwire_input = input("Type Y to start burnwire test, any key to cancel: ")
 if burnwire_input.lower() == "y":
     tests.burnwire_test.run(hardware_dict, result_dict)
 else:
