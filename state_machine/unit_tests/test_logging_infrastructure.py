@@ -7,7 +7,7 @@ def test():
     for i in range(18):
         msg = 'x' * 100
         log(msg, 1000)
-    
+
     logfile1 = get_logfile_name(0)
     logfile2 = get_logfile_name(1)
 
@@ -19,11 +19,11 @@ def test():
     print(f"/sd/logs/ directory: {listdir('/sd/logs/')}")
 
     if logfile1_created and logfile2_created:
-        print("""Log and new log functions are working; 
+        print("""Log and new log functions are working;
 files were created successfully.""")
     else:
         print("New log function not working.")
-    
+
 
 clear_storage()
 test()
