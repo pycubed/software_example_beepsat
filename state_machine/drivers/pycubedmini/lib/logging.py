@@ -1,16 +1,14 @@
 from os import listdir, stat, statvfs, remove, mkdir, rmdir
 import time
 import lib.pycubed as cubesat
-import digitalio, microcontroller
-import storage
 
 info_filename = "info.txt"
-info_filename_dir = f"/sd/info.txt"
+info_filename_dir = "/sd/info.txt"
 max_file_size = 1E8
 
 def read_infotxt():
-    """ 
-    retrieve the logfile number from info.txt 
+    """
+    retrieve the logfile number from info.txt
     """
 
     # placeholder value
@@ -31,13 +29,13 @@ def read_infotxt():
         logfile_count = int(info_file_lines[2])
         # close the file
         info_file.close()
-    
+
     # return logfile_count read from info.txt
     return logfile_count
 
 
 def write_infotxt(logfile_count):
-    """ 
+    """
     write info.txt in a certain format based on logfile_count
     """
 
@@ -45,7 +43,7 @@ def write_infotxt(logfile_count):
     info_file = open(info_filename_dir, "w")
     # write a timestamp, the current logfolder_count, and the current logfolder_arr
     info_file.write(f"{time.monotonic()}\r\n")  # line 0
-    info_file.write(f"logfile_count:\r\n")      # line 1
+    info_file.write("logfile_count:\r\n")      # line 1
     info_file.write(f"{logfile_count}\r\n")     # line 2
     # close file
     info_file.close()
@@ -63,7 +61,7 @@ def rjust(string, length, char):
 
     if string_length == length:
         return string
-    
+
     if string_length > length:
         return string[0:length]
 
