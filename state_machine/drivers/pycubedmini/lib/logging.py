@@ -6,6 +6,7 @@ info_filename = "info.txt"
 info_filename_dir = "/sd/info.txt"
 max_file_size = 1E8
 
+
 def read_infotxt():
     """
     retrieve the logfile number from info.txt
@@ -41,7 +42,7 @@ def write_infotxt(logfile_count):
 
     # overwrite the current info file
     info_file = open(info_filename_dir, "w")
-    # write a timestamp, the current logfolder_count, and the current logfolder_arr
+    # write a timestamp, the current logfile_count
     info_file.write(f"{time.monotonic()}\r\n")  # line 0
     info_file.write("logfile_count:\r\n")      # line 1
     info_file.write(f"{logfile_count}\r\n")     # line 2
@@ -83,10 +84,7 @@ def get_logfile_name(logfile_count):
 def new_log(logfile_count):
     """
     Create a new log file
-    Retrieve logfolder and logfile numbers from info.txt
-    If necessary, create a new logfolder
-    Create a new logfile
-    Write a header and return logfile path
+    Write a header and return the new logfile_count
     """
 
     # After you fill up 1000 files (~ 1 GB), overwrite old files
@@ -125,12 +123,12 @@ def log(msg, max_file_size=max_file_size):
     - write "\r\n" after the last packet
     """
 
-    # get current logfile_arr, logfile_count from info.txt
+    # get logfile_count from info.txt
     logfile_count = read_infotxt()  # if info.txt doesn't exist, write with 0
     # get current logfile_name and logfile_name_dir
     logfile_name_dir = get_logfile_name_dir(logfile_count)
 
-    # if the logs directory is missing, create logs directory and first log file
+    # if the logs directory is missing, create logs directory and first log
     if "logs" not in listdir("/sd/"):
         # create logs directory
         mkdir("/sd/logs/")
