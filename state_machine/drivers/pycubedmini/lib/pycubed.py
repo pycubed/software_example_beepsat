@@ -583,7 +583,8 @@ class _Satellite:
 # initialize Satellite as cubesat
 _cubesat = _Satellite()
 
-# Make radio and microcontroller accessible
+# Make sd card, radio and microcontroller accessible
+sd = _cubesat.sd
 radio = _cubesat.radio
 cubesat_microcontroller = _cubesat.micro
 BOOTTIME = _cubesat.BOOTTIME
