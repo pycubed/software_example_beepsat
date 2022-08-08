@@ -6,6 +6,7 @@ Manages all radio communication for the cubesat.
 from lib.template_task import Task
 import lib.transmission_queue as tq
 import cdh
+import lib.radio_headers as headers
 
 ANTENNA_ATTACHED = False
 
@@ -35,6 +36,7 @@ class task(Task):
         # set our radiohead node ID so we can get ACKs
         self.cubesat.radio.node = 0xAB  # our ID
         self.cubesat.radio.destination = 0xBA  # target's ID
+        self.msg = ''
 
     async def main_task(self):
         if tq.empty():
@@ -49,8 +51,27 @@ class task(Task):
                     #  - Execute commands
                     #  - Mark messages as received (and remove from tq)
 
-                    # header = response[0]
+                    header = response[0]
                     response = response[1:]  # remove the header byte
+
+                    if header == headers.NAIVE_START:
+                        txt = str(response, 'ascii')
+                        self.msg = txt
+                        self.last = txt
+                        print('Started recieving message')
+                    elif header == headers.NAIVE_MID:
+                        txt = str(response, 'ascii')
+                        if txt == self.last:
+                            print('Repeated message')
+                        else:
+                            self.msg += txt
+                            self.last = txt
+                            print('Continued recieving message')
+                    elif header == headers.NAIVE_END:
+                        txt = str(response, 'ascii')
+                        self.msg += txt
+                        print('Finished recieving message')
+                        print(self.msg)
 
                     # Begin Old Beacon Task Code
                     if len(response) >= 6:

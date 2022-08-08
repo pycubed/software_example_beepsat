@@ -1,0 +1,39 @@
+name: Run Emulated Flight Software
+
+on:
+  # Trigger the workflow on all pull requests, and pushes to main
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
+
+jobs:
+  build-and-run:
+    name: Build And Run
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: pip install -r state_machine/requirements.txt 
+
+      - name: Build and run
+        id: build_and_run
+        run: cd state_machine && sh build.sh drivers/emulation applications/flight
+
+      - name: Install Python dependencies
+        run: pip install flake8
+
+      - name: Run emulated flight software
+        run: ./.github/workflows/scripts/emulation.sh
