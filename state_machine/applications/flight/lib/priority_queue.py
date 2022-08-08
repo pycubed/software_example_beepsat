@@ -15,12 +15,21 @@ Usage:
 __all__ = ['push', 'pop', 'heapify']
 
 def push(heap, item):
-    """Push item onto heap, maintaining the heap invariant."""
+    """Push item onto heap, maintaining the heap invariant.
+
+    :param heap: The heap to push the item onto
+    :type heap: list
+    :param item: Any well ordered item
+    """
     heap.append(item)
     _siftdown_max(heap, 0, len(heap) - 1)
 
 def pop(heap):
-    """Pop the largest item off the heap, maintaining the heap invariant."""
+    """Pop the largest item off the heap, maintaining the heap invariant.
+
+    :param heap: The heap to pop the item from
+    :type heap: list
+    """
     lastelt = heap.pop()    # raises appropriate IndexError if heap is empty
     if heap:
         returnitem = heap[0]
@@ -29,12 +38,16 @@ def pop(heap):
         return returnitem
     return lastelt
 
-def heapify(x):
-    """Transform list into a maxheap, in-place, in O(len(x)) time."""
-    n = len(x)
+def heapify(heap):
+    """Transform list into a maxheap, in-place, in O(len(x)) time.
+
+    :param heap: The list to heapify
+    :type heap: list
+    """
+    n = len(heap)
     for i in reversed(range(n // 2)):
-        _siftup_max(x, i)
-    return x
+        _siftup_max(heap, i)
+    return heap
 
 def _siftdown_max(heap, startpos, pos):
     'Maxheap variant of _siftdown'
