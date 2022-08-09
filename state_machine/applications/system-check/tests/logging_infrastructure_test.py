@@ -38,7 +38,7 @@ files were created successfully."""
         result_string = "New log function not working."
         result_dict["LoggingInfrastructure_Test"] = (result_string, False)
         print(result_string)
-    
+
     print("Logging Infrasturcure Test complete.\n")
 
     clear_storage()
