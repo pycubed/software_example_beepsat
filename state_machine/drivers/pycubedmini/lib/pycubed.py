@@ -221,6 +221,10 @@ _LOGFAIL = const(5)
 
 # Satellite attributes
 vlowbatt = 3.0
+# Max opperating temp on specsheet for ATSAMD51J19A (Celsius)
+HIGH_TEMP = 125
+# Min opperating temp on specsheet for ATSAMD51J19A (Celsius)
+LOW_TEMP = -40
 data_cache = {}
 
 class _Satellite:

@@ -133,3 +133,7 @@ await_rx = _cubesat.radio.await_rx
 receive = _cubesat.radio.receive
 sleep = _cubesat.radio.sleep
 radio = _cubesat.radio
+# Max opperating temp on specsheet for ATSAMD51J19A (Celsius)
+HIGH_TEMP = 125
+# Min opperating temp on specsheet for ATSAMD51J19A (Celsius)
+LOW_TEMP = -40
