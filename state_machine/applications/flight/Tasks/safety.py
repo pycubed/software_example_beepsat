@@ -1,0 +1,41 @@
+from lib.template_task import Task
+import lib.pycubed as cubesat
+
+
+class task(Task):
+    name = 'safety'
+    color = 'orange'
+
+    timeout = 60 * 60  # 60 min
+
+    def debug_status(self, vbatt, temp):
+        self.debug(f'Voltage: {vbatt:.1f}V | Temp: {temp:.1f}°C')
+
+    def safe_mode(self, vbatt, temp):
+        # margins added to prevent jittering between states
+        if vbatt < cubesat.LOW_VOLTAGE + 0.1:
+            self.debug(f'Voltage too low ({vbatt:.1f}V < {cubesat.LOW_VOLTAGE + 0.1:.1f}V)')
+        elif temp + 1 >= cubesat.HIGH_TEMP:
+            self.debug(f'Temp too high ({temp:.1f}°C >= {cubesat.HIGH_TEMP + 1:.1f}°C)')
+        else:
+            self.debug_status(vbatt, temp)
+            self.debug('Safe opperating conditions reached, switching to normal mode')
+            cubesat.state_machine.switch_to('Normal')
+
+    def other_modes(self, vbatt, temp):
+        if vbatt < cubesat.LOW_VOLTAGE:
+            self.debug(f'Voltage too low ({vbatt:.1f}V < {cubesat.LOW_VOLTAGE:.1f}V) switch to safe mode')
+            cubesat.state_machine.switch_to('Safe')
+        elif temp > cubesat.HIGH_TEMP:
+            self.debug(f'Temp too high ({temp:.1f}°C > {cubesat.HIGH_TEMP:.1f}°C) switching to safe mode')
+            cubesat.state_machine.switch_to('Safe')
+        else:
+            self.debug_status(vbatt, temp)
+
+    async def main_task(self):
+        vbatt = cubesat.battery_voltage()
+        temp = cubesat.temperature_cpu()
+        if cubesat.state_machine.state == 'Safe':
+            self.safe_mode(vbatt, temp)
+        else:
+            self.other_modes(vbatt, temp)

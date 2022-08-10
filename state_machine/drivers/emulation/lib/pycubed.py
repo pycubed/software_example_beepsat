@@ -57,6 +57,7 @@ class Satellite:
         self._mag = [4.0, 3.0, 1.0]
         self._gyro = [0.0, 0.0, 0.0]
         self._torque = [0, 0, 0]
+        self._cpu_temp = 30
         self.sim = False
 
 
@@ -98,8 +99,11 @@ def setRGB(v):
 def getRGB():
     return RGB
 
+def temperature_cpu():
+    """ return the temperature reading from the CPU in celsius """
+    return _cubesat._cpu_temp
 
-vlowbatt = 4.0
+
 BOOTTIME = time.monotonic()
 data_cache = {}
 def battery_voltage():
@@ -133,7 +137,13 @@ await_rx = _cubesat.radio.await_rx
 receive = _cubesat.radio.receive
 sleep = _cubesat.radio.sleep
 radio = _cubesat.radio
+
+"""
+Constants
+"""
 # Max opperating temp on specsheet for ATSAMD51J19A (Celsius)
 HIGH_TEMP = 125
 # Min opperating temp on specsheet for ATSAMD51J19A (Celsius)
 LOW_TEMP = -40
+# Low battery voltage threshold
+LOW_VOLTAGE = 4.0

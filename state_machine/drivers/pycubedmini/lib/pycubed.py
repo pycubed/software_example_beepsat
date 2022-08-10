@@ -220,7 +220,7 @@ _BOOTCNT = const(0)
 _LOGFAIL = const(5)
 
 # Satellite attributes
-vlowbatt = 3.0
+LOW_VOLTAGE = 3.0
 # Max opperating temp on specsheet for ATSAMD51J19A (Celsius)
 HIGH_TEMP = 125
 # Min opperating temp on specsheet for ATSAMD51J19A (Celsius)
