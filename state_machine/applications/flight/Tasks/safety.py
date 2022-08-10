@@ -15,8 +15,8 @@ class task(Task):
         # margins added to prevent jittering between states
         if vbatt < cubesat.LOW_VOLTAGE + 0.1:
             self.debug(f'Voltage too low ({vbatt:.1f}V < {cubesat.LOW_VOLTAGE + 0.1:.1f}V)')
-        elif temp + 1 >= cubesat.HIGH_TEMP:
-            self.debug(f'Temp too high ({temp:.1f}°C >= {cubesat.HIGH_TEMP + 1:.1f}°C)')
+        elif temp >= cubesat.HIGH_TEMP - 1:
+            self.debug(f'Temp too high ({temp:.1f}°C >= {cubesat.HIGH_TEMP - 1:.1f}°C)')
         else:
             self.debug_status(vbatt, temp)
             self.debug('Safe opperating conditions reached, switching to normal mode')
