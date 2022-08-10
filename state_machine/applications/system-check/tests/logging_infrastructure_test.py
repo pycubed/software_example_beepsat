@@ -11,7 +11,7 @@ def run(hardware_dict, result_dict):
         return result_dict
 
     # else, clear storage and run test
-    print("Starting logging infrasturcure test...")
+    print("Starting logging infrastructure test...")
     clear_storage()
     print(f"/sd/ directory: {listdir('/sd/')}")
 
@@ -39,6 +39,6 @@ files were created successfully."""
         result_dict["LoggingInfrastructure_Test"] = (result_string, False)
         print(result_string)
 
-    print("Logging Infrasturcure Test complete.\n")
+    print("Logging Infrastructure Test complete.\n")
 
     clear_storage()
