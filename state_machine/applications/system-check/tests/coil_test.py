@@ -15,9 +15,9 @@ v2 = 0.5
 v3 = 0.75
 
 # find projected voltage: vlevel * max voltage
-projected_voltage1 = v1 * 5.06
-projected_voltage2 = v2 * 5.06
-projected_voltage3 = v3 * 5.06
+projected_v1 = v1 * 5.06
+projected_v2 = v2 * 5.06
+projected_v3 = v3 * 5.06
 
 # alias norm
 norm = numpy.linalg.norm
@@ -37,43 +37,45 @@ def test_voltage_levels(coil_index):
 
     # set up the test
     print(f"""Testing Coil Driver {coil_index} for the following voltage
-levels: {projected_voltage1} V, {projected_voltage2} V, {projected_voltage3} V.""")
+levels: {0.0} V, {projected_v1} V, {projected_v2} V, {projected_v3} V.""")
 
     # conduct the test
     start_test = input("Type Y to start the test, any key to cancel: ")
     if start_test.lower() != "y":
         return None, None
 
-    # else, test each voltage level
-    cubesat.coildriver_vout(coil_index, projected_voltage1)
+    # test at 0V to get a starter reading
+    cubesat.coildriver_vout(coil_index, 0)
+    mag_reading0 = cubesat.magnetic()
+
+    # test each voltage level
+    cubesat.coildriver_vout(coil_index, projected_v1)
     time.sleep(driver_time)
     mag_reading1 = cubesat.magnetic()
 
-    cubesat.coildriver_vout(coil_index, projected_voltage2)
+    cubesat.coildriver_vout(coil_index, projected_v2)
     time.sleep(driver_time)
     mag_reading2 = cubesat.magnetic()
 
-    cubesat.coildriver_vout(coil_index, projected_voltage3)
+    cubesat.coildriver_vout(coil_index, projected_v3)
     time.sleep(driver_time)
     mag_reading3 = cubesat.magnetic()
 
-    # calculate total magnetic reading
+    # calculate total magnetic reading, subtracting the 0V starter reading
     print("Data Collection Complete")
-    mag_total1 = norm(mag_reading1)
-    mag_total2 = norm(mag_reading2)
-    mag_total3 = norm(mag_reading3)
+    mag_total1 = norm(numpy.array(mag_reading1) - numpy.array(mag_reading0))
+    mag_total2 = norm(numpy.array(mag_reading2) - numpy.array(mag_reading0))
+    mag_total3 = norm(numpy.array(mag_reading3) - numpy.array(mag_reading0))
 
     # if magnetometer readings are increasing over time, return true
-    # for reference, an average fridge magnet has a force of around 1000 µT
-    mag3_greater_mag2 = (mag_total3 - mag_total2) >= 100
-    mag2_greater_mag1 = (mag_total2 - mag_total1) >= 100
+    mag3_greater_mag2 = (mag_total3 - mag_total2) >= 10  # µT
+    mag2_greater_mag1 = (mag_total2 - mag_total1) >= 10  # µT
     result_val_bool = mag3_greater_mag2 and mag2_greater_mag1
 
     # store the voltage levels tested and mag readings in a string
     mag_reading_string = f"""Coil Driver {coil_index} (voltage level, mag reading):
-({projected_voltage1} V, {mag_total1} uT),
-({projected_voltage2} V, {mag_total2} uT),
-({projected_voltage3} V, {mag_total3} uT)"""
+({0.0} V, {norm(mag_reading0)} µT), ({projected_v1} V, {norm(mag_reading1)} uT),
+({projected_v2} V, {norm(mag_reading2)} uT), ({projected_v3} V, {norm(mag_reading3)} uT)"""
 
     # if the test failed, print that the test failed, as well as the readings
     if not result_val_bool:
