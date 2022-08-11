@@ -272,7 +272,7 @@ class RFM9x:
         # Set sleep mode, wait 10s and confirm in sleep mode (basic device check).
         # Also set long range mode (LoRa mode) as it can only be done in sleep.
         self.sleep()
-        tasko.sleep(0.01)
+        time.sleep(0.01)
         self.long_range_mode = True
         if self.operation_mode != SLEEP_MODE or not self.long_range_mode:
             raise RuntimeError("Failed to configure radio for LoRa mode, check wiring!")
