@@ -46,13 +46,10 @@ class task(Task):
             if heard_something:
                 response = self.cubesat.radio.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED)
                 if response is not None:
-                    self.debug(f'Recieved msg "{response}", RSSI: {self.cubesat.radio.last_rssi - 137}')
-                    # Processing recieved messages goes here
-                    #  - Execute commands
-                    #  - Mark messages as received (and remove from tq)
-
                     header = response[0]
                     response = response[1:]  # remove the header byte
+
+                    self.debug(f'Recieved msg "{response}", RSSI: {self.cubesat.radio.last_rssi - 137}')
 
                     if header == headers.NAIVE_START or header == headers.NAIVE_MID or header == headers.NAIVE_END:
                         self.handle_naive(header, response)
