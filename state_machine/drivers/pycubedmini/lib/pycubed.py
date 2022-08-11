@@ -308,7 +308,7 @@ class _Satellite:
     def _init_coildriverx(self):
         """ Initialize Coil Driver X on I2C3, set mode and voltage """
         try:
-            self._drv_x = drv8830.DRV8830(self.i2c1, 0x62)  # U7
+            self._drv_x = drv8830.DRV8830(self.i2c3, 0x62)  # U7
             self.hardware['CoilDriverX'] = True
         except Exception as e:
             print('[ERROR][Initializing H-Bridge U7]', e)
@@ -316,7 +316,7 @@ class _Satellite:
     def _init_coildrivery(self):
         """ Initialize Coil Driver Y on I2C3, set mode and voltage """
         try:
-            self._drv_y = drv8830.DRV8830(self.i2c1, 0x68)  # U8
+            self._drv_y = drv8830.DRV8830(self.i2c3, 0x68)  # U8
             self.hardware['CoilDriverY'] = True
         except Exception as e:
             print('[ERROR][Initializing H-Bridge U8]', e)
@@ -324,7 +324,7 @@ class _Satellite:
     def _init_coildriverz(self):
         """ Initialize Coil Driver Z on I2C3, set mode and voltage """
         try:
-            self._drv_z = drv8830.DRV8830(self.i2c1, 0x60)  # U9
+            self._drv_z = drv8830.DRV8830(self.i2c3, 0x60)  # U9
             self.hardware['CoilDriverZ'] = True
         except Exception as e:
             print('[ERROR][Initializing H-Bridge U9]', e)
