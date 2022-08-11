@@ -96,8 +96,14 @@ class _Satellite:
     UHF_FREQ = 433.0
 
     instance = None
-    vlowbatt = 3.0
     data_cache = {}
+
+    # Satellite attributes
+    LOW_VOLTAGE = 3.0
+    # Max opperating temp on specsheet for ATSAMD51J19A (Celsius)
+    HIGH_TEMP = 125
+    # Min opperating temp on specsheet for ATSAMD51J19A (Celsius)
+    LOW_TEMP = -40
 
     def __new__(cls):
         """
@@ -441,25 +447,30 @@ class _Satellite:
         """ Return Burnwire2 object and init function"""
         return self._burnwire2, self._init_burnwire2
 
-    @property
+    @hardware
     def acceleration(self):
         """ return the accelerometer reading from the IMU in m/s^2 """
-        return self.imu.accel
+        return self.imu.accel, self._init_imu
 
-    @property
+    @hardware
     def magnetic(self):
         """ return the magnetometer reading from the IMU in µT """
-        return self.imu.mag
+        return self.imu.mag, self._init_imu
 
-    @property
+    @hardware
     def gyro(self):
         """ return the gyroscope reading from the IMU in deg/s """
-        return self.imu.gyro
+        return self.imu.gyro, self._init_imu
 
-    @property
+    @hardware
     def temperature_imu(self):
         """ return the thermometer reading from the IMU in celsius """
-        return self.imu.temperature
+        return self.imu.temperature, self._init_imu
+
+    @property
+    def temperature_cpu(self):
+        """ return the temperature reading from the CPU in celsius """
+        return self.micro.cpu.temperature
 
     def coildriver_vout(self, driver_index, projected_voltage):
         """ Set a given voltage for a given coil driver """
@@ -472,6 +483,7 @@ class _Satellite:
         else:
             print(driver_index, "is not a defined coil driver")
 
+    @property
     def battery_voltage(self):
         """
         Return the battery voltage

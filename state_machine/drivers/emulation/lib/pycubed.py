@@ -53,6 +53,13 @@ class Satellite:
     BOOTTIME = time.monotonic()
     data_cache = {}
 
+    # Max opperating temp on specsheet for ATSAMD51J19A (Celsius)
+    HIGH_TEMP = 125
+    # Min opperating temp on specsheet for ATSAMD51J19A (Celsius)
+    LOW_TEMP = -40
+    # Low battery voltage threshold
+    LOW_VOLTAGE = 4.0
+
     def __init__(self):
         self.task = None
         self.scheduled_tasks = {}
@@ -68,6 +75,7 @@ class Satellite:
         self._mag = [4.0, 3.0, 1.0]
         self._gyro = [0.0, 0.0, 0.0]
         self._torque = [0, 0, 0]
+        self._cpu_temp = 30
         self.sim = False
 
     @property
@@ -95,6 +103,11 @@ class Satellite:
         return 20  # Celsius
 
     @property
+    def temperature_cpu(self):
+        """ return the temperature reading from the CPU in celsius """
+        return 50  # Celsius
+
+    @property
     def RGB(self):
         return self._RGB
 
@@ -102,6 +115,7 @@ class Satellite:
     def RGB(self, v):
         self._RGB = v
 
+    @property
     def battery_voltage(self):
         return 6.4
 
