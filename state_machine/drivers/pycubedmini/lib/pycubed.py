@@ -551,10 +551,6 @@ class _Satellite:
 
         return self._deployA  # return true
 
-    def temperature_cpu(self):
-        """ return the temperature reading from the CPU in celsius """
-        return self.micro.cpu.temperature
-
     @property
     def RGB(self):
         return self.neopixel[0]
