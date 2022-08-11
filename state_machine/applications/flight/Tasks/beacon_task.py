@@ -4,6 +4,8 @@ from lib.template_task import Task
 import lib.transmission_queue as tq
 from lib.message import Message
 from lib.naive import NaiveMessage
+from lib.pycubed import cubesat, HardwareInitException
+import struct
 
 msg = """"Did you ever hear the tragedy of Darth Plagueis the Wise?"
 "No."
@@ -32,9 +34,31 @@ class task(Task):
         set the above ANTENNA_ATTACHED variable to True
         to actually send the beacon packet
         """
-        tq.push(Message(10, "Hello World!"))
+
+        beacon_packet = self.beacon_packet()
+        tq.push(Message(10, beacon_packet))
         if self.first_time:
             self.first_time = False
             self.debug("Pushing the large msg to tq")
             tq.push(NaiveMessage(1, msg))
         self.debug("Beacon task pushing to tq")
+
+    def beacon_packet(self):
+        try:
+            _ = cubesat.imu
+        except HardwareInitException as e:
+            print(f'IMU not initialized: {e}')
+            return bytes([0, 0, 0, 0, 0])
+
+        cpu_temp = cubesat.temperature_cpu
+        imu_temp = cubesat.temperature_imu
+        gyro = cubesat.gyro
+        acc = cubesat.acceleration
+        mag = cubesat.magnetic
+        print(f'CPU temp: {cpu_temp}')
+        print(f'IMU temp: {imu_temp}')
+        print(f'Gyro: {gyro}')
+        print(f'Acceleration: {acc}')
+        print(f'Magnetic: {mag}')
+        print(f'State: {cubesat.state_machine.state}')
+        return struct.pack("f" * 11, cpu_temp, imu_temp, gyro[0], gyro[1], gyro[2], acc[0], acc[1], acc[2], mag[0], mag[1], mag[2])

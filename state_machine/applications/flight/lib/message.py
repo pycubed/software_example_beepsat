@@ -5,12 +5,14 @@ class Message:
     :param priority: The priority of the message (higher is better)
     :type priority: int
     :param str: The message to send
-    :type str: str
+    :type str: str | bytes | bytearray
     """
 
     def __init__(self, priority, str):
         self.priority = priority
         self.header = 0x00
+        if isinstance(str, bytes) or isinstance(str, bytearray):
+            self.str = str
         self.str = bytes(str, 'ascii')
 
     def packet(self):
