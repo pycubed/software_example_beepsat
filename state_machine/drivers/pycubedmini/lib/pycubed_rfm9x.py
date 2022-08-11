@@ -32,6 +32,7 @@ http: www.airspayce.com/mikem/arduino/RadioHead/
 ** MODIFIED FOR VR3X MISSION ** https://vr3x.space
 """
 import time
+import tasko
 import random
 import digitalio
 from micropython import const
@@ -271,7 +272,7 @@ class RFM9x:
         # Set sleep mode, wait 10s and confirm in sleep mode (basic device check).
         # Also set long range mode (LoRa mode) as it can only be done in sleep.
         self.sleep()
-        time.sleep(0.01)
+        tasko.sleep(0.01)
         self.long_range_mode = True
         if self.operation_mode != SLEEP_MODE or not self.long_range_mode:
             raise RuntimeError("Failed to configure radio for LoRa mode, check wiring!")
@@ -394,9 +395,9 @@ class RFM9x:
         """Perform a reset of the chip."""
         # See section 7.2.2 of the datasheet for reset description.
         self._reset.switch_to_output(value=False)
-        time.sleep(0.0001)  # 100 us
+        tasko.sleep(0.0001)  # 100 us
         self._reset.switch_to_input(pull=digitalio.Pull.UP)
-        time.sleep(0.005)  # 5 ms
+        tasko.sleep(0.005)  # 5 ms
 
     def idle(self):
         """Enter idle standby mode."""
@@ -746,7 +747,7 @@ class RFM9x:
                 self.retry_counter+=1 # ADDED FOR PYCUBED
                 print('no uhf ack, sending again...')
                 # delay by random amount before next try
-                time.sleep(self.ack_wait + self.ack_wait * random.random())
+                tasko.sleep(self.ack_wait + self.ack_wait * random.random())
             retries_remaining = retries_remaining - 1
             # set retry flag in packet header
             self.flags |= _RH_FLAGS_RETRY
@@ -826,7 +827,7 @@ class RFM9x:
                     ):
                         # delay before sending Ack to give receiver a chance to get ready
                         if self.ack_delay is not None:
-                            time.sleep(self.ack_delay)
+                            tasko.sleep(self.ack_delay)
                         # send ACK packet to sender (data is b'!')
                         self.send(
                             b"!",
