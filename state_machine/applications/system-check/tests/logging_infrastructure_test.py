@@ -23,7 +23,7 @@ def run(hardware_dict, result_dict):
     for i in range(18):
         msg = 'x' * 100
         log(msg, 1000)
-    
+
     # check that log000.txt and log001.txt were created
     logfile1 = get_logfile_name(0)
     logfile2 = get_logfile_name(1)
@@ -32,7 +32,7 @@ def run(hardware_dict, result_dict):
 
     print(f"/sd/ directory: {listdir('/sd/')}")
     print(f"/sd/logs/ directory: {listdir('/sd/logs/')}")
-    
+
     # update result dictionary
     if logfile1_created and logfile2_created:
         result_string = """Log and new log functions are working;
