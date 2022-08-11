@@ -51,32 +51,13 @@ class task(Task):
             if heard_something:
                 response = cubesat.radio.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED)
                 if response is not None:
-                    self.debug(f'Recieved msg "{response}", RSSI: {cubesat.radio.last_rssi - 137}')
-                    # Processing recieved messages goes here
-                    #  - Execute commands
-                    #  - Mark messages as received (and remove from tq)
-
                     header = response[0]
                     response = response[1:]  # remove the header byte
 
-                    if header == headers.NAIVE_START:
-                        txt = str(response, 'ascii')
-                        self.msg = txt
-                        self.last = txt
-                        print('Started recieving message')
-                    elif header == headers.NAIVE_MID:
-                        txt = str(response, 'ascii')
-                        if txt == self.last:
-                            print('Repeated message')
-                        else:
-                            self.msg += txt
-                            self.last = txt
-                            print('Continued recieving message')
-                    elif header == headers.NAIVE_END:
-                        txt = str(response, 'ascii')
-                        self.msg += txt
-                        print('Finished recieving message')
-                        print(self.msg)
+                    self.debug(f'Recieved msg "{response}", RSSI: {self.cubesat.radio.last_rssi - 137}')
+
+                    if header == headers.NAIVE_START or header == headers.NAIVE_MID or header == headers.NAIVE_END:
+                        self.handle_naive(header, response)
 
                     # Begin Old Beacon Task Code
                     if len(response) >= 6:
@@ -128,4 +109,24 @@ class task(Task):
 
             if tq.peek().done():
                 tq.pop()
-        cubesat.radio.sleep()
+        self.cubesat.radio.sleep()
+
+    def handle_naive(self, header, response):
+        if header == headers.NAIVE_START:
+            txt = str(response, 'ascii')
+            self.msg = txt
+            self.last = txt
+            print('Started recieving message')
+        elif header == headers.NAIVE_MID:
+            txt = str(response, 'ascii')
+            if txt == self.last:
+                print('Repeated message')
+            else:
+                self.msg += txt
+                self.last = txt
+                print('Continued recieving message')
+        elif header == headers.NAIVE_END:
+            txt = str(response, 'ascii')
+            self.msg += txt
+            print('Finished recieving message')
+            print(self.msg)
