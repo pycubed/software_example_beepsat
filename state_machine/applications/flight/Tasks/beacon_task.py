@@ -61,4 +61,8 @@ class task(Task):
         print(f'Acceleration: {acc}')
         print(f'Magnetic: {mag}')
         print(f'State: {cubesat.state_machine.state}')
-        return struct.pack("f" * 11, cpu_temp, imu_temp, gyro[0], gyro[1], gyro[2], acc[0], acc[1], acc[2], mag[0], mag[1], mag[2])
+        return struct.pack("f" * 11,
+                           cpu_temp, imu_temp,
+                           gyro[0], gyro[1], gyro[2],
+                           acc[0], acc[1], acc[2],
+                           mag[0], mag[1], mag[2])
