@@ -33,6 +33,10 @@ class task(Task):
             self.debug_status(vbatt, temp)
 
     async def main_task(self):
+        """
+        If the voltage is too low or the temp is to high, switch to safe mode.
+        If the voltage is high enough and the temp is low enough, switch to normal mode.
+        """
         vbatt = cubesat.battery_voltage()
         temp = cubesat.temperature_cpu()
         if cubesat.state_machine.state == 'Safe':
