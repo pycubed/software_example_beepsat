@@ -100,12 +100,12 @@ class task(Task):
             self.debug(f"Sending packet: {debug_packet}")
 
             if with_ack:
-                if await cubesat.radio.send_with_ack(packet):
+                if cubesat.radio.send_with_ack(packet):
                     msg.ack()
                 else:
                     msg.no_ack()
             else:
-                await cubesat.radio.send(packet, keep_listening=True)
+                cubesat.radio.send(packet, keep_listening=True)
 
             if tq.peek().done():
                 tq.pop()
