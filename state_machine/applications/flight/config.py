@@ -1,7 +1,7 @@
 config = {
     "Normal": {
         "Tasks": {
-            "Battery": {
+            "Safety": {
                 "Interval": 10,
                 "Priority": 3,
                 "ScheduleLater": False
@@ -26,7 +26,7 @@ config = {
                 "Priority": 4,
                 "ScheduleLater": False
             },
-            "Detumble": {
+            "GNC": {
                 "Interval": 0.1,
                 "Priority": 3,
                 "ScheduleLater": False
@@ -38,13 +38,13 @@ config = {
             },
         },
         "StepsTo": [
-            "LowPower",
+            "Safe",
             "DeTumble"
         ]
     },
-    "LowPower": {
+    "Safe": {
         "Tasks": {
-            "Battery": {
+            "Safety": {
                 "Interval": 15.0,
                 "Priority": 1,
                 "ScheduleLater": False
@@ -64,7 +64,7 @@ config = {
     },
     "DeTumble": {
         "Tasks": {
-            "Battery": {
+            "Safety": {
                 "Interval": 15.0,
                 "Priority": 3,
                 "ScheduleLater": False

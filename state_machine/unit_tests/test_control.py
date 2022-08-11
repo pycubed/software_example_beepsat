@@ -6,10 +6,10 @@ sys.path.insert(0, './state_machine/drivers/emulation')
 sys.path.insert(0, './state_machine/applications/flight')
 sys.path.insert(0, './state_machine/frame')
 
-from Tasks.detumble import bcross  # noqa: E402
+from lib.control import bcross
 
 
-class MiscTests(unittest.TestCase):
+class BCrossTest(unittest.TestCase):
 
     def test(self):
         b = [0, 2, 3]
