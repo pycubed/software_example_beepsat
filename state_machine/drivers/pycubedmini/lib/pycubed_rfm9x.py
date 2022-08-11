@@ -395,9 +395,9 @@ class RFM9x:
         """Perform a reset of the chip."""
         # See section 7.2.2 of the datasheet for reset description.
         self._reset.switch_to_output(value=False)
-        tasko.sleep(0.0001)  # 100 us
+        time.sleep(0.0001)  # 100 us
         self._reset.switch_to_input(pull=digitalio.Pull.UP)
-        tasko.sleep(0.005)  # 5 ms
+        time.sleep(0.005)  # 5 ms
 
     def idle(self):
         """Enter idle standby mode."""
