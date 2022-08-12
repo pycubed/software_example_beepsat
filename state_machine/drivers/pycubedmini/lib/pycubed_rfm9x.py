@@ -16,7 +16,7 @@ import random
 import time
 import adafruit_bus_device.spi_device as spidev
 from micropython import const
-import asyncio
+import tasko
 
 HAS_SUPERVISOR = False
 
@@ -683,7 +683,7 @@ class RFM9x:
         return (self._read_u8(_RH_RF95_REG_12_IRQ_FLAGS) & 0x20) >> 5
 
     # pylint: disable=too-many-branches
-    def send(
+    async def send(
         self,
         data: ReadableBuffer,
         *,
@@ -749,11 +749,15 @@ class RFM9x:
             while not timed_out and not self.tx_done():
                 if ticks_diff(supervisor.ticks_ms(), start) >= self.xmit_timeout * 1000:
                     timed_out = True
+                else:
+                    await tasko.sleep(0)
         else:
             start = time.monotonic()
             while not timed_out and not self.tx_done():
                 if time.monotonic() - start >= self.xmit_timeout:
                     timed_out = True
+                else:
+                    await tasko.sleep(0)
         # Listen again if necessary and return the result packet.
         if keep_listening:
             self.listen()
@@ -764,7 +768,7 @@ class RFM9x:
         self._write_u8(_RH_RF95_REG_12_IRQ_FLAGS, 0xFF)
         return not timed_out
 
-    def send_with_ack(self, data: ReadableBuffer) -> bool:
+    async def send_with_ack(self, data: ReadableBuffer) -> bool:
         """Reliable Datagram mode:
         Send a packet with data and wait for an ACK response.
         The packet header is automatically generated.
@@ -778,13 +782,13 @@ class RFM9x:
         self.sequence_number = (self.sequence_number + 1) & 0xFF
         while not got_ack and retries_remaining:
             self.identifier = self.sequence_number
-            self.send(data, keep_listening=True)
+            await self.send(data, keep_listening=True)
             # Don't look for ACK from Broadcast message
             if self.destination == _RH_BROADCAST_ADDRESS:
                 got_ack = True
             else:
                 # wait for a packet from our destination
-                ack_packet = self.receive(timeout=self.ack_wait, with_header=True)
+                ack_packet = await self.receive(timeout=self.ack_wait, with_header=True)
                 if ack_packet is not None:
                     if ack_packet[3] & _RH_FLAGS_ACK:
                         # check the ID
@@ -794,14 +798,14 @@ class RFM9x:
             # pause before next retry -- random delay
             if not got_ack:
                 # delay by random amount before next try
-                time.sleep(self.ack_wait + self.ack_wait * random.random())
+                await tasko.sleep(self.ack_wait + self.ack_wait * random.random())
             retries_remaining = retries_remaining - 1
             # set retry flag in packet header
             self.flags |= _RH_FLAGS_RETRY
         self.flags = 0  # clear flags
         return got_ack
 
-    def receive(
+    async def receive(
         self,
         *,
         keep_listening: bool = True,
@@ -839,11 +843,15 @@ class RFM9x:
                 while not timed_out and not self.rx_done():
                     if ticks_diff(supervisor.ticks_ms(), start) >= timeout * 1000:
                         timed_out = True
+                    else:
+                        await tasko.sleep(0)
             else:
                 start = time.monotonic()
                 while not timed_out and not self.rx_done():
                     if time.monotonic() - start >= timeout:
                         timed_out = True
+                    else:
+                        await tasko.sleep(0)
         # Payload ready is set, a packet is in the FIFO.
         packet = None
         # save last RSSI reading
@@ -890,7 +898,7 @@ class RFM9x:
                         if self.ack_delay is not None:
                             time.sleep(self.ack_delay)
                         # send ACK packet to sender (data is b'!')
-                        self.send(
+                        await self.send(
                             b"!",
                             destination=packet[1],
                             node=packet[0],

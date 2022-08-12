@@ -47,48 +47,46 @@ class task(Task):
         if tq.empty():
             self.debug("No packets to send")
             cubesat.radio.listen()
-            heard_something = await cubesat.radio.await_rx(timeout=10)
-            if heard_something:
-                response = cubesat.radio.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED)
-                if response is not None:
-                    header = response[0]
-                    response = response[1:]  # remove the header byte
+            response = await cubesat.radio.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED, timeout=10)
+            if response is not None:
+                header = response[0]
+                response = response[1:]  # remove the header byte
 
-                    self.debug(f'Recieved msg "{response}", RSSI: {self.cubesat.radio.last_rssi - 137}')
+                self.debug(f'Recieved msg "{response}", RSSI: {self.cubesat.radio.last_rssi - 137}')
 
-                    if header == headers.NAIVE_START or header == headers.NAIVE_MID or header == headers.NAIVE_END:
-                        self.handle_naive(header, response)
+                if header == headers.NAIVE_START or header == headers.NAIVE_MID or header == headers.NAIVE_END:
+                    self.handle_naive(header, response)
 
-                    # Begin Old Beacon Task Code
-                    if len(response) >= 6:
-                        if not ANTENNA_ATTACHED:
-                            self.debug('Antenna not attached. Skipping over-the-air command handling')
-                        else:
-                            if response[:4] == self.super_secret_code:
-                                cmd = bytes(response[4:6])  # [pass-code(4 bytes)] [cmd 2 bytes] [args]
-                                cmd_args = None
-                                if len(response) > 6:
-                                    self.debug('command with args', 2)
-                                    try:
-                                        cmd_args = response[6:]  # arguments are everything after
-                                        self.debug(f'cmd args: {cmd_args}', 2)
-                                    except Exception as e:
-                                        self.debug(f'arg decoding error: {e}', 2)
-                                if cmd in cdh.commands:
-                                    try:
-                                        if cmd_args is None:
-                                            self.debug(f'running {cdh.commands[cmd]} (no args)')
-                                            self.cmd_dispatch[cdh.commands[cmd]](self)
-                                        else:
-                                            self.debug(f'running {cdh.commands[cmd]} (with args: {cmd_args})')
-                                            self.cmd_dispatch[cdh.commands[cmd]](self, cmd_args)
-                                    except Exception as e:
-                                        self.debug(f'something went wrong: {e}')
-                                        cubesat.radio.send(str(e).encode())
-                                else:
-                                    self.debug('invalid command!')
-                                    cubesat.radio.send(b'invalid cmd' + response[4:])
-                    # End Old Beacon Task Code
+                # Begin Old Beacon Task Code
+                if len(response) >= 6:
+                    if not ANTENNA_ATTACHED:
+                        self.debug('Antenna not attached. Skipping over-the-air command handling')
+                    else:
+                        if response[:4] == self.super_secret_code:
+                            cmd = bytes(response[4:6])  # [pass-code(4 bytes)] [cmd 2 bytes] [args]
+                            cmd_args = None
+                            if len(response) > 6:
+                                self.debug('command with args', 2)
+                                try:
+                                    cmd_args = response[6:]  # arguments are everything after
+                                    self.debug(f'cmd args: {cmd_args}', 2)
+                                except Exception as e:
+                                    self.debug(f'arg decoding error: {e}', 2)
+                            if cmd in cdh.commands:
+                                try:
+                                    if cmd_args is None:
+                                        self.debug(f'running {cdh.commands[cmd]} (no args)')
+                                        self.cmd_dispatch[cdh.commands[cmd]](self)
+                                    else:
+                                        self.debug(f'running {cdh.commands[cmd]} (with args: {cmd_args})')
+                                        self.cmd_dispatch[cdh.commands[cmd]](self, cmd_args)
+                                except Exception as e:
+                                    self.debug(f'something went wrong: {e}')
+                                    cubesat.radio.send(str(e).encode())
+                            else:
+                                self.debug('invalid command!')
+                                cubesat.radio.send(b'invalid cmd' + response[4:])
+                # End Old Beacon Task Code
             else:
                 self.debug('No packets received')
         elif should_transmit():
