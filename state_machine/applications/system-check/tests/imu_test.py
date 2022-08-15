@@ -88,7 +88,7 @@ def check_gravity_acc(acc_readings):
         zdir = abs(abs(numpy.dot(acc, numpy.array([0, 0, 1]))) - 9.8) < 1
         readings_correct_array.append([xdir, ydir, zdir])
 
-    # if there is a True value in each subarray, find its index 
+    # if there is a True value in each subarray, find its index
     # (x = 0, y = 1, z = 2)
     correct_directions = []
     for i in range(3):
@@ -128,7 +128,7 @@ def gravity_imu_test(result_dict):
     xdir, ydir, zdir = xyz_correct
 
     if result:
-        result_string = f"""Accelerometer read g as approx. 9.8 m/s^2 in 
+        result_string = f"""Accelerometer read g as approx. 9.8 m/s^2 in
 all 3 directions. x: {xdir}, y: {ydir}, z: {zdir}"""
         print(result_string)
         result_dict["IMU_AccGravity"] = (result_string, True)
@@ -209,7 +209,7 @@ def run(hardware_dict, result_dict):
     """
     If initialized correctly, run tests and update result dictionary
     If not initialized, update result dictionary.
-    Tests include: 
+    Tests include:
     - Check gyro reading is near 0 when stationary
     - Check accelerometer reads g correctly in all 3 directions
     - Check gyro reading is more than 1 when rotated
