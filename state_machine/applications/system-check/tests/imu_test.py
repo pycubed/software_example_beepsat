@@ -16,8 +16,8 @@ norm = numpy.linalg.norm
 
 def request_imu_data(prompt):
     """
-    Print the given prompt and ask the user the start/cancel the test
-    Collect IMU readings and return
+    Prompt the user to start/cancel IMU readings
+    Return IMU readings
     """
 
     print(prompt)
@@ -48,78 +48,10 @@ def request_imu_data(prompt):
     return acc_average, gyro_average, mag_change
 
 
-def check_gravity_acc(acc1, acc2, acc3):
-    # acc1 directions
-    xdir1 = abs(norm(numpy.dot(acc1, [1, 0, 0])) - 9.8) < 1
-    ydir1 = abs(norm(numpy.dot(acc1, [0, 1, 0])) - 9.8) < 1
-    zdir1 = abs(norm(numpy.dot(acc1, [0, 0, 1])) - 9.8) < 1
-
-    # acc2 directions
-    xdir2 = abs(norm(numpy.dot(acc2, [1, 0, 0])) - 9.8) < 1
-    ydir2 = abs(norm(numpy.dot(acc2, [0, 1, 0])) - 9.8) < 1
-    zdir2 = abs(norm(numpy.dot(acc2, [0, 0, 1])) - 9.8) < 1
-
-    # acc3 directions
-    xdir3 = abs(norm(numpy.dot(acc3, [1, 0, 0])) - 9.8) < 1
-    ydir3 = abs(norm(numpy.dot(acc3, [0, 1, 0])) - 9.8) < 1
-    zdir3 = abs(norm(numpy.dot(acc3, [0, 0, 1])) - 9.8) < 1
-
-    # put everything in an array and count # of true values
-    accboolarr = [xdir1, ydir1, zdir1, xdir2, ydir2,
-                  zdir2, xdir3, ydir3, zdir3]
-    count = 0
-    for accbool in accboolarr:
-        if accbool:
-            count += 1
-
-    return count == 3
-
-
-def gravity_imu_test(result_dict):
-    # TODO: refactor this
-
-    # get readings from all 3 sides
-    prompt1 = "Please leave the cubesat flat on one side."
-    res1 = request_imu_data(prompt1)
-    if res1 is None:
-        result_dict["IMU_AccGravity"] = (
-            "Gravity test not completed.", None)
-        return result_dict
-    acc1, _, _ = res1
-
-    prompt2 = "Please leave the cubesat flat on another side."
-    res2 = request_imu_data(prompt2)
-    if res2 is None:
-        result_dict["IMU_AccGravity"] = (
-            "Gravity test not completed.", None)
-        return result_dict
-    acc2, _, _ = res2
-
-    prompt3 = "Please leave the cubesat flat on another side."
-    res3 = request_imu_data(prompt3)
-    if res3 is None:
-        result_dict["IMU_AccGravity"] = (
-            "Gravity test not completed.", None)
-        return result_dict
-    acc3, _, _ = res3
-
-    result = check_gravity_acc(acc1, acc2, acc3)
-    if result:
-        result_string = "X, Y, and Z directions successful in reading g m/s^2."
-        print(result_string)
-        result_dict["IMU_AccGravity"] = (result_string, True)
-    else:
-        result_string = "Failed to read g m/s^2 in at least one direction."
-        print(result_string)
-        result_dict["IMU_AccGravity"] = (result_string, False)
-    return result_dict
-
-
 def stationary_imu_test(result_dict):
     """
     Check that norm of gyro is near 0
     """
-    # prompt user and get imu data
     prompt = "Please leave the cubesat stationary on a table."
     res = request_imu_data(prompt)
 
@@ -130,46 +62,107 @@ def stationary_imu_test(result_dict):
 
     _, gyro, _ = res
     gyro_string = f"Gyro: {tuple(gyro)} (deg/s)"
-    gyro_is_stationary = norm(gyro) < 1
+    gyro_stationary = norm(gyro) < 1
 
-    # print result to user
-    if gyro_is_stationary:
+    if gyro_stationary:
         print("Stationary gyroscope reading is near 0 deg/s.")
     else:
-        print("Stationary gyroscope reading is not near 0 deg/s.")
+        print(f"Gyro reading is too large with norm {norm(gyro)} ≥ 1 deg/s.")
 
-    # update result dictionary
-    result_dict["IMU_GyroStationary"] = (gyro_string, gyro_is_stationary)
+    result_dict["IMU_GyroStationary"] = (gyro_string, gyro_stationary)
+    return result_dict
+
+
+def check_gravity_acc(acc_readings):
+    """
+    Given 3 sets of acc readings, check that each set has one
+    correct reading for g, in any order
+    """
+
+    # note if x, y, z readings are correct for each acc value, add to
+    # readings_correct_array
+    readings_correct_array = []
+    for acc in acc_readings:
+        xdir = abs(abs(numpy.dot(acc, numpy.array([1, 0, 0]))) - 9.8) < 1
+        ydir = abs(abs(numpy.dot(acc, numpy.array([0, 1, 0]))) - 9.8) < 1
+        zdir = abs(abs(numpy.dot(acc, numpy.array([0, 0, 1]))) - 9.8) < 1
+        readings_correct_array.append([xdir, ydir, zdir])
+
+    # if there is a True value in each subarray, find its index 
+    # (x = 0, y = 1, z = 2)
+    correct_directions = []
+    for i in range(3):
+        correct_index = -1
+        if True in readings_correct_array[i]:
+            correct_index = readings_correct_array[i].index(True)
+        correct_directions.append(correct_index)
+
+    # populate xyz_correct and return
+    # if a direction's index is in correct_directions, we read g correct in
+    # that direction at least once
+    xyz_correct = [(i in correct_directions) for i in range(3)]
+    result = xyz_correct == [True, True, True]
+    return result, xyz_correct
+
+
+def gravity_imu_test(result_dict):
+    """
+    Check that we read g correctly in all 3 directions, given any user
+    input order
+    """
+    # get readings from all 3 sides
+    acc_readings = []
+    for i in range(3):
+        prompt = "Please leave the cubesat flat on one side."
+        if i > 0:
+            prompt = "Please leave the cubesat flat on another side."
+        res = request_imu_data(prompt)
+        if res is None:
+            result_dict["IMU_AccGravity"] = (
+                "Gravity test not completed.", None)
+            return result_dict
+        acc, _, _ = res
+        acc_readings.append(numpy.array(acc))
+
+    result, xyz_correct = check_gravity_acc(acc_readings)
+    xdir, ydir, zdir = xyz_correct
+
+    if result:
+        result_string = f"""Accelerometer read g as approx. 9.8 m/s^2 in 
+all 3 directions. x: {xdir}, y: {ydir}, z: {zdir}"""
+        print(result_string)
+        result_dict["IMU_AccGravity"] = (result_string, True)
+    else:
+        result_string = f"""Failed to read g m/s^2 in all 3 directions.
+x: {xdir}, y: {ydir}, z: {zdir}"""
+        print(result_string)
+        result_dict["IMU_AccGravity"] = (result_string, False)
     return result_dict
 
 
 def rotating_imu_test(result_dict):
     """
-    Check that the norm of gyro is more than 0
+    Check that the norm of gyro is greater than 1
     """
-    # prompt user and get imu data
-    prompt = f"""Please rotate the cubesat as best as possible for {wait_time}
-seconds once you start the test."""
+    prompt = f"""Please rotate the cubesat for {wait_time} seconds
+once you start the test."""
     res = request_imu_data(prompt)
 
     if res is None:
-        # user entered "n", cancel the test
         result_dict["IMU_GyroRotating"] = (
             "Rotating test not completed.", None)
         return result_dict
 
     _, gyro, _ = res
     gyro_string = (f"Gyro: {tuple(gyro)} (deg/s)")
-    gyro_is_rotating = norm(gyro) >= 1
+    gyro_rotating = norm(gyro) >= 1
 
-    # print result to user
-    if gyro_is_rotating:
-        print("Rotating gyroscope reading is approx. greater than 0 deg/s.")
+    if gyro_rotating:
+        print(f"Gyro reading is too small with norm {norm(gyro)} ≤ 1 deg/s.")
     else:
         print("Rotating gyroscope reading is near 0 deg/s.")
 
-    # update result dictionary
-    result_dict["IMU_GyroRotating"] = (gyro_string, gyro_is_rotating)
+    result_dict["IMU_GyroRotating"] = (gyro_string, gyro_rotating)
     return result_dict
 
 
@@ -178,28 +171,24 @@ def magnet_imu_test(result_dict):
     Check that the magnetometer reading increased as the magnet was
     moved closer
     """
-    # prompt user and get imu data
     prompt = f"""Please slowly move the magnet closer to the cubesat for
 {wait_time} seconds once you start the test."""
     res = request_imu_data(prompt)
 
     if res is None:
-        # user entered "n", cancel the test
         result_dict["IMU_MagMagnet"] = ("Magnet test not completed.", None)
         return result_dict
 
     _, _, mag = res
     mag_string = (f"Change in Mag Reading: {mag} (µT)")
-    mag_is_increasing = mag >= 10
+    mag_increasing = mag >= 10
 
-    # print result to user
-    if mag_is_increasing:
+    if mag_increasing:
         print("Magnetometer reading is increasing.")
     else:
         print("Magnetometer reading is not increasing.")
 
-    # update result dictionary
-    result_dict["IMU_MagMagnet"] = (mag_string, mag_is_increasing)
+    result_dict["IMU_MagMagnet"] = (mag_string, mag_increasing)
     return result_dict
 
 
@@ -208,22 +197,24 @@ def temp_imu_test(result_dict):
     Verify that the temperature sensor on the IMU returns a reasonable
     value
     """
-    # collect temperature reading, print to user
     temp = cubesat.temperature_imu()
-    print(f"IMU Temperature Reading: {temp} degrees Celsius")
-    result_val_bool = temp >= 20 and temp <= 80
+    print(f"IMU Temperature Reading: {temp} °C.")
+    temp_in_range = 20 <= temp <= 80
 
-    # update result dict based on user input
-    result_dict["IMU_Temp"] = (f"Temperature: {temp}", result_val_bool)
+    result_dict["IMU_Temp"] = (f"Temperature: {temp} °C", temp_in_range)
     return result_dict
 
 
 def run(hardware_dict, result_dict):
     """
-    Check the IMU when the cubesat is stationary, moving, rotating,
-    and around a magnetic field. Also check the IMU temperature sensor
-    If initialized correctly, run test and update result dictionary
-    If not initialized, update result dictionary
+    If initialized correctly, run tests and update result dictionary
+    If not initialized, update result dictionary.
+    Tests include: 
+    - Check gyro reading is near 0 when stationary
+    - Check accelerometer reads g correctly in all 3 directions
+    - Check gyro reading is more than 1 when rotated
+    - Check magnetometer readings increase as a magnet is moved closer
+    - Check the temperature is within a reasonable range
     """
 
     # if no IMU detected, update result dictionary and return
