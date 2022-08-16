@@ -20,6 +20,7 @@ class StateMachine:
         from StateMachineConfig import config, TaskMap, TransitionFunctionMap
 
         self.config = config
+        self.transition_function_map = TransitionFunctionMap
         validate_config(config, TaskMap, TransitionFunctionMap)
 
         self.states = list(config.keys())
@@ -50,11 +51,11 @@ class StateMachine:
 
         # execute transition functions
         if self.state != state_name:
-            for fn in config[self.state]['ExitFunctions']:
-                fn = TransitionFunctionMap[fn]
+            for fn in self.config[self.state]['ExitFunctions']:
+                fn = self.transition_function_map[fn]
                 fn(self.state, state_name, cubesat)
-            for fn in config[state_name]['EnterFunctions']:
-                fn = TransitionFunctionMap[fn]
+            for fn in self.config[state_name]['EnterFunctions']:
+                fn = self.transition_function_map[fn]
                 fn(self.state, state_name, cubesat)
 
         # reschedule tasks
