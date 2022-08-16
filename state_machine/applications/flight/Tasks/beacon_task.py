@@ -5,6 +5,7 @@ import lib.transmission_queue as tq
 from lib.message import Message
 from lib.naive import NaiveMessage
 from lib.pycubed import cubesat, HardwareInitException
+from state_machine import state_machine
 import struct
 
 msg = """"Did you ever hear the tragedy of Darth Plagueis the Wise?"
@@ -55,14 +56,17 @@ class task(Task):
         gyro = cubesat.gyro
         acc = cubesat.acceleration
         mag = cubesat.magnetic
+        state_byte = state_machine.states.index(state_machine.state)
+        state_byte = bytes([state_byte])
         print(f'CPU temp: {cpu_temp}')
         print(f'IMU temp: {imu_temp}')
         print(f'Gyro: {gyro}')
         print(f'Acceleration: {acc}')
         print(f'Magnetic: {mag}')
-        print(f'State: {cubesat.state_machine.state}')
-        return struct.pack("f" * 11,
-                           cpu_temp, imu_temp,
+        print(f'State: {state_machine.state} [{state_byte}]')
+        format = 'c' + 'f' * 11  # 1 char + 11 floats
+        return struct.pack(format,
+                           state_byte, cpu_temp, imu_temp,
                            gyro[0], gyro[1], gyro[2],
                            acc[0], acc[1], acc[2],
                            mag[0], mag[1], mag[2])

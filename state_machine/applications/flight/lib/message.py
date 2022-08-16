@@ -13,7 +13,8 @@ class Message:
         self.header = 0x00
         if isinstance(str, bytes) or isinstance(str, bytearray):
             self.str = str
-        self.str = bytes(str, 'ascii')
+        else:
+            self.str = bytes(str, 'ascii')
 
     def packet(self):
         """Returns the byte representation of the message, and if it should be sent with or without ack."""
