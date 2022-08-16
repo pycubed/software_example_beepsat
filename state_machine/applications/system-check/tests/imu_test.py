@@ -120,7 +120,7 @@ def gravity_imu_test(result_dict):
     xdir, ydir, zdir = xyz_correct
 
     if result:
-        result_string = f"""Accelerometer read g as approx. 9.8 m/s^2 in 
+        result_string = f"""Accelerometer read g as approx. 9.8 m/s^2 in
 all 3 directions. x: {xdir}, y: {ydir}, z: {zdir}"""
     else:
         result_string = f"""Failed to read g m/s^2 in all 3 directions.
@@ -196,7 +196,7 @@ def run(hardware_dict, result_dict):
     """
     If initialized correctly, run tests and update result dictionary
     If not initialized, update result dictionary.
-    Tests include: 
+    Tests include:
     - Check gyro reading is near 0 when stationary
     - Check accelerometer reads g correctly in all 3 directions
     - Check gyro reading is more than 1 when rotated
