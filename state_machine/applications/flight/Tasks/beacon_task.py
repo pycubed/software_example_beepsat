@@ -57,14 +57,13 @@ class task(Task):
         acc = cubesat.acceleration
         mag = cubesat.magnetic
         state_byte = state_machine.states.index(state_machine.state)
-        state_byte = bytes([state_byte])
         print(f'CPU temp: {cpu_temp}')
         print(f'IMU temp: {imu_temp}')
         print(f'Gyro: {gyro}')
         print(f'Acceleration: {acc}')
         print(f'Magnetic: {mag}')
         print(f'State: {state_machine.state} [{state_byte}]')
-        format = 'c' + 'f' * 11  # 1 char + 11 floats
+        format = 'b' + 'f' * 11  # 1 char + 11 floats
         return struct.pack(format,
                            state_byte, cpu_temp, imu_temp,
                            gyro[0], gyro[1], gyro[2],
