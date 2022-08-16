@@ -22,8 +22,7 @@ hardware_dict = pycubed._cubesat.hardware
 result_dict = {
     "LoggingInfrastructure_Test": ("", False),
     "Basic_SDCard_Test": ("", False),
-    "IMU_AccStationary": ("", False),
-    "IMU_AccMoving": ("", False),
+    "IMU_AccGravity": ("", False),
     "IMU_GyroStationary": ("", False),
     "IMU_GyroRotating": ("", False),
     "IMU_MagMagnet": ("", False),
