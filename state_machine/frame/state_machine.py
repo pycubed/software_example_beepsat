@@ -45,7 +45,7 @@ class StateMachine:
         """Switches the state of the cubesat to the new state"""
 
         # prevent (or allow forced) illegal transitions
-        if not(state_name in self.config[self.state]['StepsTo'] or force):
+        if not (state_name in self.config[self.state]['StepsTo'] or force):
             raise ValueError(
                 f'You cannot transition from {self.state} to {state_name}')
 
