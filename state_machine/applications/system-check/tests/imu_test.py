@@ -43,14 +43,13 @@ def request_imu_data(prompt):
     gyro_average = gyro_total / 10
     mag_change = norm(end_mag - start_mag)
 
-    # return average acc, average gyro, change in mag
     print("Data Collection Complete")
     return acc_average, gyro_average, mag_change
 
 
 def stationary_imu_test(result_dict):
     """
-    Check that norm of gyro is near 0
+    Check that norm of gyro is less than 1 deg/s
     """
     prompt = "Please leave the cubesat stationary on a table."
     res = request_imu_data(prompt)
@@ -58,19 +57,19 @@ def stationary_imu_test(result_dict):
     if res is None:
         result_dict["IMU_GyroStationary"] = (
             "Stationary test not completed.", None)
-        return result_dict
+        return
 
     _, gyro, _ = res
     gyro_string = f"Gyro: {tuple(gyro)} (deg/s)"
     gyro_stationary = norm(gyro) < 1
 
     if gyro_stationary:
-        print("Stationary gyroscope reading is near 0 deg/s.")
+        print(f"Stationary gyroscope reading has norm {norm(gyro)} < 1 deg/s.")
     else:
         print(f"Gyro reading is too large with norm {norm(gyro)} ≥ 1 deg/s.")
 
     result_dict["IMU_GyroStationary"] = (gyro_string, gyro_stationary)
-    return result_dict
+    return
 
 
 def check_gravity_acc(acc_readings):
@@ -79,27 +78,20 @@ def check_gravity_acc(acc_readings):
     correct reading for g, in any order
     """
 
-    # note if x, y, z readings are correct for each acc value, add to
-    # readings_correct_array
-    readings_correct_array = []
+    # note if x, y, z readings are correct for each acc value
+    # if there is a True value, find its index (x = 0, y = 1, z = 2)
+    correct_directions = []
     for acc in acc_readings:
+        correct_index = -1
         xdir = abs(abs(numpy.dot(acc, numpy.array([1, 0, 0]))) - 9.8) < 1
         ydir = abs(abs(numpy.dot(acc, numpy.array([0, 1, 0]))) - 9.8) < 1
         zdir = abs(abs(numpy.dot(acc, numpy.array([0, 0, 1]))) - 9.8) < 1
-        readings_correct_array.append([xdir, ydir, zdir])
-
-    # if there is a True value in each subarray, find its index
-    # (x = 0, y = 1, z = 2)
-    correct_directions = []
-    for i in range(3):
-        correct_index = -1
-        if True in readings_correct_array[i]:
-            correct_index = readings_correct_array[i].index(True)
+        if True in [xdir, ydir, zdir]:
+            correct_index = [xdir, ydir, zdir].index(True)
         correct_directions.append(correct_index)
 
-    # populate xyz_correct and return
     # if a direction's index is in correct_directions, we read g correct in
-    # that direction at least once
+    # that direction at least once. populate xyz_correct
     xyz_correct = [(i in correct_directions) for i in range(3)]
     result = xyz_correct == [True, True, True]
     return result, xyz_correct
@@ -120,7 +112,7 @@ def gravity_imu_test(result_dict):
         if res is None:
             result_dict["IMU_AccGravity"] = (
                 "Gravity test not completed.", None)
-            return result_dict
+            return
         acc, _, _ = res
         acc_readings.append(numpy.array(acc))
 
@@ -128,16 +120,14 @@ def gravity_imu_test(result_dict):
     xdir, ydir, zdir = xyz_correct
 
     if result:
-        result_string = f"""Accelerometer read g as approx. 9.8 m/s^2 in
+        result_string = f"""Accelerometer read g as approx. 9.8 m/s^2 in 
 all 3 directions. x: {xdir}, y: {ydir}, z: {zdir}"""
-        print(result_string)
-        result_dict["IMU_AccGravity"] = (result_string, True)
     else:
         result_string = f"""Failed to read g m/s^2 in all 3 directions.
 x: {xdir}, y: {ydir}, z: {zdir}"""
-        print(result_string)
-        result_dict["IMU_AccGravity"] = (result_string, False)
-    return result_dict
+
+    print(result_string)
+    result_dict["IMU_AccGravity"] = (result_string, result)
 
 
 def rotating_imu_test(result_dict):
@@ -151,19 +141,18 @@ once you start the test."""
     if res is None:
         result_dict["IMU_GyroRotating"] = (
             "Rotating test not completed.", None)
-        return result_dict
+        return
 
     _, gyro, _ = res
     gyro_string = (f"Gyro: {tuple(gyro)} (deg/s)")
     gyro_rotating = norm(gyro) >= 1
 
     if gyro_rotating:
-        print(f"Gyro reading is too small with norm {norm(gyro)} ≤ 1 deg/s.")
+        print(f"Gyro reading is correct with norm {norm(gyro)} ≥ 1 deg/s.")
     else:
-        print("Rotating gyroscope reading is near 0 deg/s.")
+        print(f"Gyro reading is too small with norm {norm(gyro)} < 1 deg/s.")
 
     result_dict["IMU_GyroRotating"] = (gyro_string, gyro_rotating)
-    return result_dict
 
 
 def magnet_imu_test(result_dict):
@@ -177,19 +166,18 @@ def magnet_imu_test(result_dict):
 
     if res is None:
         result_dict["IMU_MagMagnet"] = ("Magnet test not completed.", None)
-        return result_dict
+        return
 
     _, _, mag = res
     mag_string = (f"Change in Mag Reading: {mag} (µT)")
     mag_increasing = mag >= 10
 
     if mag_increasing:
-        print("Magnetometer reading is increasing.")
+        print(f"Increase of magnetometer reading ({mag} µT) ≥ 10 µT")
     else:
-        print("Magnetometer reading is not increasing.")
+        print(f"Increase of magnetometer reading ({mag} µT) < 10 µT")
 
     result_dict["IMU_MagMagnet"] = (mag_string, mag_increasing)
-    return result_dict
 
 
 def temp_imu_test(result_dict):
@@ -202,14 +190,13 @@ def temp_imu_test(result_dict):
     temp_in_range = 20 <= temp <= 80
 
     result_dict["IMU_Temp"] = (f"Temperature: {temp} °C", temp_in_range)
-    return result_dict
 
 
 def run(hardware_dict, result_dict):
     """
     If initialized correctly, run tests and update result dictionary
     If not initialized, update result dictionary.
-    Tests include:
+    Tests include: 
     - Check gyro reading is near 0 when stationary
     - Check accelerometer reads g correctly in all 3 directions
     - Check gyro reading is more than 1 when rotated
