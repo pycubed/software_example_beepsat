@@ -74,14 +74,14 @@ def run(hardware_dict, result_dict):
 
     # if no SD Card detected, update result dictionary and return
     if not hardware_dict["SDcard"]:
-        result_dict["SDcard_Logging"] = (
+        result_dict["Basic_SDCard_Test"] = (
             "Cannot test logging; no SD Card detected", None)
         return result_dict
 
     # if SD Card detected, run other tests
-    print("Starting logging test...")
+    print("Starting Basic SD Card test...")
     result_val_string, result_val_bool = sd_test()
-    result_dict["SDcard_Logging"] = (result_val_string, result_val_bool)
-    print("Logging test complete.\n")
+    result_dict["Basic_SDCard_Test"] = (result_val_string, result_val_bool)
+    print("Basic SD Card test complete.\n")
 
     return result_dict
