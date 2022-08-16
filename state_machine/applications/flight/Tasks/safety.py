@@ -1,5 +1,5 @@
 from lib.template_task import Task
-import lib.pycubed as cubesat
+from lib.pycubed import cubesat
 
 
 class task(Task):
@@ -37,8 +37,8 @@ class task(Task):
         If the voltage is too low or the temp is to high, switch to safe mode.
         If the voltage is high enough and the temp is low enough, switch to normal mode.
         """
-        vbatt = cubesat.battery_voltage()
-        temp = cubesat.temperature_cpu()
+        vbatt = cubesat.battery_voltage
+        temp = cubesat.temperature_cpu
         if cubesat.state_machine.state == 'Safe':
             self.safe_mode(vbatt, temp)
         else:

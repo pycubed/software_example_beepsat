@@ -39,8 +39,26 @@ class Radio:
         return True
 
 
+"""
+Define HardwareInitException
+"""
+class HardwareInitException(Exception):
+    pass
+
+
 class Satellite:
     tasko = None
+    _RGB = (0, 0, 0)
+    vlowbatt = 4.0
+    BOOTTIME = time.monotonic()
+    data_cache = {}
+
+    # Max opperating temp on specsheet for ATSAMD51J19A (Celsius)
+    HIGH_TEMP = 125
+    # Min opperating temp on specsheet for ATSAMD51J19A (Celsius)
+    LOW_TEMP = -40
+    # Low battery voltage threshold
+    LOW_VOLTAGE = 4.0
 
     def __init__(self):
         self.task = None
@@ -60,90 +78,56 @@ class Satellite:
         self._cpu_temp = 30
         self.sim = False
 
+    @property
+    def acceleration(self):
+        """ return the accelerometer reading from the IMU """
+        reader.read(self)
+        return self._accel
 
-_cubesat = Satellite()
+    @property
+    def magnetic(self):
+        """ return the magnetometer reading from the IMU """
+        reader.read(self)
+        return self._mag
 
-"""
-IMU-related functions
-"""
+    @property
+    def gyro(self):
+        """ return the gyroscope reading from the IMU """
+        reader.read(self)
+        return self._gyro
 
-def acceleration():
-    """ return the accelerometer reading from the IMU """
-    reader.read(_cubesat)
-    return _cubesat._accel
+    @property
+    def temperature_imu(self):
+        """ return the thermometer reading from the IMU """
+        reader.read(self)
+        return 20  # Celsius
 
-def magnetic():
-    """ return the magnetometer reading from the IMU """
-    reader.read(_cubesat)
-    return _cubesat._mag
+    @property
+    def temperature_cpu(self):
+        """ return the temperature reading from the CPU in celsius """
+        return 50  # Celsius
 
-def gyro():
-    """ return the gyroscope reading from the IMU """
-    reader.read(_cubesat)
-    return _cubesat._gyro
+    @property
+    def RGB(self):
+        return self._RGB
 
-def temperature_imu():
-    """ return the thermometer reading from the IMU """
-    reader.read(_cubesat)
-    return 20  # Celsius
+    @RGB.setter
+    def RGB(self, v):
+        self._RGB = v
 
+    @property
+    def battery_voltage(self):
+        return 6.4
 
-"""
-Misc Functions
-"""
-RGB = (0, 0, 0)
-def setRGB(v):
-    global RGB
-    RGB = v
+    def log(self, str):
+        """Logs to sd card"""
+        str = (str[:20] + '...') if len(str) > 23 else str
+        print(f'log not implemented, tried to log: {str}')
 
-def getRGB():
-    return RGB
-
-def temperature_cpu():
-    """ return the temperature reading from the CPU in celsius """
-    return _cubesat._cpu_temp
-
-
-BOOTTIME = time.monotonic()
-data_cache = {}
-def battery_voltage():
-    return 6.4
-
-
-def sim():
-    return _cubesat.sim
-
-def log(self, str):
-    """Logs to sd card"""
-    str = (str[:20] + '...') if len(str) > 23 else str
-    print(f'log not implemented, tried to log: {str}')
+    @property
+    def sun_vector():
+        """Returns the sun pointing vector in the body frame"""
+        return array([0, 0, 0])
 
 
-"""
-Sun Sensor Functions
-"""
-
-def sun_vector():
-    """Returns the sun pointing vector in the body frame"""
-    return array([0, 0, 0])
-
-
-"""
-Radio related functions
-"""
-# send = _cubesat.radio.send
-# listen = _cubesat.radio.listen
-await_rx = _cubesat.radio.await_rx
-receive = _cubesat.radio.receive
-sleep = _cubesat.radio.sleep
-radio = _cubesat.radio
-
-"""
-Constants
-"""
-# Max opperating temp on specsheet for ATSAMD51J19A (Celsius)
-HIGH_TEMP = 125
-# Min opperating temp on specsheet for ATSAMD51J19A (Celsius)
-LOW_TEMP = -40
-# Low battery voltage threshold
-LOW_VOLTAGE = 4.0
+cubesat = Satellite()

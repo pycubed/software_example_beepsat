@@ -1,5 +1,5 @@
 from lib.debugcolor import co
-import lib.pycubed as cubesat
+from lib.pycubed import cubesat
 
 
 class Task:

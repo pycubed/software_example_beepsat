@@ -31,6 +31,7 @@ http: www.airspayce.com/mikem/arduino/RadioHead/
 
 ** MODIFIED FOR VR3X MISSION ** https://vr3x.space
 """
+import tasko
 import time
 import random
 import digitalio
@@ -642,7 +643,7 @@ class RFM9x:
         """crc status"""
         return (self._read_u8(_RH_RF95_REG_12_IRQ_FLAGS) & 0x20) >> 5
 
-    def send(
+    async def send(
         self,
         data,
         *,
@@ -698,10 +699,14 @@ class RFM9x:
         # Wait for tx done interrupt with explicit polling (not ideal but
         # best that can be done right now without interrupts).
         start = time.monotonic()
+
         timed_out = False
-        while not timed_out and not self.tx_done():
+        while not self.tx_done():
             if (time.monotonic() - start) >= self.xmit_timeout:
                 timed_out = True
+                break
+            else:
+                yield
         # Listen again if necessary and return the result packet.
         if keep_listening:
             self.listen()
@@ -712,7 +717,7 @@ class RFM9x:
         self._write_u8(_RH_RF95_REG_12_IRQ_FLAGS, 0xFF)
         return not timed_out
 
-    def send_with_ack(self, data):
+    async def send_with_ack(self, data):
         """Reliable Datagram mode:
            Send a packet with data and wait for an ACK response.
            The packet header is automatically generated.
@@ -723,11 +728,11 @@ class RFM9x:
         else:
             retries_remaining = 1
         got_ack = False
-        self.retry_counter=0 # ADDED FOR PYCUBED
+        self.retry_counter = 0  # ADDED FOR PYCUBED
         self.sequence_number = (self.sequence_number + 1) & 0xFF
         while not got_ack and retries_remaining:
             self.identifier = self.sequence_number
-            self.send(data, keep_listening=True)
+            await self.send(data, keep_listening=True)
             # Don't look for ACK from Broadcast message
             if self.destination == _RH_BROADCAST_ADDRESS:
                 print('uhf destination=RHbroadcast address (dont look for ack)')
@@ -743,11 +748,11 @@ class RFM9x:
                             break
             # pause before next retry -- random delay
             if not got_ack:
-                self.retry_counter+=1 # ADDED FOR PYCUBED
+                self.retry_counter += 1  # ADDED FOR PYCUBED
                 print('no uhf ack, sending again...')
                 # delay by random amount before next try
-                time.sleep(self.ack_wait + self.ack_wait * random.random())
-            retries_remaining = retries_remaining - 1
+                tasko.sleep(self.ack_wait + self.ack_wait * random.random())
+            retries_remaining -= 1
             # set retry flag in packet header
             self.flags |= _RH_FLAGS_RETRY
         self.flags = 0  # clear flags
@@ -826,7 +831,7 @@ class RFM9x:
                     ):
                         # delay before sending Ack to give receiver a chance to get ready
                         if self.ack_delay is not None:
-                            time.sleep(self.ack_delay)
+                            tasko.sleep(self.ack_delay)
                         # send ACK packet to sender (data is b'!')
                         self.send(
                             b"!",
