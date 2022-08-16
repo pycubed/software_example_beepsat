@@ -242,7 +242,7 @@ class _Satellite:
         try:
             self._radio = pycubed_rfm9x.RFM9x(
                 self.spi, self._rf_cs, self._rf_rst,
-                self.UHF_FREQ, rfm95pw=True)
+                self.UHF_FREQ)
             self.radio.dio0 = self.radio_DIO0
             self._radio.node = 0xAB  # our ID
             self._radio.destination = 0xBA  # target's ID
