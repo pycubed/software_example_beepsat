@@ -14,10 +14,10 @@ config = {
             "Beacon": {
                 "Interval": 30,
                 "Priority": 1,
-                "ScheduleLater": True
+                "ScheduleLater": False
             },
             "Blink": {
-                "Interval": 2,
+                "Interval": 0.2,
                 "Priority": 255,
                 "ScheduleLater": False
             },
@@ -33,7 +33,7 @@ config = {
             },
             "Radio": {
                 "Interval": 3,
-                "Priority": 2,
+                "Priority": 0,
                 "ScheduleLater": True
             },
         },
