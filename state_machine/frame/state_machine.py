@@ -41,8 +41,13 @@ class StateMachine:
         for _, task in self.scheduled_tasks.items():
             task.stop()
 
-    def switch_to(self, state_name, force=False):
-        """Switches the state of the cubesat to the new state"""
+    def switch_to(self, state_name: str, force=False):
+        """Switches the state of the cubesat to the new state
+
+        Args:
+        :param state_name: The name of the state to switch to
+        :type state_name: str
+        """
 
         # prevent (or allow forced) illegal transitions
         if not (state_name in self.config[self.state]['StepsTo'] or force):
