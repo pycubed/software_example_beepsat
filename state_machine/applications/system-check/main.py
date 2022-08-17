@@ -12,7 +12,7 @@ import tests.i2c_scan
 import tests.sd_test
 import tests.logging_infrastructure_test
 import tests.imu_test
-import tests.radio_test
+# import tests.radio_test
 import tests.sun_sensor_test
 import tests.coil_test
 import tests.burnwire_test
@@ -90,6 +90,7 @@ else:
     result_dict["Burnwire1"] = ("Test was not run.", None)
     result_dict["Burnwire2"] = ("Test was not run.", None)
 
+'''
 # ask to test radio
 radio_input = input("Type Y to start the radio test, any key to cancel: ")
 if radio_input.lower() == "y":
@@ -98,6 +99,7 @@ if radio_input.lower() == "y":
 else:
     result_dict["Radio_ReceiveBeacon"] = ("Test was not run.", None)
     result_dict["Radio_SendBeacon"] = ("Test was not run.", None)
+'''
 
 # print test results; failed tests first, and then passed tests
 print("\nTest has concluded. Printing results...\n")
