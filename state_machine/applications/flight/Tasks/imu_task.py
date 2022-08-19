@@ -8,6 +8,8 @@ class task(Task):
     data_file = None
 
     async def main_task(self):
+        if not cubesat.imu:
+            return
         # take IMU readings
         readings = {
             'accel': cubesat.acceleration,

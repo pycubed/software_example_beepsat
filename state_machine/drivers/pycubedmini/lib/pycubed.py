@@ -49,13 +49,6 @@ class device:
 
 
 """
-Define HardwareInitException
-"""
-class HardwareInitException(Exception):
-    pass
-
-
-"""
 Define constants, Satellite attributes and Satellite Class
 """
 # NVM register numbers
@@ -118,15 +111,15 @@ class _Satellite:
         self.neopixel
         self.imu
         self.radio
-        self.sun_minusy
-        self.sun_minusz
-        self.sun_minusx
-        self.sun_plusy
-        self.sun_plusz
-        self.sun_plusx
-        self.coildriverx
-        self.coildrivery
-        self.coildriverz
+        self.sun_xn
+        self.sun_yn
+        self.sun_zn
+        self.sun_xp
+        self.sun_yp
+        self.sun_zp
+        self.drv_x
+        self.drv_y
+        self.drv_z
         self.burnwire1
         self.burnwire2
 
