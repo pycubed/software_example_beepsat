@@ -227,7 +227,7 @@ class _Satellite:
             print('[ERROR][Initializing RADIO]', e)
 
     @device
-    def sun_minusy(self):
+    def sun_yn(self):
         """ Initialize the -Y sun sensor on I2C2 """
         try:
             sun_yn = adafruit_tsl2561.TSL2561(self.i2c3, address=0x29)
@@ -237,7 +237,7 @@ class _Satellite:
             print('[ERROR][Initializing Sun Sensor -Y]', e)
 
     @device
-    def sun_minusz(self):
+    def sun_zn(self):
         """ Initialize the -Z sun sensor on I2C2 """
         try:
             sun_zn = adafruit_tsl2561.TSL2561(self.i2c3, address=0x39)
@@ -247,7 +247,7 @@ class _Satellite:
             print('[ERROR][Initializing Sun Sensor -Z]', e)
 
     @device
-    def sun_minusx(self):
+    def sun_xn(self):
         """ Initialize the -X sun sensor on I2C1 """
         try:
             sun_xn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x29)
@@ -257,7 +257,7 @@ class _Satellite:
             print('[ERROR][Initializing Sun Sensor -X]', e)
 
     @device
-    def sun_plusy(self):
+    def sun_yp(self):
         """ Initialize the +Y sun sensor on I2C1 """
         try:
             sun_yp = adafruit_tsl2561.TSL2561(self.i2c3, address=0x49)
@@ -267,7 +267,7 @@ class _Satellite:
             print('[ERROR][Initializing Sun Sensor +Y]', e)
 
     @device
-    def sun_plusz(self):
+    def sun_zp(self):
         """ Initialize the +Z sun sensor on I2C1 """
         try:
             sun_zp = adafruit_tsl2561.TSL2561(self.i2c2, address=0x39)
@@ -277,7 +277,7 @@ class _Satellite:
             print('[ERROR][Initializing Sun Sensor +Z]', e)
 
     @device
-    def sun_plusx(self):
+    def sun_xp(self):
         """ Initialize the +X sun sensor on I2C2 """
         try:
             sun_xp = adafruit_tsl2561.TSL2561(self.i2c2, address=0x49)
@@ -287,29 +287,26 @@ class _Satellite:
             print('[ERROR][Initializing Sun Sensor +X]', e)
 
     @device
-    def coildriverx(self):
+    def drv_x(self):
         """ Initialize Coil Driver X on I2C3, set mode and voltage """
         try:
-            drv_x = drv8830.DRV8830(self.i2c1, 0xC4 >> 1)  # U7
-            return drv_x
+            return drv8830.DRV8830(self.i2c1, 0xC4 >> 1)  # U7
         except Exception as e:
             print('[ERROR][Initializing H-Bridge U7]', e)
 
     @device
-    def coildrivery(self):
+    def drv_y(self):
         """ Initialize Coil Driver Y on I2C3, set mode and voltage """
         try:
-            drv_y = drv8830.DRV8830(self.i2c1, 0xC0 >> 1)  # U8
-            return drv_y
+            return drv8830.DRV8830(self.i2c1, 0xC0 >> 1)  # U8
         except Exception as e:
             print('[ERROR][Initializing H-Bridge U8]', e)
 
     @device
-    def coildriverz(self):
+    def drv_z(self):
         """ Initialize Coil Driver Z on I2C3, set mode and voltage """
         try:
-            self._drv_z = drv8830.DRV8830(self.i2c1, 0xD0 >> 1)  # U9
-            self.hardware['CoilDriverZ'] = True
+            return drv8830.DRV8830(self.i2c1, 0xD0 >> 1)  # U9
         except Exception as e:
             print('[ERROR][Initializing H-Bridge U9]', e)
 
