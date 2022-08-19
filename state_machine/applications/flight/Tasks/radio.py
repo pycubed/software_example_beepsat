@@ -38,8 +38,11 @@ class task(Task):
         self.msg = ''
 
     async def main_task(self):
-        if not cubesat.radio or not ANTENNA_ATTACHED:
+        if not cubesat.radio:
             self.debug('No radio attached, skipping radio task')
+            return
+        elif not ANTENNA_ATTACHED:
+            self.debug('No antenna attached, skipping radio task')
             return
 
         if tq.empty():
