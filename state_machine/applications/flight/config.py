@@ -1,7 +1,7 @@
 config = {
     "Normal": {
         "Tasks": {
-            "Battery": {
+            "Safety": {
                 "Interval": 10,
                 "Priority": 3,
                 "ScheduleLater": False
@@ -14,10 +14,10 @@ config = {
             "Beacon": {
                 "Interval": 30,
                 "Priority": 1,
-                "ScheduleLater": True
+                "ScheduleLater": False
             },
             "Blink": {
-                "Interval": 2,
+                "Interval": 0.2,
                 "Priority": 255,
                 "ScheduleLater": False
             },
@@ -33,18 +33,18 @@ config = {
             },
             "Radio": {
                 "Interval": 3,
-                "Priority": 2,
+                "Priority": 0,
                 "ScheduleLater": True
             },
         },
         "StepsTo": [
-            "LowPower",
+            "Safe",
             "DeTumble"
         ]
     },
-    "LowPower": {
+    "Safe": {
         "Tasks": {
-            "Battery": {
+            "Safety": {
                 "Interval": 15.0,
                 "Priority": 1,
                 "ScheduleLater": False
@@ -64,7 +64,7 @@ config = {
     },
     "DeTumble": {
         "Tasks": {
-            "Battery": {
+            "Safety": {
                 "Interval": 15.0,
                 "Priority": 3,
                 "ScheduleLater": False
