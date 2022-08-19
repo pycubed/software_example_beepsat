@@ -11,10 +11,12 @@ class task(Task):
     rgb_on = False
 
     async def main_task(self):
-        if cubesat.neopixel:
-            if self.rgb_on:
-                cubesat.RGB = (0, 0, 0)
-                self.rgb_on = False
-            else:
-                cubesat.RGB = (50, 0, 50)
-                self.rgb_on = True
+        if not cubesat.neopixel:
+            self.debug('No neopixel attached, skipping blink task')
+            return
+        if self.rgb_on:
+            cubesat.RGB = (0, 0, 0)
+            self.rgb_on = False
+        else:
+            cubesat.RGB = (50, 0, 50)
+            self.rgb_on = True
