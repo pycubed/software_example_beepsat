@@ -1,6 +1,6 @@
 from os import listdir, stat, statvfs, remove, mkdir, rmdir
 import time
-import lib.pycubed as cubesat
+from lib.pycubed import cubesat
 
 info_filename = "info.txt"
 info_filename_dir = "/sd/info.txt"
