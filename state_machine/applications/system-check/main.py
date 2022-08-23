@@ -6,7 +6,7 @@ PyCubed Mini mainboard-v02 for Pocketqube Mission
 # print acknowledgement that test has started
 print("\n#################### S Y S T E M   C H E C K ####################\n")
 
-from lib import pycubed
+from lib.pycubed import cubesat
 import tests
 import tests.i2c_scan
 import tests.sd_test
@@ -18,7 +18,7 @@ import tests.coil_test
 import tests.burnwire_test
 
 # initialize hardware_dict and result_dict
-hardware_dict = pycubed._cubesat.hardware
+hardware_dict = cubesat.hardware
 result_dict = {
     "LoggingInfrastructure_Test": ("", False),
     "Basic_SDCard_Test": ("", False),
