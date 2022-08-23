@@ -6,24 +6,23 @@ PyCubed Mini mainboard-v02 for Pocketqube Mission
 # print acknowledgement that test has started
 print("\n#################### S Y S T E M   C H E C K ####################\n")
 
-from lib import pycubed
+from lib.pycubed import cubesat
 import tests
 import tests.i2c_scan
 import tests.sd_test
 import tests.logging_infrastructure_test
 import tests.imu_test
-import tests.radio_test
+# import tests.radio_test
 import tests.sun_sensor_test
 import tests.coil_test
 import tests.burnwire_test
 
 # initialize hardware_dict and result_dict
-hardware_dict = pycubed._cubesat.hardware
+hardware_dict = cubesat.hardware
 result_dict = {
     "LoggingInfrastructure_Test": ("", False),
     "Basic_SDCard_Test": ("", False),
-    "IMU_AccStationary": ("", False),
-    "IMU_AccMoving": ("", False),
+    "IMU_AccGravity": ("", False),
     "IMU_GyroStationary": ("", False),
     "IMU_GyroRotating": ("", False),
     "IMU_MagMagnet": ("", False),
@@ -91,6 +90,7 @@ else:
     result_dict["Burnwire1"] = ("Test was not run.", None)
     result_dict["Burnwire2"] = ("Test was not run.", None)
 
+'''
 # ask to test radio
 radio_input = input("Type Y to start the radio test, any key to cancel: ")
 if radio_input.lower() == "y":
@@ -99,6 +99,7 @@ if radio_input.lower() == "y":
 else:
     result_dict["Radio_ReceiveBeacon"] = ("Test was not run.", None)
     result_dict["Radio_SendBeacon"] = ("Test was not run.", None)
+'''
 
 # print test results; failed tests first, and then passed tests
 print("\nTest has concluded. Printing results...\n")
