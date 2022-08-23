@@ -5,7 +5,7 @@ Sun Sensor Test
 * Author(s): Yashika Batra
 """
 
-from lib import pycubed as cubesat
+from lib.pycubed import cubesat
 
 
 def lux(sun_sensor_index):
@@ -13,17 +13,17 @@ def lux(sun_sensor_index):
     Return the lux reading for a given sun sensor
     """
     if sun_sensor_index == "-Y":
-        return cubesat._cubesat.sun_yn.lux
+        return cubesat.sun_yn.lux
     elif sun_sensor_index == "-Z":
-        return cubesat._cubesat.sun_zn.lux
+        return cubesat.sun_zn.lux
     elif sun_sensor_index == "-X":
-        return cubesat._cubesat.sun_xn.lux
+        return cubesat.sun_xn.lux
     elif sun_sensor_index == "+Y":
-        return cubesat._cubesat.sun_yp.lux
+        return cubesat.sun_yp.lux
     elif sun_sensor_index == "+Z":
-        return cubesat._cubesat.sun_zp.lux
+        return cubesat.sun_zp.lux
     elif sun_sensor_index == "+X":
-        return cubesat._cubesat.sun_xp.lux
+        return cubesat.sun_xp.lux
     else:
         raise ValueError(f"Sun sensor index {sun_sensor_index} is not defined.")
 
