@@ -6,7 +6,7 @@ Torque Driver Test
 """
 
 import time
-from lib import pycubed as cubesat
+from lib.pycubed import cubesat
 from ulab import numpy
 
 # voltage level constants; set between -1 and 1
@@ -46,20 +46,20 @@ levels: {0.0} V, {projected_v1} V, {projected_v2} V, {projected_v3} V.""")
 
     # test at 0V to get a starter reading
     cubesat.coildriver_vout(coil_index, 0)
-    mag_reading0 = cubesat.magnetic()
+    mag_reading0 = cubesat.magnetic
 
     # test each voltage level
     cubesat.coildriver_vout(coil_index, projected_v1)
     time.sleep(driver_time)
-    mag_reading1 = cubesat.magnetic()
+    mag_reading1 = cubesat.magnetic
 
     cubesat.coildriver_vout(coil_index, projected_v2)
     time.sleep(driver_time)
-    mag_reading2 = cubesat.magnetic()
+    mag_reading2 = cubesat.magnetic
 
     cubesat.coildriver_vout(coil_index, projected_v3)
     time.sleep(driver_time)
-    mag_reading3 = cubesat.magnetic()
+    mag_reading3 = cubesat.magnetic
 
     # calculate total magnetic reading, subtracting the 0V starter reading
     print("Data Collection Complete")
