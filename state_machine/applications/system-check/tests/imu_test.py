@@ -7,7 +7,7 @@ IMU Sensor Test
 
 import time
 from ulab import numpy
-from lib import pycubed as cubesat
+from lib.pycubed import cubesat
 
 
 wait_time = 3
@@ -30,14 +30,14 @@ def request_imu_data(prompt):
 
     # collect starting and ending mag readings
     # total acc and gyro readings; do 10 reads over 3 sec
-    start_mag = numpy.array(cubesat.magnetic())
+    start_mag = numpy.array(cubesat.magnetic)
     acc_total = numpy.array([0., 0., 0.])
     gyro_total = numpy.array([0., 0., 0.])
     for _ in range(10):
-        acc_total += numpy.array(cubesat.acceleration())
-        gyro_total += numpy.array(cubesat.gyro())
+        acc_total += numpy.array(cubesat.acceleration)
+        gyro_total += numpy.array(cubesat.gyro)
         time.sleep(0.3)
-    end_mag = numpy.array(cubesat.magnetic())
+    end_mag = numpy.array(cubesat.magnetic)
 
     acc_average = acc_total / 10
     gyro_average = gyro_total / 10
@@ -185,7 +185,7 @@ def temp_imu_test(result_dict):
     Verify that the temperature sensor on the IMU returns a reasonable
     value
     """
-    temp = cubesat.temperature_imu()
+    temp = cubesat.temperature_imu
     print(f"IMU Temperature Reading: {temp} °C.")
     temp_in_range = 20 <= temp <= 80
 
