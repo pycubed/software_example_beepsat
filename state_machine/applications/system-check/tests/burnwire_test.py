@@ -5,7 +5,7 @@ Burnwire Deployment Test
 * Author(s): Yashika Batra
 """
 
-from lib import pycubed as cubesat
+from lib.pycubed import cubesat
 
 
 def get_user_input():
