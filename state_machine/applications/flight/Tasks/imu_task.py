@@ -1,5 +1,5 @@
 from lib.template_task import Task
-import lib.pycubed as cubesat
+from lib.pycubed import cubesat
 
 
 class task(Task):
@@ -10,9 +10,9 @@ class task(Task):
     async def main_task(self):
         # take IMU readings
         readings = {
-            'accel': cubesat.acceleration(),
-            'mag':   cubesat.magnetic(),
-            'gyro':  cubesat.gyro(),
+            'accel': cubesat.acceleration,
+            'mag':   cubesat.magnetic,
+            'gyro':  cubesat.gyro,
         }
 
         # store them in our cubesat data_cache object

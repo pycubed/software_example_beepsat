@@ -1,4 +1,4 @@
-from Tasks.battery_task import task as battery
+from Tasks.safety import task as safety
 from Tasks.beacon_task import task as beacon
 from Tasks.blink_task import task as blink
 from Tasks.imu_task import task as imu
@@ -9,7 +9,7 @@ from TransitionFunctions import announcer, low_power_on, low_power_off
 from config import config  # noqa: F401
 
 TaskMap = {
-    "Battery": battery,
+    "Safety": safety,
     "Beacon": beacon,
     "Blink": blink,
     "IMU": imu,

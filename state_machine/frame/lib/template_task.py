@@ -1,15 +1,12 @@
 from lib.debugcolor import co
-import lib.pycubed as cubesat
+from lib.pycubed import cubesat
 
 
 class Task:
 
     """
-    The Task Object.
-
-    Attributes:
-        name:        Name of the task object for future reference
-        color:       Debug color for serial terminal
+    Template task object.
+    Stores the task name and color.
     """
 
     name = 'temp'
@@ -19,9 +16,8 @@ class Task:
         """
         Initialize the Task using the PyCubed cubesat object.
 
-        :type satellite: Satellite
         :param satellite: The cubesat to be registered
-
+        :type satellite: Satellite
         """
         self.cubesat = satellite
 
@@ -30,8 +26,9 @@ class Task:
         Print a debug message formatted with the task name and color
 
         :param msg: Debug message to print
+        :type msg: str
         :param level: > 1 will print as a sub-level
-
+        :type level: int
         """
         if level == 1:
             header = f"[{co(msg=self.name,color=self.color)}/{cubesat.state_machine.state}]"
@@ -45,6 +42,5 @@ class Task:
 
         :param `*args`: Variable number of arguments used for task execution.
         :param `**kwargs`: Variable number of keyword arguments used for task execution.
-
         """
         pass
