@@ -1,4 +1,4 @@
-from lib.pycubed import _cubesat as cubesat
+from lib.pycubed import cubesat
 
 
 def run():
