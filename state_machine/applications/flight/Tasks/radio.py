@@ -4,10 +4,10 @@ Radio Task:
 Manages all radio communication for the cubesat.
 """
 from lib.template_task import Task
-import lib.transmission_queue as tq
-import lib.commands as cdh
-import lib.radio_headers as headers
-from lib.pycubed import cubesat, HardwareInitException
+import radio_utils.transmission_queue as tq
+import radio_utils.commands as cdh
+import radio_utils.headers as headers
+from pycubed import cubesat, HardwareInitException
 
 ANTENNA_ATTACHED = False
 

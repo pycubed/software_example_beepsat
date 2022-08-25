@@ -1,5 +1,8 @@
 import time
 import tasko
+import sys
+
+sys.path.insert(0, './lib/')
 
 import lib.reader as reader
 try:
@@ -22,7 +25,8 @@ class Radio:
         _ = await tasko.sleep(timeout * 0.5)
         return True
 
-    def receive(self, *, keep_listening=True, with_header=False, with_ack=False, timeout=None, debug=False):
+    async def receive(self, *, keep_listening=True, with_header=False, with_ack=False, timeout=None, debug=False):
+        await tasko.sleep(0.02)
         return "something we recieved over radio"
 
     @property

@@ -1,5 +1,5 @@
-from lib.message import Message
-import lib.radio_headers as headers
+from .message import Message
+from . import headers
 
 class NaiveMessage(Message):
     """Transmits the message 249 bytes at a time.

@@ -1,10 +1,10 @@
 # Transmit "Hello World" beacon
 
 from lib.template_task import Task
-import lib.transmission_queue as tq
-from lib.message import Message
-from lib.naive import NaiveMessage
-from lib.pycubed import cubesat, HardwareInitException
+import radio_utils.transmission_queue as tq
+from radio_utils.message import Message
+from radio_utils.naive import NaiveMessage
+from pycubed import cubesat, HardwareInitException
 from state_machine import state_machine
 import struct
 

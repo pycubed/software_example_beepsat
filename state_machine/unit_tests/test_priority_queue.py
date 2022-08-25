@@ -1,7 +1,7 @@
 import unittest
 import sys
 
-sys.path.insert(0, 'state_machine/applications/flight/lib')
+sys.path.insert(0, 'state_machine/applications/flight/lib/radio_utils')
 
 import priority_queue as pq  # noqa: E402
 from message import Message as msg  # noqa: E402

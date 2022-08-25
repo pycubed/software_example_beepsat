@@ -1,14 +1,13 @@
 import unittest
 import sys
 
-sys.path.insert(0, 'state_machine/applications/flight/')
+sys.path.insert(0, 'state_machine/applications/flight/lib')
 
-import lib.radio as radio  # noqa: E402
+from radio_utils import transmission_queue as tq  # noqa: E402
 
 class Test(unittest.TestCase):
 
     def test(self):
-        tq = radio.transmission_queue
         for i in range(tq.limit):
             tq.push(i)
         self.assertRaises(Exception, tq.push, 101)
