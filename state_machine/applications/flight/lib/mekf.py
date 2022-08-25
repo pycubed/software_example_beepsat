@@ -23,7 +23,7 @@ P = I(6)  # Covariance matrix
 
 
 def propagate_state(q, β, ω, δt):
-    """State propogation function. 
+    """State propogation function.
     Substracts out the gyro bias from the gyro reading,
     then propogates the state forward by the time step.
 

@@ -39,7 +39,7 @@ def block(S):
 
 def hat(v):
     """Converts v to a matrix such that hat(v)w = cross(v, w)
-    
+
     :param v: vector
     :type v: numpy.ndarray
     :return: 3x3 numpy array

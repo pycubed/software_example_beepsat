@@ -33,7 +33,7 @@ def d_state(x):
 
     :param x: 6-vector, first 3 are position (km), last 3 are velocity (km/s)
     :type x: numpy.ndarray
-    :return: 6-vector, first 3 are velocity (km/s), last 3 are acceleration (km/s^2) 
+    :return: 6-vector, first 3 are velocity (km/s), last 3 are acceleration (km/s^2)
     """
     pos = x[0:3]
     vel = x[3:6]
