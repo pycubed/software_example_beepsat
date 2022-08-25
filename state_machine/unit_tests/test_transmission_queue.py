@@ -3,7 +3,7 @@ import sys
 
 sys.path.insert(0, 'state_machine/applications/flight/')
 
-import lib.transmission_queue as tq  # noqa: E402
+import lib.radio.transmission_queue as tq  # noqa: E402
 
 class Test(unittest.TestCase):
 
