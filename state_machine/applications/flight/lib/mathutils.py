@@ -6,7 +6,7 @@ except Exception:
 def block(S):
     """Returns a block matrix from a list of lists of matrices
     For example:
-    
+
     .. code-block:: python
 
         A = eye(2)
