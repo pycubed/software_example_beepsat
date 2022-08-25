@@ -4,11 +4,11 @@ Writen by Aleksei Seletskiy
 
 A Multiplicative Extended Kalman filter (MEKF) is a variant of an Extended Kalman Filter (EKF).
 The important features of this MEKF are:
-    - We eliminate rigibody dynamics by assuming we have a near perfect gyro (after the bias β is removed).
-    - We assume our gyro sample is rate is high enough that ω is essentialy constant over a sample period.
-    - Thus we treat ω (angular velocity) as a the control.
-    - We are running an EKF with a local axis-angle error vector, but the global state is stored using a quaternion.
-    - The gyro bias (β) is estimated.
+- We eliminate rigibody dynamics by assuming we have a near perfect gyro (after the bias β is removed).
+- We assume our gyro sample is rate is high enough that ω is essentialy constant over a sample period.
+- Thus we treat ω (angular velocity) as a the control.
+- We are running an EKF with a local axis-angle error vector, but the global state is stored using a quaternion.
+- The gyro bias (β) is estimated.
 """
 try:
     from ulab.numpy import dot as matmul, eye as I, zeros, array, linalg, concatenate as concat  # noqa: E741
@@ -23,12 +23,19 @@ P = I(6)  # Covariance matrix
 
 
 def propagate_state(q, β, ω, δt):
-    """State propogation function
-    args:
-        q: Quaternion attitude vector
-        β: Gyro bias axis-angle vector
-        ω: Measured angular velocity
-        δt: Time step
+    """State propogation function. 
+    Substracts out the gyro bias from the gyro reading,
+    then propogates the state forward by the time step.
+
+    :param q: Quaternion attitude vector
+    :type q: numpy.array
+    :param β: Gyro bias axis-angle vector
+    :type β: numpy.array
+    :param ω: Measured angular velocity
+    :type ω: numpy.array
+    :param δt: Time step
+    :type δt: float
+    :return: New quaternion attitude vector
     """
     θ = linalg.norm(ω - β) * δt
     if linalg.norm(ω - β) == 0:
@@ -45,13 +52,13 @@ def step(
     br_sun
 ):
     """Updates the state of the MEKF by one itteration of sensor readings.
-    args:
-        ω: Gyroscope reading
-        δt: Time step
-        nr_mag: Inertial frame magnetic field vector
-        nr_sun: Inertial frame sun pointing vector
-        br_mag: Measured body frame magnetic field vector
-        br_sun: Measured body frame sun pointing vector
+
+    :param ω: Gyroscope reading
+    :param δt: Time step
+    :param nr_mag: Inertial frame magnetic field vector
+    :param nr_sun: Inertial frame sun pointing vector
+    :param br_mag: Measured body frame magnetic field vector
+    :param br_sun: Measured body frame sun pointing vector
     """
     global q
     global β

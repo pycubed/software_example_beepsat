@@ -18,10 +18,11 @@ def mjd(utime):
 
 def rotZ(theta):
     """Returns the rotation matrix for a given angle around the z-axis.
-    Args:
-        - theta: Angle in radians.
-    Returns:
-        - A 3x3 numpy array. """
+
+    :param theta: Angle in radians.
+    :type theta: float
+    :returns: A 3x3 numpy array.
+    """
     return array([[cos(theta),   sin(theta),  0],
                   [-sin(theta),  cos(theta),  0],
                   [0,            0,           1]])
@@ -30,11 +31,9 @@ def ERA(utime):
     """Returns the the ERA (Earth Rotation Angle) at a certain unix time stamp.
     Inspired by SOFA's iauEra00 function.
 
-    Args:
-        - utime: A unix timestamp.
-
-    Returned (function value):
-        - ERA (Earth Rotation Angle) at this time stamp (radians)
+    :param utime: A unix timestamp
+    :type utime: int
+    :returns: The Earth Rotation Angle in radians.
     """
     # Days since J2000.0.
     d = mjd(utime)
@@ -57,14 +56,11 @@ def earth_rotation(utime):
 def eci_to_ecef(utime):
     """Returns the rotation matrix from ECI (Earth Centered Inertial) to ECEF (Earth Centered Earth Fixed).
     Applies correction for Earth-rotation.
-    Based on: https://space.stackexchange.com/a/53569
+    Based on SatelliteDynamic's rECItoECEF.
 
-    Args:
-        - date: A unix timestamp.
-
-    Returns:
-        - A 3x3 numpy array.
-    Based on SatelliteDynamic's rECItoECEF
+    :param utime: A unix timestamp
+    :type utime: int
+    :returns: A 3x3 numpy array.
     """
     # we may choose to add bias_precession_nutation and polar motion in the future
     # rc2i = bias_precession_nutation(epc)
@@ -74,25 +70,24 @@ def eci_to_ecef(utime):
     # return rpm @ r @ rc2i
     return R
 
-def ecef_to_eci(date):
+def ecef_to_eci(utime):
     """Returns the rotation matrix from ECEF (Earth Centered Earth Fixed) to ECI (Earth Centered Inertial).
-    Args:
-        - date: A unix timestamp.
 
-    Returns:
-        - A 3x3 numpy array.
+    :param utime: A unix timestamp
+    :type utime: int
+    :returns: A 3x3 numpy array.
     """
-    return eci_to_ecef(date).transpose()
+    return eci_to_ecef(utime).transpose()
 
 def ned_to_ecef(lon, lat):
     """ Returns the rotation matrix for transforming coordinates in an earth-centered NED frame
     to coordinates in an ECEF frame.
-    Args:
-        - lon: Longitude in radians (geocentric)
-        - lat: Latitude in radians (geocentric)
 
-    Returns:
-        - A 3x3 numpy array.
+    :param lon: Longitude in radians (geocentric).
+    :type lon: float
+    :param lat: Latitude in radians (geocentric).
+    :param lat: float
+    :returns: A 3x3 numpy array.
     """
     return array([[-sin(lat) * cos(lon),  -sin(lon), -cos(lat) * cos(lon)],
                   [-sin(lat) * sin(lon),   cos(lon), -cos(lat) * sin(lon)],
@@ -101,10 +96,11 @@ def ned_to_ecef(lon, lat):
 def convert_ecef_to_geoc(ecef, degrees=False):
     """Converts from ECEF (Earth Centered Earth Fixed) to geocentric coordinates.
 
-    Args:
-        - ecef: A 3x1 numpy array containing the ECEF coordinates (km).
-    Returns:
-        - A 3x1 numpy array containing the geocentric coordinates long, lat, alt (radians, radians, km)
+    :param ecef: ECEF coordinates in km.
+    :type ecef: numpy.array
+    :param degrees: If True, returns the coordinates in degrees.
+    :type degrees: bool, optional
+    :returns: A 3x1 numpy arary containing the geocentric coordinates long, lat, alt (radians, radians, km)
     """
     x, y, z = ecef
     lat = arctan2(z, sqrt(x * x + y * y))

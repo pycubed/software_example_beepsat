@@ -6,13 +6,16 @@ except Exception:
 def block(S):
     """Returns a block matrix from a list of lists of matrices
     For example:
-    A = eye(2)
-    B = zeros((2, 3))
-    C = ones((4, 2))
-    D = ones((4, 3))*4
-    block([[A, B],
-           [C, D]])
-    >>> array([[1., 0., 0., 0., 0.],
+    
+    .. code-block:: python
+
+        A = eye(2)
+        B = zeros((2, 3))
+        C = ones((4, 2))
+        D = ones((4, 3)) * 4
+        block([[A, B],
+               [C, D]])
+        array([[1., 0., 0., 0., 0.],
                [0., 1., 0., 0., 0.],
                [1., 1., 4., 4., 4.],
                [1., 1., 4., 4., 4.],
@@ -35,7 +38,12 @@ def block(S):
 
 
 def hat(v):
-    """Converts v to a matrix such that hat(v)w = cross(v, w)"""
+    """Converts v to a matrix such that hat(v)w = cross(v, w)
+    
+    :param v: vector
+    :type v: numpy.ndarray
+    :return: 3x3 numpy array
+    """
     if not isinstance(v, ndarray):
         v = array(v)
     return array([

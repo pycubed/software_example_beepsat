@@ -12,13 +12,14 @@ J2 = 1.08262668E-3  # J2 Value
 
 def rk4(x, dt, f):
     """Runge-Kutta order 4 integration
-    Args:
-        - x: 6-vector, first 3 are position, last 3 are velocity
-        - dt: time step
-        - f: function defining the time derivative of x, ie: f(x)=dx
 
-    Returns:
-        - x: The integrated state
+    :param x: 6-vector, first 3 are position, last 3 are velocity
+    :type x: numpy.ndarray
+    :param dt: time step
+    :type dt: float
+    :param f: function defining the time derivative of x, ie: f(x)=dx
+    :type f: function
+    :return: The integrated state
     """
     k1 = dt * f(x)
     k2 = dt * f(x + k1 / 2)
@@ -27,11 +28,13 @@ def rk4(x, dt, f):
     return x + (1 / 6) * (k1 + (2 * k2) + (2 * k3) + k4)
 
 def d_state(x):
-    """Time derivative of the state variable
-    Args:
-        - x: 6-vector, first 3 are position (km), last 3 are velocity (km/s)
-    Returns:
-        - dx: 6-vector, first 3 are velocity (km/s), last 3 are acceleration (km/s^2) """
+    """Time derivative of the satellite's state (position, velocity) in the ECI frame.
+    Takes into account spherical gravity and the J2 perturbation.
+
+    :param x: 6-vector, first 3 are position (km), last 3 are velocity (km/s)
+    :type x: numpy.ndarray
+    :return: 6-vector, first 3 are velocity (km/s), last 3 are acceleration (km/s^2) 
+    """
     pos = x[0:3]
     vel = x[3:6]
 
@@ -58,12 +61,14 @@ def propogate(state, time_forward, integration_step=5):
     """Propogate the satelite state forward time_forward (s), in steps of integration_step (s) using rk4 integration.
     Takes into account spherical gravity and the J2 perturbation.
     In the ECI frame
-    Args:
-        - state: 6-vector, first 3 are position (km), last 3 are velocity (km/s)
-        - time_forward: time to propogate forward (s)
-        - integration_step: time step for rk4 integration (s)
-    Returns:
-        - state: propogated state, 6-vector, first 3 are position (km), last 3 are velocity (km/s)
+
+    :param state: 6-vector, first 3 are position (km), last 3 are velocity (km/s)
+    :type state: numpy.ndarray
+    :param time_forward: time to propogate forward (s)
+    :type time_forward: float
+    :param integration_step: time step for rk4 integration (s)
+    :type integration_step: float
+    :return: propogated state, 6-vector, first 3 are position (km), last 3 are velocity (km/s)
     """
     while time_forward > 0:
         dt = min(time_forward, integration_step)
