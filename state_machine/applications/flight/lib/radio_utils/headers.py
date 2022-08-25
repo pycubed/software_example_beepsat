@@ -4,4 +4,8 @@ NAIVE_START = 0xff
 NAIVE_MID = 0xfe
 NAIVE_END = 0xfd
 
+CHUNK_START = 0xfc
+CHUNK_MID = 0xfb
+CHUNK_END = 0xfa
+
 COMMAND = 0x01

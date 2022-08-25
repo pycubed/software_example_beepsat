@@ -1,0 +1,1 @@
+MAX_PACKET_LEN = 252
