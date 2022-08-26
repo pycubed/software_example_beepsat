@@ -30,10 +30,10 @@ jobs:
 
       - name: Build and run
         id: build_and_run
-        run: cd state_machine && sh build.sh drivers/emulation applications/flight
+        run: cd state_machine && sh build.sh drivers/example applications/example
 
       - name: Install Python dependencies
         run: pip install flake8
 
       - name: Run emulated flight software
-        run: ./.github/workflows/scripts/emulation.sh "Emulated flight software"
+        run: ./.github/workflows/scripts/emulation.sh "Example stack"
