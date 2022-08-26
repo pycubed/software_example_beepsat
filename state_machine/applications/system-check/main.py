@@ -16,6 +16,10 @@ import tests.imu_test
 import tests.sun_sensor_test
 import tests.coil_test
 import tests.burnwire_test
+import supervisor
+
+supervisor.disable_autoreload()
+
 
 # initialize hardware_dict and result_dict
 hardware_dict = cubesat.hardware
