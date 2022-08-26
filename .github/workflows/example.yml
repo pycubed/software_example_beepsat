@@ -35,5 +35,5 @@ jobs:
       - name: Install Python dependencies
         run: pip install flake8
 
-      - name: Run emulated flight software
-        run: ./.github/workflows/scripts/emulation.sh "Example stack"
+      - name: Run example stack
+        run: ./.github/workflows/scripts/time_out.sh "Example stack"
