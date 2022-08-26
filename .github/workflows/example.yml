@@ -1,4 +1,4 @@
-name: Run Emulated Flight Software
+name: Run Example Stack
 
 on:
   # Trigger the workflow on all pull requests, and pushes to main
