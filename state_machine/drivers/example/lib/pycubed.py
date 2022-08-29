@@ -1,20 +1,15 @@
 import time
 
-def acceleration():
-    return (0.0, 0.0, 0.0)
+class Satellite:
 
-def magnetic():
-    return (0.0, 0.0, 0.0)
-
-def gyro():
-    return (0.0, 0.0, 0.0)
-
-def temperature_imu():
-    return 20
-
-def battery_voltage():
-    return 6.4
+    def __init__(self):
+        self.acceleration = (0.0, 0.0, 0.0)
+        self.magnetic = (0.0, 0.0, 0.0)
+        self.gyro = (0.0, 0.0, 0.0)
+        self.temperature_imu = 20.0
+        self.battery_voltage = 6.4
+        self.vlowbatt = 4.0
+        self.BOOTTIME = time.monotonic()
 
 
-BOOTTIME = time.monotonic()
-vlowbatt = 4.0
+cubesat = Satellite()

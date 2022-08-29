@@ -1,12 +1,12 @@
 import traceback
 from lib.pycubed import cubesat
-import state_machine
+from state_machine import state_machine
 
 
 print('Running...')
 try:
     # should run forever
-    _ = state_machine.StateMachine(cubesat, 'Normal')
+    state_machine.start('Normal')
 except Exception as e:
     formated_exception = traceback.format_exception(e, e, e.__traceback__)
     for line in formated_exception:
