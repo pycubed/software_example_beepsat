@@ -223,9 +223,7 @@ class _Satellite:
     def sun_yn(self):
         """ Initialize the -Y sun sensor on I2C2 """
         try:
-            sun_yn = adafruit_tsl2561.TSL2561(self.i2c3, address=0x29)
-            sun_yn.enabled = False
-            return sun_yn
+            return adafruit_tsl2561.TSL2561(self.i2c3, address=0x29)
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor -Y]', e)
 
@@ -233,9 +231,7 @@ class _Satellite:
     def sun_zn(self):
         """ Initialize the -Z sun sensor on I2C2 """
         try:
-            sun_zn = adafruit_tsl2561.TSL2561(self.i2c3, address=0x39)
-            sun_zn.enabled = False
-            return sun_zn
+            return adafruit_tsl2561.TSL2561(self.i2c3, address=0x39)
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor -Z]', e)
 
@@ -243,9 +239,7 @@ class _Satellite:
     def sun_xn(self):
         """ Initialize the -X sun sensor on I2C1 """
         try:
-            sun_xn = adafruit_tsl2561.TSL2561(self.i2c2, address=0x29)
-            sun_xn.enabled = False
-            return sun_xn
+            return adafruit_tsl2561.TSL2561(self.i2c2, address=0x49)
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor -X]', e)
 
@@ -253,9 +247,7 @@ class _Satellite:
     def sun_yp(self):
         """ Initialize the +Y sun sensor on I2C1 """
         try:
-            sun_yp = adafruit_tsl2561.TSL2561(self.i2c3, address=0x49)
-            sun_yp.enabled = False
-            return sun_yp
+            return adafruit_tsl2561.TSL2561(self.i2c3, address=0x49)
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor +Y]', e)
 
@@ -263,9 +255,7 @@ class _Satellite:
     def sun_zp(self):
         """ Initialize the +Z sun sensor on I2C1 """
         try:
-            sun_zp = adafruit_tsl2561.TSL2561(self.i2c2, address=0x39)
-            sun_zp.enabled = False
-            return sun_zp
+            return adafruit_tsl2561.TSL2561(self.i2c2, address=0x39)
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor +Z]', e)
 
@@ -273,9 +263,7 @@ class _Satellite:
     def sun_xp(self):
         """ Initialize the +X sun sensor on I2C2 """
         try:
-            sun_xp = adafruit_tsl2561.TSL2561(self.i2c2, address=0x49)
-            sun_xp.enabled = False
-            return sun_xp
+            return adafruit_tsl2561.TSL2561(self.i2c2, address=0x29)
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor +X]', e)
 
