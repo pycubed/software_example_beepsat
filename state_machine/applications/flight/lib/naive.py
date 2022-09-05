@@ -8,7 +8,7 @@ class NaiveMessage(Message):
     :param priority: The priority of the message (higher is better)
     :type priority: int
     :param str: The message to send
-    :type str: str
+    :type str: str | bytes | bytearray
     """
 
     packet_len = 249  # not 251 because for some reason packet loss is extremely high at this threshold

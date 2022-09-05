@@ -1,7 +1,7 @@
 # print the time in seconds since boot every 20 seconds
 
 from lib.template_task import Task
-import lib.pycubed as cubesat
+from lib.pycubed import cubesat
 import time
 
 
