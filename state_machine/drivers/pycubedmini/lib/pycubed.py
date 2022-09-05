@@ -121,7 +121,6 @@ class _Satellite:
         self.drv_y
         self.drv_z
         self.burnwire1
-        self.burnwire2
 
     @device
     def i2c1(self):
@@ -302,18 +301,6 @@ class _Satellite:
         except Exception as e:
             print('[ERROR][Initializing Burn Wire IC1]', e)
 
-    @device
-    def burnwire2(self):
-        """ Initialize Burnwire2 on PA18 """
-        # TODO: update firmware so we can use board.BURN2
-        try:
-            # changed pinout from BURN2 to PA18 (BURN2 did not support PWMOut)
-            # Initializing Burn Wire 2 hardware as false; no corresponding IC
-            return pwmio.PWMOut(
-                microcontroller.pin.PA18, frequency=1000, duty_cycle=0)
-        except Exception as e:
-            print('[ERROR][Initializing Burn Wire IC2]', e)
-
     @property
     def acceleration(self):
         """ return the accelerometer reading from the IMU in m/s^2 """
@@ -382,7 +369,7 @@ class _Satellite:
              self.sun_yp.lux - self.sun_yn.lux,
              self.sun_zp.lux - self.sun_zn.lux])
 
-    def burn(self, burn_num='1', dutycycle=0, duration=1):
+    def burn(self, dutycycle=0, duration=1):
         """
         Given a burn wire num, a dutycycle, and a burn duration, control
         the voltage of the corresponding burnwire IC
@@ -390,33 +377,21 @@ class _Satellite:
         run the IC at (ex. if "dtycycl" = 0.5, we burn at 1.65 volts)
         initialize with default burn_num = '1' ; burnwire 2 IC is not set up
         """
-        # BURN1 = -Z,BURN2 = extra burnwire pin, dutycycle ~0.13%
-        dtycycl = int((dutycycle / 100) * (0xFFFF))
-
-        # initialize burnwire based on the burn_num passed to the function
-        if '1' in burn_num:
-            burnwire = self.burnwire1
-        elif '2' in burn_num:
-            # because burnwire2 is not set up, will throw HardwareInitException
-            burnwire = self.burnwire2
-        else:
-            print("Burnwire2 IC is not set up.")
-            return False
-
-        self.setRGB(255, 0, 0)  # set RGB to red
+        burnwire = self.burnwire1
+        self.RGB = (255, 0, 0)
 
         # set the burnwire's dutycycle; begins the burn
-        burnwire.duty_cycle = dtycycl
+        burnwire.duty_cycle = int(dutycycle * (0xFFFF))
         time.sleep(duration)  # wait for given duration
 
         # set burnwire's dutycycle back to 0; ends the burn
         burnwire.duty_cycle = 0
-        self.setRGB(0, 0, 0)  # set RGB to no color
+        self.RGB = (0, 0, 0)
 
         self._deployA = True  # sets deployment variable to true
-        burnwire.deinit()  # deinitialize burnwire
+        # burnwire.deinit()  # deinitialize burnwire
 
-        return self._deployA  # return true
+        return self._deployA
 
     @property
     def RGB(self):
