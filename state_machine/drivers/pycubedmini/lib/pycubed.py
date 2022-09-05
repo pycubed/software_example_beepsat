@@ -375,7 +375,6 @@ class _Satellite:
         the voltage of the corresponding burnwire IC
         "dutycycle" tells us the proportion of total voltage we will
         run the IC at (ex. if "dtycycl" = 0.5, we burn at 1.65 volts)
-        initialize with default burn_num = '1' ; burnwire 2 IC is not set up
         """
         burnwire = self.burnwire1
         self.RGB = (255, 0, 0)
