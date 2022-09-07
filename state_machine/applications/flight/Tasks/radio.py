@@ -7,7 +7,7 @@ from lib.template_task import Task
 import lib.transmission_queue as tq
 import cdh
 import lib.radio_headers as headers
-from lib.pycubed import cubesat, HardwareInitException
+from lib.pycubed import cubesat
 
 ANTENNA_ATTACHED = False
 
@@ -35,10 +35,11 @@ class task(Task):
         self.msg = ''
 
     async def main_task(self):
-        try:
-            _ = cubesat.radio
-        except HardwareInitException:
+        if not cubesat.radio:
             self.debug('No radio attached, skipping radio task')
+            return
+        elif not ANTENNA_ATTACHED:
+            self.debug('No antenna attached, skipping radio task')
             return
 
         if tq.empty():
