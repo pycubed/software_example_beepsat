@@ -133,5 +133,9 @@ class Satellite:
     def imu(self):
         return None
 
+    @property
+    def neopixel(self):
+        return True
+
 
 cubesat = Satellite()
