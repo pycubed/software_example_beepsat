@@ -21,6 +21,7 @@ from bitflags import bitFlag, multiBitFlag
 from micropython import const
 import adafruit_tsl2561
 import time
+import tasko
 from ulab.numpy import array
 
 class device:
@@ -369,28 +370,36 @@ class _Satellite:
              self.sun_yp.lux - self.sun_yn.lux,
              self.sun_zp.lux - self.sun_zn.lux])
 
-    def burn(self, dutycycle=0, duration=1):
+    async def burn(self, dutycycle=0, duration=1):
         """
-        Given a burn wire num, a dutycycle, and a burn duration, control
-        the voltage of the corresponding burnwire IC
-        "dutycycle" tells us the proportion of total voltage we will
-        run the IC at (ex. if "dtycycl" = 0.5, we burn at 1.65 volts)
+        Activates the burnwire for a given duration and dutycycle.
+
+        :param dutycycle: The dutycycle of the burnwire, between 0 and 1
+        :type dutycycle: float
+        :param duration: The duration of the burn, in seconds
+        :type duration: float
+
+        :return: True if the burn was successful, False otherwise
+        :rtype: bool
         """
-        burnwire = self.burnwire1
-        self.RGB = (255, 0, 0)
+        try:
+            burnwire = self.burnwire1
+            self.RGB = (255, 0, 0)
 
-        # set the burnwire's dutycycle; begins the burn
-        burnwire.duty_cycle = int(dutycycle * (0xFFFF))
-        time.sleep(duration)  # wait for given duration
+            # set the burnwire's dutycycle; begins the burn
+            burnwire.duty_cycle = int(dutycycle * (0xFFFF))
+            await tasko.sleep(duration)  # wait for given duration
 
-        # set burnwire's dutycycle back to 0; ends the burn
-        burnwire.duty_cycle = 0
-        self.RGB = (0, 0, 0)
+            # set burnwire's dutycycle back to 0; ends the burn
+            burnwire.duty_cycle = 0
+            self.RGB = (0, 0, 0)
 
-        self._deployA = True  # sets deployment variable to true
-        # burnwire.deinit()  # deinitialize burnwire
-
-        return self._deployA
+            self._deployA = True  # sets deployment variable to true
+            return True
+            # burnwire.deinit()  # deinitialize burnwire
+        except Exception as e:
+            print('[ERROR][Burning]', e)
+            return False
 
     @property
     def RGB(self):
