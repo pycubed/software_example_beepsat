@@ -22,7 +22,6 @@ supervisor.disable_autoreload()
 
 
 # initialize hardware_dict and result_dict
-hardware_dict = cubesat.hardware
 result_dict = {
     "LoggingInfrastructure_Test": ("", False),
     "Basic_SDCard_Test": ("", False),
@@ -52,44 +51,28 @@ result_dict = {
     "Burnwire2": ("", False),
 }
 
-# print hardware initialization results
-print("Hardware initialization results:\n")
-
-print("Failed initializations:")
-for entry in hardware_dict.items():
-    if not entry[1]:
-        print(f"{entry[0]}")
-print("")
-
-print("Successful initializations:")
-for entry in hardware_dict.items():
-    if entry[1]:
-        print(f"{entry[0]}")
-
-print("")
-
 # complete an i2c scan: print all devices connected to each i2c bus
 tests.i2c_scan.run()
 
 # test sd card
-tests.sd_test.run(hardware_dict, result_dict)
+tests.sd_test.run(result_dict)
 
 # test logging infrastructure
-tests.logging_infrastructure_test.run(hardware_dict, result_dict)
+tests.logging_infrastructure_test.run(result_dict)
 
 # test imu
-tests.imu_test.run(hardware_dict, result_dict)
+tests.imu_test.run(result_dict)
 
 # test sun sensor
-tests.sun_sensor_test.run(hardware_dict, result_dict)
+tests.sun_sensor_test.run(result_dict)
 
 # test coil driver
-tests.coil_test.run(hardware_dict, result_dict)
+tests.coil_test.run(result_dict)
 
 # ask to test burnwire
 burnwire_input = input("Type Y to start burnwire test, any key to cancel: ")
 if burnwire_input.lower() == "y":
-    tests.burnwire_test.run(hardware_dict, result_dict)
+    tests.burnwire_test.run(result_dict)
 else:
     result_dict["Burnwire1"] = ("Test was not run.", None)
     result_dict["Burnwire2"] = ("Test was not run.", None)
