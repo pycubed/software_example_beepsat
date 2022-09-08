@@ -6,6 +6,7 @@ SD Card Logging Test
 """
 
 import os
+from lib.pycubed import cubesat
 
 
 def sd_test():
@@ -72,16 +73,10 @@ def run(hardware_dict, result_dict):
     If not initialized, update result dictionary
     """
 
-    # if no SD Card detected, update result dictionary and return
-    if not hardware_dict["SDcard"]:
+    if cubesat.sdcard:
+        print("Starting Basic SD Card test...")
+        result_dict["Basic_SDCard_Test"] = sd_test()
+        print("Basic SD Card test complete.\n")
+    else:
         result_dict["Basic_SDCard_Test"] = (
             "Cannot test logging; no SD Card detected", None)
-        return result_dict
-
-    # if SD Card detected, run other tests
-    print("Starting Basic SD Card test...")
-    result_val_string, result_val_bool = sd_test()
-    result_dict["Basic_SDCard_Test"] = (result_val_string, result_val_bool)
-    print("Basic SD Card test complete.\n")
-
-    return result_dict
