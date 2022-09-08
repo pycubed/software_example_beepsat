@@ -30,6 +30,9 @@ class task(Task):
         if not cubesat.radio:
             self.debug('No radio attached, skipping radio task')
             return
+        elif not ANTENNA_ATTACHED:
+            self.debug('No antenna attached, skipping radio task')
+            return
 
         if should_transmit():
             msg = tq.peek()
