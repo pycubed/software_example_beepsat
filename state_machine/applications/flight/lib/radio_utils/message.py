@@ -21,7 +21,7 @@ class Message:
         pkt = bytearray(len(self.str) + 1)
         pkt[0] = self.header
         pkt[1:] = self.str
-        return pkt, True
+        return pkt, False
 
     def done(self):
         return True
