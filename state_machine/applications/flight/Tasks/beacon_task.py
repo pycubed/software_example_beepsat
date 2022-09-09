@@ -4,7 +4,7 @@ from lib.template_task import Task
 import lib.transmission_queue as tq
 from lib.message import Message
 from lib.naive import NaiveMessage
-from lib.pycubed import cubesat, HardwareInitException
+from lib.pycubed import cubesat
 from state_machine import state_machine
 import struct
 
@@ -45,10 +45,8 @@ class task(Task):
         self.debug("Beacon task pushing to tq")
 
     def beacon_packet(self):
-        try:
-            _ = cubesat.imu
-        except HardwareInitException as e:
-            print(f'IMU not initialized: {e}')
+        if not cubesat.imu:
+            self.debug('IMU not initialized')
             return bytes([0, 0, 0, 0, 0])
 
         cpu_temp = cubesat.temperature_cpu
