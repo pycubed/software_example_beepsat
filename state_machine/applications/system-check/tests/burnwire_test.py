@@ -67,7 +67,7 @@ def burnwire_test(result_dict, burnnum):
     return result_dict
 
 
-def run(hardware_dict, result_dict):
+def run(result_dict):
     """
     Check burnwire 1 and 2
     If initialized correctly, run test and update result dictionary
@@ -76,19 +76,11 @@ def run(hardware_dict, result_dict):
     """
 
     # if no Burn Wire 1 detected, update result dictionary
-    if not hardware_dict["Burnwire1"]:
+    if not cubesat.burnwire1:
         result_dict["Burnwire1"] = ("No burnwire 1 detected", None)
     else:  # Burn Wire 1 detected, run tests
         print("Starting Burnwire1 test...")
         burnwire_test(result_dict, 1)
         print("Burnwire1 Test complete.\n")
-
-    # if no Burn Wire 2 detected, update result dictionary
-    if not hardware_dict["Burnwire2"]:
-        result_dict["Burnwire2"] = ("No burnwire 2 detected", None)
-    else:  # Burn Wire 2 detected, run tests
-        print("Starting Burnwire2 test...")
-        burnwire_test(result_dict, 2)
-        print("Burnwire2 Test complete.\n")
 
     return result_dict

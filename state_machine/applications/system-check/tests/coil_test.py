@@ -61,6 +61,8 @@ levels: {0.0} V, {projected_v1} V, {projected_v2} V, {projected_v3} V.""")
     time.sleep(driver_time)
     mag_reading3 = cubesat.magnetic
 
+    cubesat.coildriver_vout(coil_index, 0)
+
     # calculate total magnetic reading, subtracting the 0V starter reading
     print("Data Collection Complete")
     mag_total1 = norm(numpy.array(mag_reading1) - numpy.array(mag_reading0))
@@ -113,7 +115,7 @@ def coil_test(result_dict, coil_index):
     return result_dict
 
 
-def run(hardware_dict, result_dict):
+def run(result_dict):
     """
     Check coil driver X, Y, and Z
     If initialized correctly, run test and update result dictionary
@@ -122,7 +124,7 @@ def run(hardware_dict, result_dict):
     """
 
     # if no Coil X detected, update result dictionary
-    if not hardware_dict["CoilDriverX"]:
+    if not cubesat.drv_x:
         result_dict["CoilDriverX"] = ("No Coil Driver X detected", None)
     else:  # Coil X detected, run tests
         print("Starting Coil Driver X test...")
@@ -130,7 +132,7 @@ def run(hardware_dict, result_dict):
         print("Coil Driver X Test complete.\n")
 
     # if no Coil Y detected, update result dictionary
-    if not hardware_dict["CoilDriverY"]:
+    if not cubesat.drv_y:
         result_dict["CoilDriverY"] = ("No Coil Driver Y detected", None)
     else:  # Coil Y detected, run tests
         print("Starting Coil Driver Y test...")
@@ -138,7 +140,7 @@ def run(hardware_dict, result_dict):
         print("Coil Driver Y Test complete.\n")
 
     # if no Coil Z detected, update result dictionary
-    if not hardware_dict["CoilDriverZ"]:
+    if not cubesat.drv_z:
         result_dict["CoilDriverZ"] = ("No Coil Driver Z detected", None)
     else:  # Coil Z detected, run tests
         print("Starting Coil Driver Z test...")

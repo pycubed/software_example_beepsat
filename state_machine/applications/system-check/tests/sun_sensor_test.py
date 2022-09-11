@@ -66,12 +66,12 @@ def test_individual_sun_sensor(result_dict, sensor_index, light_dark):
     lux_val = user_test(sensor_index, light_dark)
 
     # find result key and result value strings
-    result_key = f"Sun {sensor_index}_{light_dark}"
+    result_key = f"Sun{sensor_index}_{light_dark}"
 
     # if lux value is None, test was cancelled, update result dict and continue
     if lux_val is None:
         result_dict[result_key] = (
-            f"Did not test Sun Sensor {sensor_index}", False)
+            f"Could not get a lux value for Sun Sensor {sensor_index}. Test cancelled or failed.", False)
         return result_dict
 
     # else continue
@@ -91,7 +91,7 @@ def test_individual_sun_sensor(result_dict, sensor_index, light_dark):
     return result_dict
 
 
-def run(hardware_dict, result_dict):
+def run(result_dict):
     """
     Check Sun Sensor -Y, -Z, -X, +Y, +Z, +X
     If initialized correctly, run test and update result dictionary through
@@ -100,7 +100,7 @@ def run(hardware_dict, result_dict):
     """
 
     # if no Sun Sensor -Y detected, update result dictionary
-    if not hardware_dict["Sun-Y"]:
+    if not cubesat.sun_yn:
         result_dict["Sun-Y_Light"] = ("No sun sensor -Y detected", None)
         result_dict["Sun-Y_Dark"] = ("No sun sensor -Y detected", None)
     else:  # Sun Sensor -Y detected, run tests
@@ -110,7 +110,7 @@ def run(hardware_dict, result_dict):
         print("Sun Sensor -Y test complete.\n")
 
     # if no Sun Sensor -Z detected, update result dictionary
-    if not hardware_dict["Sun-Z"]:
+    if not cubesat.sun_zn:
         result_dict["Sun-Z_Light"] = ("No sun sensor -Z detected", None)
         result_dict["Sun-Z_Dark"] = ("No sun sensor -Z detected", None)
     else:  # Sun Sensor -Z detected, run tests
@@ -120,7 +120,7 @@ def run(hardware_dict, result_dict):
         print("Sun Sensor -Z test complete.\n")
 
     # if no Sun Sensor -X detected, update result dictionary
-    if not hardware_dict["Sun-X"]:
+    if not cubesat.sun_xn:
         result_dict["Sun-X_Light"] = ("No sun sensor -X detected", None)
         result_dict["Sun-X_Dark"] = ("No sun sensor -X detected", None)
     else:  # Sun Sensor -X detected, run tests
@@ -130,7 +130,7 @@ def run(hardware_dict, result_dict):
         print("Sun Sensor -X test complete.\n")
 
     # if no Sun Sensor +Y detected, update result dictionary
-    if not hardware_dict["Sun+Y"]:
+    if not cubesat.sun_yp:
         result_dict["Sun+Y_Light"] = ("No sun sensor +Y detected", None)
         result_dict["Sun+Y_Dark"] = ("No sun sensor +Y detected", None)
     else:  # Sun Sensor +Y detected, run tests
@@ -140,7 +140,7 @@ def run(hardware_dict, result_dict):
         print("Sun Sensor +Y test complete.\n")
 
     # if no Sun Sensor +Z detected, update result dictionary
-    if not hardware_dict["Sun+Z"]:
+    if not cubesat.sun_zp:
         result_dict["Sun+Z_Light"] = ("No sun sensor +Z detected", None)
         result_dict["Sun+Z_Dark"] = ("No sun sensor +Z detected", None)
     else:  # Sun Sensor +Z detected, run tests
@@ -150,7 +150,7 @@ def run(hardware_dict, result_dict):
         print("Sun Sensor +Z test complete.\n")
 
     # if no Sun Sensor +X detected, update result dictionary
-    if not hardware_dict["Sun+X"]:
+    if not cubesat.sun_xp:
         result_dict["Sun+X_Light"] = ("No sun sensor +X detected", None)
         result_dict["Sun+X_Dark"] = ("No sun sensor +X detected", None)
     else:  # Sun Sensor +X detected, run tests
