@@ -7,7 +7,7 @@ from lib.template_task import Task
 import lib.transmission_queue as tq
 import cdh
 import lib.radio_headers as headers
-from lib.pycubed import cubesat, HardwareInitException
+from lib.pycubed import cubesat
 
 ANTENNA_ATTACHED = False
 
@@ -30,18 +30,16 @@ class task(Task):
         'exec_cmd':     cdh.exec_cmd,
     }
 
-    def __init__(self, satellite):
-        # Copy pasted from beacon_task.py, not sure about the purpose
-        # Or if we need it for our protocol.
-        super().__init__(satellite)
-        # set our radiohead node ID so we can get ACKs
+    def __init__(self):
+        super().__init__()
         self.msg = ''
 
     async def main_task(self):
-        try:
-            _ = cubesat.radio
-        except HardwareInitException:
+        if not cubesat.radio:
             self.debug('No radio attached, skipping radio task')
+            return
+        elif not ANTENNA_ATTACHED:
+            self.debug('No antenna attached, skipping radio task')
             return
 
         if tq.empty():
@@ -52,7 +50,7 @@ class task(Task):
                 header = response[0]
                 response = response[1:]  # remove the header byte
 
-                self.debug(f'Recieved msg "{response}", RSSI: {self.cubesat.radio.last_rssi - 137}')
+                self.debug(f'Recieved msg "{response}", RSSI: {cubesat.radio.last_rssi - 137}')
 
                 if header == headers.NAIVE_START or header == headers.NAIVE_MID or header == headers.NAIVE_END:
                     self.handle_naive(header, response)
@@ -107,7 +105,7 @@ class task(Task):
 
             if tq.peek().done():
                 tq.pop()
-        self.cubesat.radio.sleep()
+        cubesat.radio.sleep()
 
     def handle_naive(self, header, response):
         if header == headers.NAIVE_START:

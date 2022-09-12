@@ -1,61 +1,67 @@
 import tasko
+from lib.pycubed import cubesat
 
-from StateMachineConfig import config, TaskMap, TransitionFunctionMap
 from lib.state_machine_utils import validate_config
 
 
 class StateMachine:
     """Singleton State Machine Class"""
 
-    def __init__(self, cubesat, start_state):
+    def __init__(self):
+        pass
+
+    def start(self, start_state: str):
+        """Starts the state machine
+
+        Args:
+        :param start_state: The state to start the state machine in
+        :type start_state: str
+        """
+        from StateMachineConfig import config, TaskMap, TransitionFunctionMap
+
         self.config = config
+        self.transition_function_map = TransitionFunctionMap
         validate_config(config, TaskMap, TransitionFunctionMap)
 
-        self.state = start_state
-
-        # allow access to cubesat object
-        self.cubesat = cubesat
-
-        # create shared asyncio object
-        self.tasko = tasko
-
-        # supports legacy code, only the state machine should use tasko
-        cubesat.tasko = tasko
+        self.states = list(config.keys())
+        self.states.sort()
 
         # init task objects
-        self.tasks = {key: task(cubesat) for key, task in TaskMap.items()}
+        self.tasks = {key: task() for key, task in TaskMap.items()}
 
         # set scheduled tasks to none
         self.scheduled_tasks = {}
 
-        # Make state machine accesible to cubesat
-        cubesat.state_machine = self
-
-        # switch to start state, and start event loop
+        self.state = start_state
         self.switch_to(start_state, force=True)
-        self.tasko.run()
+        tasko.run()
 
     def stop_all(self):
         """Stops all running tasko processes"""
         for _, task in self.scheduled_tasks.items():
             task.stop()
 
-    def switch_to(self, state_name, force=False):
-        """Switches the state of the cubesat to the new state"""
+    def switch_to(self, state_name: str, force=False):
+        """Switches the state of the cubesat to the new state
 
-        # prevent (or force) illegal transitions
-        if not(state_name in self.config[self.state]['StepsTo'] or force):
+        Args:
+        :param state_name: The name of the state to switch to
+        :type state_name: str
+        """
+
+        # prevent (or allow forced) illegal transitions
+        if not (state_name in self.config[self.state]['StepsTo'] or force):
             raise ValueError(
                 f'You cannot transition from {self.state} to {state_name}')
 
         # execute transition functions
         if self.state != state_name:
-            for fn in config[self.state]['ExitFunctions']:
-                fn = TransitionFunctionMap[fn]
-                fn(self.state, state_name, self.cubesat)
-            for fn in config[state_name]['EnterFunctions']:
-                fn = TransitionFunctionMap[fn]
-                fn(self.state, state_name, self.cubesat)
+            for fn in self.config[self.state]['ExitFunctions']:
+                fn = self.transition_function_map[fn]
+                fn(self.state, state_name, cubesat)
+            for fn in self.config[state_name]['EnterFunctions']:
+                fn = self.transition_function_map[fn]
+                fn(self.state, state_name, cubesat)
 
         # reschedule tasks
         self.stop_all()
@@ -65,9 +71,9 @@ class StateMachine:
 
         for task_name, props in state_config['Tasks'].items():
             if props['ScheduleLater']:
-                schedule = self.tasko.schedule_later
+                schedule = tasko.schedule_later
             else:
-                schedule = self.tasko.schedule
+                schedule = tasko.schedule
 
             frequency = 1 / props['Interval']
             priority = props['Priority']
@@ -75,3 +81,6 @@ class StateMachine:
 
             self.scheduled_tasks[task_name] = schedule(
                 frequency, task_fn, priority)
+
+
+state_machine = StateMachine()
