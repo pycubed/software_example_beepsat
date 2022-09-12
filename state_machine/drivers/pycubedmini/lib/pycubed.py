@@ -1,7 +1,5 @@
 """
-CircuitPython driver for PyCubed satellite board
-PyCubed Mini mainboard-v02 for Pocketqube Mission
-* Author(s): Max Holliday, Yashika Batra
+CircuitPython driver for PyCubed-Mini
 """
 
 import sdcardio
