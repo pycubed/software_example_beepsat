@@ -10,7 +10,7 @@ from lib.pycubed import cubesat
 import tests
 import tests.i2c_scan
 import tests.sd_test
-import tests.logging_infrastructure_test
+# import tests.logging_infrastructure_test
 import tests.imu_test
 # import tests.radio_test
 import tests.sun_sensor_test
@@ -48,7 +48,6 @@ result_dict = {
     "CoilDriverY": ("", False),
     "CoilDriverZ": ("", False),
     "Burnwire1": ("", False),
-    "Burnwire2": ("", False),
 }
 
 # complete an i2c scan: print all devices connected to each i2c bus
@@ -58,7 +57,7 @@ tests.i2c_scan.run()
 tests.sd_test.run(result_dict)
 
 # test logging infrastructure
-tests.logging_infrastructure_test.run(result_dict)
+# tests.logging_infrastructure_test.run(result_dict)
 
 # test imu
 tests.imu_test.run(result_dict)
