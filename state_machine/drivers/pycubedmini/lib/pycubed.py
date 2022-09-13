@@ -299,20 +299,23 @@ class _Satellite:
         except Exception as e:
             print('[ERROR][Initializing Burn Wire IC1]', e)
 
+    def imuToBodyFrame(self, vec):
+        return array([-vec[0], vec[2], vec[1]])
+
     @property
     def acceleration(self):
         """ return the accelerometer reading from the IMU in m/s^2 """
-        return self.imu.accel if self.imu else None
+        return self.imuToBodyFrame(self.imu.accel) if self.imu else None
 
     @property
     def magnetic(self):
         """ return the magnetometer reading from the IMU in µT """
-        return self.imu.mag if self.imu else None
+        return self.imuToBodyFrame(self.imu.mag) if self.imu else None
 
     @property
     def gyro(self):
         """ return the gyroscope reading from the IMU in deg/s """
-        return self.imu.gyro if self.imu else None
+        return self.imuToBodyFrame(self.imu.gyro) if self.imu else None
 
     @property
     def temperature_imu(self):
