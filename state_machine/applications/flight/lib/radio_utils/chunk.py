@@ -1,7 +1,6 @@
 from .message import Message
 from . import headers
 from . import MAX_PACKET_LEN
-import os
 
 class ChunkMessage(Message):
     """Transmits the message 251 bytes at a time.

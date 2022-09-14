@@ -1,5 +1,10 @@
 import time
 from lib.pycubed import cubesat
+from lib.radio_utils import transmission_queue as tq
+from lib.radio_utils import headers
+import lib.radio_utils as radio_utils
+ChunkMessage = radio_utils.chunk.ChunkMessage
+Message = radio_utils.message.Message
 
 NO_OP = b'\x00\x00'
 HARD_RESET = b'\x00\x01'
@@ -9,11 +14,12 @@ EXEC_PY = b'\x00\x04'
 
 def noop(self):
     self.debug('no-op')
-    pass
 
-def hreset(self):
+async def hreset(self):
     self.debug('Resetting')
-    cubesat.radio1.send(data=b'resetting')
+    msg = bytearray([headers.DEFAULT])
+    msg.append(b'reset')
+    await cubesat.radio.send(data=msg)
     cubesat.micro.on_next_reset(self.cubesat.micro.RunMode.NORMAL)
     cubesat.micro.reset()
 
@@ -40,7 +46,15 @@ def shutdown(self, args):
 
 def query(self, args):
     self.debug(f'query: {args}')
-    self.cubesat.radio1.send(data=str(eval(args)))
+    res = str(eval(args)).encode('utf-8')
+    if len(res) <= radio_utils.PACKET_DATA_LEN:
+        tq.push(Message(1, res))
+    else:
+        fname = f'/sd/query{time.monotonic_ns()}.txt'
+        f = open(fname, 'w')
+        f.write(res)
+        f.close()
+        tq.push(ChunkMessage(res))
 
 def exec_py(self, args):
     self.debug(f'exec: {args}')

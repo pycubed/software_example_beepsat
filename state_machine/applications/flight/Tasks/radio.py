@@ -10,6 +10,7 @@ import radio_utils.headers as headers
 from pycubed import cubesat
 
 ANTENNA_ATTACHED = False
+CHUNK_BUFFER_SIZE = 1000
 
 def should_transmit():
     """
@@ -64,6 +65,8 @@ class task(Task):
 
                 if header == headers.NAIVE_START or header == headers.NAIVE_MID or header == headers.NAIVE_END:
                     self.handle_naive(header, response)
+                elif header == headers.CHUNK_START or header == headers.CHUNK_MID or header == headers.CHUNK_END:
+                    self.handle_chunk(header, response)
                 elif header == headers.COMMAND:
                     self.handle_command(response)
             else:
@@ -116,3 +119,16 @@ class task(Task):
         else:
             self.debug('invalid command!')
             cubesat.radio.send(b'invalid cmd' + cmd)
+
+    def handle_chunk(self, header, response):
+        if header == headers.CHUNK_START:
+            self.cmsg = response
+        elif header == headers.CHUNK_MID:
+            self.cmsg += response
+        elif header == headers.CHUNK_END:
+            self.cmsg += response
+        if len(self.cmsg) > CHUNK_BUFFER_SIZE or header == headers.CHUNK_END:
+            f = open("/sd/chunk.txt", "a")
+            f.write(self.cmsg)
+            f.close()
+            self.cmsg = None
