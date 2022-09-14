@@ -106,6 +106,7 @@ class _Satellite:
         self.i2c3
         self.spi
         self.sdcard
+        self.vfs
         self.neopixel
         self.imu
         self.radio
@@ -163,7 +164,7 @@ class _Satellite:
     @device
     def vfs(self):
         try:
-            vfs = storage.VfsFat(self.sd)
+            vfs = storage.VfsFat(self.sdcard)
             storage.mount(vfs, "/sd")
             sys.path.append("/sd")
             return vfs
