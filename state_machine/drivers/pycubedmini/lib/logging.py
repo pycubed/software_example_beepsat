@@ -174,7 +174,7 @@ def storage_stats():
     return (fs_storage_percent, sd_storage_percent)
 
 
-def clear_storage():
+def clear_log_storage():
     """
     Clear the logs directory and info.txt file on the sd card
     """
