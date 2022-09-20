@@ -141,5 +141,5 @@ class task(Task):
             f.write(data)
             f.close()
             self.debug('Sucesfully wrote to file')
-        except Error as e:
+        except Exception as e:
             self.debug(f'Error while writing to file {e}')

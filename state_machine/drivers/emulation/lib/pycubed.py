@@ -1,8 +1,5 @@
 import time
 import tasko
-import sys
-
-sys.path.insert(0, './lib/')
 
 import lib.reader as reader
 try:

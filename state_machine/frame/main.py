@@ -1,3 +1,7 @@
+import sys
+if '/lib' not in sys.path:
+    sys.path.insert(0, './lib')
+
 import traceback
 from pycubed import cubesat
 from state_machine import state_machine
