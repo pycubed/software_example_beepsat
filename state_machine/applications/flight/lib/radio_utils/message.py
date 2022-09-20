@@ -8,9 +8,10 @@ class Message:
     :type str: str | bytes | bytearray
     """
 
-    def __init__(self, priority, str):
+    def __init__(self, priority, str, with_ack=False):
         self.priority = priority
         self.header = 0x00
+        self.with_ack = with_ack
         if isinstance(str, bytes) or isinstance(str, bytearray):
             self.str = str
         else:
@@ -21,7 +22,7 @@ class Message:
         pkt = bytearray(len(self.str) + 1)
         pkt[0] = self.header
         pkt[1:] = self.str
-        return pkt, False
+        return pkt, self.with_ack
 
     def done(self):
         return True

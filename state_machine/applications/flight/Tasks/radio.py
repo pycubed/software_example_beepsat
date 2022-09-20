@@ -91,8 +91,9 @@ class task(Task):
         elif header == headers.NAIVE_END:
             txt = str(response, 'ascii')
             self.msg += txt
-            print('Finished recieving message')
+            self.debug('Finished recieving message')
             print(self.msg)
+            self.try_write('/sd/naive.txt', 'w', self.msg)
 
     def handle_command(self, response):
         if len(response) < 6 or response[:4] != self.super_secret_code:
@@ -128,7 +129,17 @@ class task(Task):
         elif header == headers.CHUNK_END:
             self.cmsg += response
         if len(self.cmsg) > CHUNK_BUFFER_SIZE or header == headers.CHUNK_END:
-            f = open("/sd/chunk.txt", "a")
-            f.write(self.cmsg)
-            f.close()
+            self.try_write('/sd/chunk.txt', 'a', self.cmsg)
             self.cmsg = None
+
+    def try_write(self, file, mode, data):
+        if not cubesat.sdcard or not cubesat.vfs:
+            self.debug('No SD card attached, skipping writing to file')
+            return
+        try:
+            f = open(f"/sd/{file}", mode)
+            f.write(data)
+            f.close()
+            self.debug('Sucesfully wrote to file')
+        except Error as e:
+            self.debug(f'Error while writing to file {e}')
