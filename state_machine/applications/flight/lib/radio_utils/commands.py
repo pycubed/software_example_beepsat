@@ -5,7 +5,7 @@ from radio_utils import transmission_queue as tq
 from radio_utils import headers
 from radio_utils.chunk import ChunkMessage
 from radio_utils.message import Message
-import msgpack
+import json
 
 NO_OP = b'\x00\x00'
 HARD_RESET = b'\x00\x01'
@@ -44,8 +44,9 @@ def request_file(task, file):
         tq.push(Message(9, b'File not found', with_ack=True))
 
 def list_dir(task, path):
+    path = str(path, 'utf-8')
     res = os.listdir(path)
-    res = msgpack.pack(res)
+    res = json.dumps(res)
     downlink(res)
 
 def tq_len(task):

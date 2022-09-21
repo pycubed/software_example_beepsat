@@ -44,3 +44,6 @@ class ChunkMessage(Message):
 
     def ack(self):
         self.cursor += self.packet_len
+
+    def __repr__(self) -> str:
+        return f'<Chunk: {self.path}>'
