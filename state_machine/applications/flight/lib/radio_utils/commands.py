@@ -37,9 +37,11 @@ def exec_py(task, args):
     exec(args)
 
 def request_file(task, file):
-    if os.path.exists(file):
+    file = str(file, 'utf-8')
+    try:
+        os.stat(file)
         tq.push(ChunkMessage(1, file))
-    else:
+    except Exception:
         task.debug(f'File not found: {file}')
         tq.push(Message(9, b'File not found', with_ack=True))
 

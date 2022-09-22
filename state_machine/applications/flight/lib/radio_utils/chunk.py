@@ -1,6 +1,7 @@
 from .message import Message
 from . import headers
 from . import MAX_PACKET_LEN
+import os
 
 class ChunkMessage(Message):
     """Transmits the message 251 bytes at a time.
@@ -19,7 +20,7 @@ class ChunkMessage(Message):
         self.cursor = 0
         self.priority = priority
         self.path = path
-        self.msg_len = 0
+        self.msg_len = os.stat(path)[6]
 
     def packet(self):
         try:
@@ -30,11 +31,11 @@ class ChunkMessage(Message):
             print(f'Error reading file {self.path}: {e}')
         pkt = bytearray(len(payload) + 1)
         if self.msg_len <= self.cursor + self.packet_len:  # last packet
-            pkt[0] = headers.NAIVE_END
+            pkt[0] = headers.CHUNK_END
         elif self.cursor == 0:
-            pkt[0] = headers.NAIVE_START
+            pkt[0] = headers.CHUNK_START
         else:
-            pkt[0] = headers.NAIVE_MID
+            pkt[0] = headers.CHUNK_MID
 
         pkt[1:] = payload
         return pkt, True

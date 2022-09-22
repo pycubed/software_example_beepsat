@@ -10,7 +10,6 @@ import radio_utils.headers as headers
 from pycubed import cubesat
 
 ANTENNA_ATTACHED = False
-CHUNK_BUFFER_SIZE = 1000
 
 def should_transmit():
     """
@@ -25,7 +24,7 @@ class task(Task):
 
     def __init__(self):
         super().__init__()
-        self.msg = ''
+        self.msg = bytes([])
 
     async def main_task(self):
         if not cubesat.radio:
@@ -76,24 +75,17 @@ class task(Task):
 
     def handle_naive(self, header, response):
         if header == headers.NAIVE_START:
-            txt = str(response, 'ascii')
-            self.msg = txt
-            self.last = txt
-            print('Started recieving message')
-        elif header == headers.NAIVE_MID:
-            txt = str(response, 'ascii')
-            if txt == self.last:
-                print('Repeated message')
+            self.msg_last = response
+            self.msg = response
+        else:
+            if response != self.msg_last:
+                self.msg += response
             else:
-                self.msg += txt
-                self.last = txt
-                print('Continued recieving message')
-        elif header == headers.NAIVE_END:
-            txt = str(response, 'ascii')
-            self.msg += txt
-            self.debug('Finished recieving message')
-            print(self.msg)
-            self.try_write('/sd/naive.txt', 'w', self.msg)
+                self.debug('Repeated chunk')
+
+        if header == headers.NAIVE_END:
+            self.cmsg_last = None
+            self.msg = str(self.msg, 'utf-8')
 
     def handle_command(self, response):
         if len(response) < 6 or response[:4] != self.super_secret_code:
@@ -123,14 +115,16 @@ class task(Task):
 
     def handle_chunk(self, header, response):
         if header == headers.CHUNK_START:
-            self.cmsg = response
-        elif header == headers.CHUNK_MID:
-            self.cmsg += response
-        elif header == headers.CHUNK_END:
-            self.cmsg += response
-        if len(self.cmsg) > CHUNK_BUFFER_SIZE or header == headers.CHUNK_END:
-            self.try_write('/sd/chunk.txt', 'a', self.cmsg)
-            self.cmsg = None
+            self.cmsg_last = response
+            self.try_write('chunk', 'wb', response)
+        else:
+            if response != self.cmsg_last:
+                self.try_write('chunk', 'ab', response)
+            else:
+                self.debug('Repeated chunk')
+
+        if header == headers.CHUNK_END:
+            self.cmsg_last = None
 
     def try_write(self, file, mode, data):
         if not cubesat.sdcard or not cubesat.vfs:
