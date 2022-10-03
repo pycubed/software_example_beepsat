@@ -3,13 +3,10 @@ Python system check script for PyCubed satellite board
 PyCubed Mini mainboard-v02 for Pocketqube Mission
 * Author(s): Yashika Batra
 """
-# print acknowledgement that test has started
-print("\n#################### S Y S T E M   C H E C K ####################\n")
-
 import tests
 import tests.i2c_scan
 import tests.sd_test
-# import tests.logging_infrastructure_test
+import tests.logging_infrastructure_test
 import tests.imu_test
 # import tests.radio_test
 import tests.sun_sensor_test
@@ -18,6 +15,10 @@ import tests.burnwire_test
 import supervisor
 
 supervisor.disable_autoreload()
+
+
+# print acknowledgement that test has started
+print("\n#################### S Y S T E M   C H E C K ####################\n")
 
 # initialize hardware_dict and result_dict
 result_dict = {
@@ -55,7 +56,7 @@ tests.i2c_scan.run()
 tests.sd_test.run(result_dict)
 
 # test logging infrastructure
-# tests.logging_infrastructure_test.run(result_dict)
+tests.logging_infrastructure_test.run(result_dict)
 
 # test imu
 tests.imu_test.run(result_dict)
