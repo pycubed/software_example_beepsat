@@ -1,11 +1,11 @@
 """
 Python system check script for PyCubed satellite board
+PyCubed Mini mainboard-v02 for Pocketqube Mission
 * Author(s): Yashika Batra
 """
 # print acknowledgement that test has started
 print("\n#################### S Y S T E M   C H E C K ####################\n")
 
-from lib.pycubed import cubesat
 import tests
 import tests.i2c_scan
 import tests.sd_test
@@ -18,7 +18,6 @@ import tests.burnwire_test
 import supervisor
 
 supervisor.disable_autoreload()
-
 
 # initialize hardware_dict and result_dict
 result_dict = {
