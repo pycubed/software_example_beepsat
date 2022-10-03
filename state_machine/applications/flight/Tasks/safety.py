@@ -1,5 +1,6 @@
 from lib.template_task import Task
 from lib.pycubed import cubesat
+from state_machine import state_machine
 
 
 class task(Task):
@@ -20,15 +21,15 @@ class task(Task):
         else:
             self.debug_status(vbatt, temp)
             self.debug('Safe operating conditions reached, switching to normal mode')
-            cubesat.state_machine.switch_to('Normal')
+            state_machine.switch_to('Normal')
 
     def other_modes(self, vbatt, temp):
         if vbatt < cubesat.LOW_VOLTAGE:
             self.debug(f'Voltage too low ({vbatt:.1f}V < {cubesat.LOW_VOLTAGE:.1f}V) switch to safe mode')
-            cubesat.state_machine.switch_to('Safe')
+            state_machine.switch_to('Safe')
         elif temp > cubesat.HIGH_TEMP:
             self.debug(f'Temp too high ({temp:.1f}°C > {cubesat.HIGH_TEMP:.1f}°C) switching to safe mode')
-            cubesat.state_machine.switch_to('Safe')
+            state_machine.switch_to('Safe')
         else:
             self.debug_status(vbatt, temp)
 
@@ -39,7 +40,7 @@ class task(Task):
         """
         vbatt = cubesat.battery_voltage
         temp = cubesat.temperature_cpu
-        if cubesat.state_machine.state == 'Safe':
+        if state_machine.state == 'Safe':
             self.safe_mode(vbatt, temp)
         else:
             self.other_modes(vbatt, temp)
