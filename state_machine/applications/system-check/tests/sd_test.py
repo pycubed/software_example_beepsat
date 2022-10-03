@@ -7,7 +7,7 @@ SD Card Logging Test
 
 import os
 from lib.pycubed import cubesat
-from lib.logging import *
+from lib.logging import clear_log_storage
 
 
 def sd_test():
@@ -61,7 +61,7 @@ def sd_test():
 
     if filepath in os.listdir("/sd/"):
         return ("File deletion failed.", False)
-    
+
     clear_log_storage()
 
     # if nothing has failed so far, return success
