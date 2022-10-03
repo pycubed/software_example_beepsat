@@ -1,6 +1,5 @@
 """
 Python system check script for PyCubed satellite board
-PyCubed Mini mainboard-v02 for Pocketqube Mission
 * Author(s): Yashika Batra
 """
 # print acknowledgement that test has started
