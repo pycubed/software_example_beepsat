@@ -25,12 +25,15 @@ class Message:
         return pkt, self.with_ack
 
     def done(self):
+        """Returns true if the message is done sending."""
         return True
 
     def ack(self):
+        """Called when the message is acknowledged."""
         pass
 
     def no_ack(self):
+        """Called when the message fails to be acknowledged."""
         pass
 
     def __lt__(self, other):

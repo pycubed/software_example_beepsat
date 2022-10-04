@@ -74,6 +74,7 @@ class task(Task):
         cubesat.radio.sleep()
 
     def handle_naive(self, header, response):
+        """Handler function for the naive message type"""
         if header == headers.NAIVE_START:
             self.msg_last = response
             self.msg = response
@@ -88,6 +89,7 @@ class task(Task):
             self.msg = str(self.msg, 'utf-8')
 
     def handle_command(self, response):
+        """Handler function for commands"""
         if len(response) < 6 or response[:4] != self.super_secret_code:
             return
 
@@ -114,6 +116,7 @@ class task(Task):
             cubesat.radio.send(b'invalid cmd' + cmd)
 
     def handle_chunk(self, header, response):
+        """Handler function for the chunk message type"""
         if header == headers.CHUNK_START:
             self.cmsg_last = response
             self.try_write('chunk', 'wb', response)
@@ -127,6 +130,7 @@ class task(Task):
             self.cmsg_last = None
 
     def try_write(self, file, mode, data):
+        """Try to write to the sd card. If it fails, print an error"""
         if not cubesat.sdcard or not cubesat.vfs:
             self.debug('No SD card attached, skipping writing to file')
             return

@@ -23,6 +23,8 @@ class ChunkMessage(Message):
         self.msg_len = os.stat(path)[6]
 
     def packet(self):
+        """Reads the next chunk of data from sd, and returns this is a packet.
+        Always requests an ack."""
         try:
             with open(self.path, "rb") as f:
                 f.seek(self.cursor)

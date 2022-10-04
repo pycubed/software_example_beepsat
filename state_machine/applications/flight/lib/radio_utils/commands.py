@@ -16,9 +16,11 @@ LIST_DIR = b'\x00\x06'
 TQ_LEN = b'\x00\x07'
 
 def noop(self):
+    """No operation"""
     self.debug('no-op')
 
 async def hreset(self):
+    """Hard reset"""
     self.debug('Resetting')
     msg = bytearray([headers.DEFAULT])
     msg.append(b'reset')
@@ -28,15 +30,18 @@ async def hreset(self):
 
 
 def query(task, args):
+    """Execute the query as python and return the result"""
     task.debug(f'query: {args}')
     res = str(eval(args))
     downlink(res)
 
 def exec_py(task, args):
+    """Execute the python code"""
     task.debug(f'exec: {args}')
     exec(args)
 
 def request_file(task, file):
+    """Request a file to be downlinked"""
     file = str(file, 'utf-8')
     try:
         os.stat(file)
@@ -46,18 +51,21 @@ def request_file(task, file):
         tq.push(Message(9, b'File not found', with_ack=True))
 
 def list_dir(task, path):
+    """List the contents of a directory"""
     path = str(path, 'utf-8')
     res = os.listdir(path)
     res = json.dumps(res)
     downlink(res)
 
 def tq_len(task):
+    """Return the length of the transmission queue"""
     len = str(tq.len())
     tq.push(Message(1, len))
 
 # Helper functions
 
 def downlink(data, priority=1):
+    """Write data to a file, and then create a new ChunkMessage to downlink it"""
     fname = f'/sd/downlink/{time.monotonic_ns()}.txt'
     f = open(fname, 'w')
     f.write(data)
