@@ -72,7 +72,7 @@ class _Satellite:
     c_downlink = multiBitFlag(register=_DWNLINK, lowest_bit=0, num_bits=8)
     c_logfail = multiBitFlag(register=_LOGFAIL, lowest_bit=0, num_bits=8)
 
-    UHF_FREQ = 401.82
+    UHF_FREQ = 433.0
 
     instance = None
     data_cache = {}

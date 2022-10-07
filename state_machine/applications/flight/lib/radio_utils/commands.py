@@ -76,6 +76,7 @@ def move_file(task, args):
     try:
         args = json.loads(args)
         os.rename(args[0], args[1])
+        task.debug('Sucess moving file')
         tq.push(Message(9, b'Success moving file'))
     except Exception as e:
         task.debug(f'Error moving file: {e}')
@@ -93,6 +94,8 @@ def copy_file(task, args):
         args = json.loads(args)
         with open(args[0], 'rb') as source, open(args[1], 'wb') as dest:
             cp(source, dest)
+        task.debug('Sucess copying file')
+        tq.push(Message(9, b'Success copying file'))
     except Exception as e:
         task.debug(f'Error moving file: {e}')
         downlink(f'Error moving file: {e}', priority=9)
