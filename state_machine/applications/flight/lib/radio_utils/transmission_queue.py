@@ -1,4 +1,4 @@
-import lib.priority_queue as pq
+from . import priority_queue as pq
 
 queue = []
 limit = 100

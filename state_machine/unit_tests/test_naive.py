@@ -1,10 +1,10 @@
 import unittest
 import sys
 
-sys.path.insert(0, './state_machine/applications/flight')
+sys.path.insert(0, './state_machine/applications/flight/lib/')
 
-from lib.naive import NaiveMessage
-import lib.radio_headers as headers
+from radio_utils.naive import NaiveMessage
+import radio_utils.headers as headers
 
 packet_len = NaiveMessage.packet_len
 

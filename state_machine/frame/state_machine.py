@@ -1,5 +1,5 @@
 import tasko
-from lib.pycubed import cubesat
+from pycubed import cubesat
 
 from lib.state_machine_utils import validate_config
 

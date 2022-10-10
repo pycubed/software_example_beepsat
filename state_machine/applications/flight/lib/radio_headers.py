@@ -1,4 +1,0 @@
-DEFAULT = 0x00
-NAIVE_START = 0xff
-NAIVE_MID = 0xfe
-NAIVE_END = 0xfd
