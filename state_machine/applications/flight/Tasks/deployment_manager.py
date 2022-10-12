@@ -11,11 +11,11 @@ class deployment_manager(Task):
 
     async def main_task(self):
         # nvm shit
-        if (cubesat.f_deploy):
+        if (cubesat.f_contact):
             state_machine.switch_to('Normal')
         else:
             if await cubesat.burn(duration=15):
-                self.deubg('Successfully burned')
+                self.debug('Successfully burned')
             else:
                 # Consider panic mode
                 self.deubg('Uncuccessful burn')

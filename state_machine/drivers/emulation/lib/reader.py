@@ -21,3 +21,6 @@ def read(cubesat):
                         print("randomizing voltage")
                     else:
                         print("no longer randomizing voltage")
+                if data[4] == 'c':  # Toggle contact flag
+                    cubesat.f_contact = not cubesat.f_contact
+                    print(f'Set contact flag to {cubesat.f_contact}')

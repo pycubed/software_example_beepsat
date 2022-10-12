@@ -60,7 +60,7 @@ _LOGFAIL = const(5)
 
 class _Satellite:
     # Define NVM flags
-    f_deploy = bitFlag(register=_FLAG, bit=1)
+    f_contact = bitFlag(register=_FLAG, bit=1)
     f_mdeploy = bitFlag(register=_FLAG, bit=2)
     f_burn1 = bitFlag(register=_FLAG, bit=3)
     f_burn2 = bitFlag(register=_FLAG, bit=4)
