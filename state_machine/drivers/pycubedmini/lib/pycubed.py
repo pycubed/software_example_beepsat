@@ -372,7 +372,7 @@ class _Satellite:
              self.sun_yp.lux - self.sun_yn.lux,
              self.sun_zp.lux - self.sun_zn.lux])
 
-    async def burn(self, dutycycle=0, duration=1):
+    async def burn(self, dutycycle=0.5, duration=1):
         """
         Activates the burnwire for a given duration and dutycycle.
 
