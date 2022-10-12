@@ -20,8 +20,8 @@ class task(Task):
             self.debug(f'Temp too high ({temp:.1f}°C >= {cubesat.HIGH_TEMP - 1:.1f}°C)')
         else:
             self.debug_status(vbatt, temp)
-            self.debug('Safe operating conditions reached, switching to normal mode')
-            state_machine.switch_to('Normal')
+            self.debug(f'Safe operating conditions reached, switching back to {state_machine.previous_state} mode')
+            state_machine.switch_to(state_machine.previous_state)
 
     def other_modes(self, vbatt, temp):
         if vbatt < cubesat.LOW_VOLTAGE:

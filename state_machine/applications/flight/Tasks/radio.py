@@ -57,6 +57,7 @@ class task(Task):
             cubesat.radio.listen()
             response = await cubesat.radio.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED, timeout=10)
             if response is not None:
+                cubesat.f_deploy = True
                 header = response[0]
                 response = response[1:]  # remove the header byte
 

@@ -50,3 +50,5 @@ config = {
         ]
     }
 }
+
+initial = "Normal"

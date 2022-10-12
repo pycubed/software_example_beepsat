@@ -54,6 +54,8 @@ class StateMachine:
             raise ValueError(
                 f'You cannot transition from {self.state} to {state_name}')
 
+        self.previous_state = self.state
+
         # execute transition functions
         if self.state != state_name:
             for fn in self.config[self.state]['ExitFunctions']:

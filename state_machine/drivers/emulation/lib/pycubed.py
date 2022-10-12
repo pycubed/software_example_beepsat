@@ -2,6 +2,7 @@ import time
 import tasko
 
 import lib.reader as reader
+import random
 try:
     from ulab.numpy import array
 except ImportError:
@@ -69,6 +70,7 @@ class Satellite:
         self.c_gs_resp = 1
         self.c_state_err = 0
         self.c_boot = None
+        self.f_deploy = False
 
         # magnetometer and accelerometer chosen to be arbitrary non zero, non parallel values
         # to provide more interesting output from the b-cross controller.
@@ -77,7 +79,10 @@ class Satellite:
         self._gyro = [0.0, 0.0, 0.0]
         self._torque = [0, 0, 0]
         self._cpu_temp = 30
+
+        # debug utilities
         self.sim = False
+        self.randomize_voltage = False
 
     @property
     def acceleration(self):
@@ -118,7 +123,9 @@ class Satellite:
 
     @property
     def battery_voltage(self):
-        return 6.4
+        reader.read(self)
+        random_offset = - 0.5 + random.random() if self.randomize_voltage else 0
+        return self.LOW_VOLTAGE + 0.01 + random_offset
 
     def log(self, str):
         """Logs to sd card"""
@@ -132,10 +139,6 @@ class Satellite:
 
     @property
     def imu(self):
-        return True
-
-    @property
-    def neopixel(self):
         return True
 
     @property
