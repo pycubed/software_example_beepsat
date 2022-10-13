@@ -18,4 +18,4 @@ class deployment_manager(Task):
                 self.debug('Successfully burned')
             else:
                 # Consider panic mode
-                self.deubg('Uncuccessful burn')
+                self.debug('Unsuccessful burn')
