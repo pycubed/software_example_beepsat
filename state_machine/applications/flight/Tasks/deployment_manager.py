@@ -10,8 +10,8 @@ class deployment_manager(Task):
     rgb_on = False
 
     async def main_task(self):
-        # nvm shit
         if (cubesat.f_contact):
+            self.debug('Contact with ground station has been already established, switching to Normal mode')
             state_machine.switch_to('Normal')
         else:
             if await cubesat.burn(duration=15):
