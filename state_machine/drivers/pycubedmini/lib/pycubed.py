@@ -111,6 +111,7 @@ class _Satellite:
         self.vfs
         self.neopixel
         self.imu
+        self.rtc
         self.radio
         self.sun_xn
         self.sun_yn
