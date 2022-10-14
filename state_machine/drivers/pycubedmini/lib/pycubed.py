@@ -15,6 +15,7 @@ import neopixel
 import pwmio
 import bmx160
 import drv8830
+from adafruit_pcf8523 import PCF8523
 from bitflags import bitFlag, multiBitFlag
 from micropython import const
 import adafruit_tsl2561
@@ -187,7 +188,7 @@ class _Satellite:
     def imu(self):
         """ Define IMU parameters and initialize """
         try:
-            return bmx160.BMX160_I2C(self.i2c1, address=0x68)
+            return bmx160.BMX160_I2C(self.i2c1, address=0x69)
         except Exception as e:
             print(f'[ERROR][Initializing IMU] {e}\n\tMaybe try address=0x68?')
 
@@ -300,6 +301,14 @@ class _Satellite:
                 microcontroller.pin.PA19, frequency=1000, duty_cycle=0)
         except Exception as e:
             print('[ERROR][Initializing Burn Wire IC1]', e)
+
+    @device
+    def rtc(self):
+        """ Initialize Real Time Clock """
+        try:
+            return PCF8523(self.i2c2)
+        except Exception as e:
+            print('[ERROR][Initializing RTC]', e)
 
     def imuToBodyFrame(self, vec):
         return array([-vec[0], vec[2], vec[1]])
