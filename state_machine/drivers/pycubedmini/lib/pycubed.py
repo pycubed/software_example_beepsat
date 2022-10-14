@@ -61,9 +61,9 @@ _LOGFAIL = const(5)
 class _Satellite:
     # Define NVM flags
     f_contact = bitFlag(register=_FLAG, bit=1)
-    f_mdeploy = bitFlag(register=_FLAG, bit=2)
-    f_burn1 = bitFlag(register=_FLAG, bit=3)
-    f_burn2 = bitFlag(register=_FLAG, bit=4)
+    f_burn = bitFlag(register=_FLAG, bit=2)
+    f_free1 = bitFlag(register=_FLAG, bit=3)
+    f_free2 = bitFlag(register=_FLAG, bit=4)
 
     # Define NVM counters
     c_boot = multiBitFlag(register=_BOOTCNT, lowest_bit=0, num_bits=8)
@@ -396,7 +396,7 @@ class _Satellite:
             burnwire.duty_cycle = 0
             self.RGB = (0, 0, 0)
 
-            self._deployA = True  # sets deployment variable to true
+            self.f_burn = True
             return True
             # burnwire.deinit()  # deinitialize burnwire
         except Exception as e:
