@@ -14,6 +14,9 @@ EXEC_PY = b'\x00\x04'
 REQUEST_FILE = b'\x00\x05'
 LIST_DIR = b'\x00\x06'
 TQ_LEN = b'\x00\x07'
+MOVE_FILE = b'\x00\x08'
+COPY_FILE = b'\x00\x09'
+DELETE_FILE = b'\x00\x10'
 
 def noop(self):
     """No operation"""
@@ -62,6 +65,49 @@ def tq_len(task):
     len = str(tq.len())
     tq.push(Message(1, len))
 
+def move_file(task, args):
+    """
+    Move a file from source to dest
+
+    :param task: The task that called this function
+    :param args: json string [source, dest]
+    :type args: string
+    """
+    try:
+        args = json.loads(args)
+        os.rename(args[0], args[1])
+        task.debug('Sucess moving file')
+        tq.push(Message(9, b'Success moving file'))
+    except Exception as e:
+        task.debug(f'Error moving file: {e}')
+        downlink(f'Error moving file: {e}', priority=9)
+
+def copy_file(task, args):
+    """
+    Copy a file from source to dest
+
+    :param task: The task that called this function
+    :param args: json string [source, dest]
+    :type args: string
+    """
+    try:
+        args = json.loads(args)
+        with open(args[0], 'rb') as source, open(args[1], 'wb') as dest:
+            cp(source, dest)
+        task.debug('Sucess copying file')
+        tq.push(Message(9, b'Success copying file'))
+    except Exception as e:
+        task.debug(f'Error moving file: {e}')
+        downlink(f'Error moving file: {e}', priority=9)
+
+def delete_file(task, file):
+    """Deletes a  file"""
+    try:
+        os.remove(file)
+        tq.push(Message(9, b'Success deleting file'))
+    except Exception as e:
+        task.debug(f'Error deleting file: {e}')
+        downlink(f'Error deleting file: {e}', priority=9)
 # Helper functions
 
 def downlink(data, priority=1):
@@ -72,6 +118,18 @@ def downlink(data, priority=1):
     f.close()
     tq.push(ChunkMessage(priority, fname))
 
+def cp(source, dest, buffer_size=1024):
+    """
+    Copy a file from source to dest. source and dest
+    must be file-like objects, i.e. any object with a read or
+    write method, like for example StringIO.
+    """
+    while True:
+        copy_buffer = source.read(buffer_size)
+        if not copy_buffer:
+            break
+        dest.write(copy_buffer)
+
 
 commands = {
     NO_OP: noop,
@@ -81,4 +139,7 @@ commands = {
     REQUEST_FILE: request_file,
     LIST_DIR: list_dir,
     TQ_LEN: tq_len,
+    MOVE_FILE: move_file,
+    COPY_FILE: copy_file,
+    DELETE_FILE: delete_file,
 }
