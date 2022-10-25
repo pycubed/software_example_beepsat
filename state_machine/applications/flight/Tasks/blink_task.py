@@ -1,7 +1,7 @@
 # Blink the RGB LED
 
 from lib.template_task import Task
-from lib.pycubed import cubesat
+from pycubed import cubesat
 
 
 class task(Task):

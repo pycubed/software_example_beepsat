@@ -1,5 +1,5 @@
 import tasko
-from lib.pycubed import cubesat
+from pycubed import cubesat
 
 from lib.state_machine_utils import validate_config
 
@@ -77,7 +77,7 @@ class StateMachine:
 
             frequency = 1 / props['Interval']
             priority = props['Priority']
-            task_fn = self.tasks[task_name].main_task
+            task_fn = self.tasks[task_name]._run
 
             self.scheduled_tasks[task_name] = schedule(
                 frequency, task_fn, priority)

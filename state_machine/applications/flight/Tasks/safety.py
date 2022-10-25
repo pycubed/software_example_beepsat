@@ -1,5 +1,5 @@
 from lib.template_task import Task
-from lib.pycubed import cubesat
+from pycubed import cubesat
 from state_machine import state_machine
 
 

@@ -32,7 +32,7 @@ config = {
                 "ScheduleLater": False
             },
             "Radio": {
-                "Interval": 3,
+                "Interval": 0.5,
                 "Priority": 0,
                 "ScheduleLater": True
             },

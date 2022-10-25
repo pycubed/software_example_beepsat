@@ -1,4 +1,4 @@
-name: Run Emulated Flight Software
+name: Run Example Stack
 
 on:
   # Trigger the workflow on all pull requests, and pushes to main
@@ -30,10 +30,10 @@ jobs:
 
       - name: Build and run
         id: build_and_run
-        run: cd state_machine && sh build.sh drivers/emulation applications/flight
+        run: cd state_machine && sh build.sh drivers/example applications/example
 
       - name: Install Python dependencies
         run: pip install flake8
 
-      - name: Run emulated flight software
-        run: ./.github/workflows/scripts/time_out.sh "Emulated flight software"
+      - name: Run example stack
+        run: ./.github/workflows/scripts/time_out.sh "Example stack"
