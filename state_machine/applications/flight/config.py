@@ -39,7 +39,6 @@ config = {
         },
         "StepsTo": [
             "Safe",
-            "DeTumble"
         ]
     },
     "Safe": {
@@ -51,7 +50,8 @@ config = {
             }
         },
         "StepsTo": [
-            "Normal"
+            "Normal",
+            "Deployment"
         ],
         "EnterFunctions": [
             "Announcer",
@@ -62,16 +62,29 @@ config = {
             "LowPowerOff"
         ]
     },
-    "DeTumble": {
+    "Deployment": {
         "Tasks": {
+            "Radio": {
+                "Interval": 30.0,
+                "Priority": 3,
+                "ScheduleLater": False
+            },
+            "DeploymentManager": {
+                "Interval": 5.0,
+                "Priority": 1,
+                "ScheduleLater": False
+            },
             "Safety": {
-                "Interval": 15.0,
+                "Interval": 10.0,
                 "Priority": 3,
                 "ScheduleLater": False
             }
         },
         "StepsTo": [
-            "Normal"
+            "Normal",
+            "Safe"
         ]
     }
 }
+
+initial = "Deployment"
