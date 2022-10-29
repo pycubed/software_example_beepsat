@@ -5,6 +5,7 @@ cp -r $1/* build
 cp -r $2/* build
 
 # extraneous file removal
+cd build
 find . -type d -name __pycache__ -exec rm -r {} \+
-rm README.md
+rm -f README.md
 cd - 
