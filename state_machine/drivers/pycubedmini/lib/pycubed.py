@@ -123,6 +123,7 @@ class _Satellite:
         self.drv_y
         self.drv_z
         self.burnwire1
+        self.incr_boot_count()
 
     @device
     def i2c1(self):
@@ -425,9 +426,8 @@ class _Satellite:
         """ return the time on a monotonic clock """
         return int(time.monotonic()) - self.BOOTTIME
 
-    def reset_boot_count(self):
-        """ reset boot count in non-volatile memory (nvm) """
-        self.c_boot = 0
+    def incr_boot_count(self):
+        self.c_boot = (self.c_boot + 1) % 256
 
     def incr_logfail_count(self):
         """ increment logfail count in non-volatile memory (nvm) """
