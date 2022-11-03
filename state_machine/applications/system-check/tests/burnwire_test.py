@@ -28,7 +28,7 @@ def get_user_input():
     if start_test.lower() != "y":
         return None, None
 
-    return dutycycle, duration 
+    return dutycycle, duration
 
 
 async def burnwire_test(result_dict):

@@ -96,7 +96,7 @@ async def main_test():
     choice = input("~> ")
     if choice == 'a' or choice == 'd':
         for (_, _, test, default) in all_tests:
-            if(choice == 'a' or default):
+            if (choice == 'a' or default):
                 await test.run(result_dict)
     else:
         for (_, nick, test, _) in all_tests:
