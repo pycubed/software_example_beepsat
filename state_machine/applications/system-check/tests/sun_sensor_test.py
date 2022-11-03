@@ -91,7 +91,7 @@ def test_individual_sun_sensor(result_dict, sensor_index, light_dark):
     return result_dict
 
 
-def run(result_dict):
+async def run(result_dict):
     """
     Check Sun Sensor -Y, -Z, -X, +Y, +Z, +X
     If initialized correctly, run test and update result dictionary through

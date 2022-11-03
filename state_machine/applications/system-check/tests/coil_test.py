@@ -115,7 +115,7 @@ def coil_test(result_dict, coil_index):
     return result_dict
 
 
-def run(result_dict):
+async def run(result_dict):
     """
     Check coil driver X, Y, and Z
     If initialized correctly, run test and update result dictionary

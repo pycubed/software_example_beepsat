@@ -69,7 +69,7 @@ def sd_test():
 read from, and deleted successfully.""", True)
 
 
-def run(result_dict):
+async def run(result_dict):
     """
     Check SD card
     If initialized correctly, run test and update result dictionary
