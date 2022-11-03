@@ -13,8 +13,12 @@ class deployment_manager(Task):
         if (cubesat.f_contact):
             self.debug('Contact with ground station has been already established, switching to Normal mode')
             state_machine.switch_to('Normal')
+        elif (cubesat.f_burn):
+            self.debug('Already burned, switching to Normal mode')
+            state_machine.switch_to('Normal')
         else:
             if await cubesat.burn(duration=15):
+                cubesat.f_burn = True
                 self.debug('Successfully burned')
             else:
                 # Consider panic mode
