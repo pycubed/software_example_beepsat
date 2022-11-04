@@ -21,53 +21,43 @@ def get_user_input():
     print("""If using a multimeter, please read the voltage between the ground pin
 (GND) and burnwire pin on the -Z solar board.""")
 
-    # get user input for voltage level and duration
-    voltage = float(input("""At what voltage do you want to run the burnwire IC?
-(number between 0 and 3.3): """))
-    burn_time = int(input("How long do you want to run the burnwire test? (seconds): "))
+    dutycycle = float(input("At what duty cycle do you want to run the burnwire[0,1]: "))
+    duration = float(input("How many seconds to run the burnwire: "))
 
     start_test = input("Type Y to start the test, any key to cancel: ")
     if start_test.lower() != "y":
         return None, None
 
-    return voltage, burn_time
+    return dutycycle, duration
 
 
-def burnwire_test(result_dict, burnnum):
+async def burnwire_test(result_dict):
     """
     Retrieve burnwire and voltage level from get_user_input() and run the test
     If None, update the result dictionary that the test was not run
     Else, process user inputted test results and update the result dictionary
     """
 
-    # get user input for voltage and duration
-    voltage, burn_time = get_user_input()
+    dutycycle, duration = get_user_input()
 
-    # if voltage and burn_time are None, user entered "N" to cancel the test
-    if voltage is None and burn_time is None:
-        result_dict[f"Burnwire{burnnum}"] = ("Test was not run.", None)
+    if dutycycle is None or duration is None:
+        result_dict["Burnwire"] = ("Test was not run.", None)
         return result_dict
 
-    # else, user entered "Y", calculate voltage level and conduct the test
-    voltage_level = voltage / 3.3
-    cubesat.burn(burn_num=str(burnnum), dutycycle=voltage_level,
-                 duration=burn_time)
+    await cubesat.burn(dutycycle, duration)
 
-    # gather user input and return results
-    print("Burnwire Test Complete")
     success_input = input("Did the test work as expected? (Y/N): ")
     success = False
     if success_input.lower() == "y":
         success = True
 
     # process results
-    result_key = f"Burnwire {burnnum}"
-    result_val_string = f"Tested burnwire {burnnum} at {voltage} V"
-    result_dict[result_key] = (result_val_string, success)
+    result_val_string = f"Tested burnwire at dutycle {dutycycle} for {duration} seconds."
+    result_dict["Burnwire"] = (result_val_string, success)
     return result_dict
 
 
-def run(result_dict):
+async def run(result_dict):
     """
     Check burnwire 1 and 2
     If initialized correctly, run test and update result dictionary
@@ -80,7 +70,7 @@ def run(result_dict):
         result_dict["Burnwire1"] = ("No burnwire 1 detected", None)
     else:  # Burn Wire 1 detected, run tests
         print("Starting Burnwire1 test...")
-        burnwire_test(result_dict, 1)
+        await burnwire_test(result_dict)
         print("Burnwire1 Test complete.\n")
 
     return result_dict

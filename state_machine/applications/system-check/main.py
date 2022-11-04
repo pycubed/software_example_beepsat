@@ -4,7 +4,6 @@ PyCubed Mini mainboard-v02 for Pocketqube Mission
 * Author(s): Yashika Batra
 """
 # print acknowledgement that test has started
-print("\n#################### S Y S T E M   C H E C K ####################\n")
 
 import tests
 import tests.i2c_scan
@@ -16,97 +15,98 @@ import tests.sun_sensor_test
 import tests.coil_test
 import tests.burnwire_test
 import supervisor
+import tasko
+from print_utils import bold, normal, red, green
 
 supervisor.disable_autoreload()
 
 # initialize hardware_dict and result_dict
 result_dict = {
-    "LoggingInfrastructure_Test": ("", False),
-    "Basic_SDCard_Test": ("", False),
-    "IMU_AccGravity": ("", False),
-    "IMU_GyroStationary": ("", False),
-    "IMU_GyroRotating": ("", False),
-    "IMU_MagMagnet": ("", False),
-    "IMU_Temp": ("", False),
-    "Radio_ReceiveBeacon": ("", False),
-    "Radio_SendBeacon": ("", False),
-    "Sun-Y_Dark": ("", False),
-    "Sun-Y_Light": ("", False),
-    "Sun-Z_Dark": ("", False),
-    "Sun-Z_Light": ("", False),
-    "Sun-X_Dark": ("", False),
-    "Sun-X_Light": ("", False),
-    "Sun+Y_Dark": ("", False),
-    "Sun+Y_Light": ("", False),
-    "Sun+Z_Dark": ("", False),
-    "Sun+Z_Light": ("", False),
-    "Sun+X_Dark": ("", False),
-    "Sun+X_Light": ("", False),
-    "CoilDriverX": ("", False),
-    "CoilDriverY": ("", False),
-    "CoilDriverZ": ("", False),
-    "Burnwire1": ("", False),
+    "LoggingInfrastructure_Test": ("", None),
+    "Basic_SDCard_Test": ("", None),
+    "IMU_AccGravity": ("", None),
+    "IMU_GyroStationary": ("", None),
+    "IMU_GyroRotating": ("", None),
+    "IMU_MagMagnet": ("", None),
+    "IMU_Temp": ("", None),
+    "Radio_ReceiveBeacon": ("", None),
+    "Radio_SendBeacon": ("", None),
+    "Sun-Y_Dark": ("", None),
+    "Sun-Y_Light": ("", None),
+    "Sun-Z_Dark": ("", None),
+    "Sun-Z_Light": ("", None),
+    "Sun-X_Dark": ("", None),
+    "Sun-X_Light": ("", None),
+    "Sun+Y_Dark": ("", None),
+    "Sun+Y_Light": ("", None),
+    "Sun+Z_Dark": ("", None),
+    "Sun+Z_Light": ("", None),
+    "Sun+X_Dark": ("", None),
+    "Sun+X_Light": ("", None),
+    "CoilDriverX": ("", None),
+    "CoilDriverY": ("", None),
+    "CoilDriverZ": ("", None),
+    "Burnwire": ("", None),
 }
 
-# complete an i2c scan: print all devices connected to each i2c bus
-tests.i2c_scan.run()
+"""
+Each test group contains:
+    - full name
+    - nick name
+    - class reference
+    - if it is to be run in default mode
+"""
+all_tests = [
+    ("SD Test", "sd", tests.sd_test, True),
+    ("IMU Test", "imu", tests.imu_test, True),
+    ("Sun Sensor Test", "sun", tests.sun_sensor_test, True),
+    ("Coil Driver Test", "coil", tests.coil_test, True),
+    ("Burnwire Test", "burn", tests.burnwire_test, False),
+    ("I2C_Scan", "i2c", tests.i2c_scan, False),
+]
 
-# test sd card
-tests.sd_test.run(result_dict)
+def test_options(tests):
+    print(f'\n\nSelect: {bold}(a){normal} for all, {bold}(d){normal} for default, or select a specific test:')
+    for (name, nick, _, _) in tests:
+        print(f"  {bold}({nick}){normal}: {name}")
 
-# test logging infrastructure
-# tests.logging_infrastructure_test.run(result_dict)
+def results_to_str(results):
+    failed = []
+    passed = []
+    for (test_name, (test_description, test_success)) in results.items():
+        if test_success is not None:
+            if test_success:
+                passed.append(f"{test_name}: {test_description}")
+            else:
+                failed.append(f"{test_name}: {test_description}")
+    newline = '\n'  # f strings can't contain \
 
-# test imu
-tests.imu_test.run(result_dict)
+    def bullet(str):
+        '''Utility to a bullet point before a string'''
+        return f'  - {str}'
 
-# test sun sensor
-tests.sun_sensor_test.run(result_dict)
+    return f"""{red}{bold}Failed Tests:{normal}
+{newline.join(map(bullet, failed))}
+{green}{bold}Passed Tests:{normal}
+{newline.join(map(bullet, passed))}"""
 
-# test coil driver
-tests.coil_test.run(result_dict)
 
-# ask to test burnwire
-burnwire_input = input("Type Y to start burnwire test, any key to cancel: ")
-if burnwire_input.lower() == "y":
-    tests.burnwire_test.run(result_dict)
-else:
-    result_dict["Burnwire1"] = ("Test was not run.", None)
-    result_dict["Burnwire2"] = ("Test was not run.", None)
+async def main_test():
+    test_options(all_tests)
+    choice = input("~> ")
+    if choice == 'a' or choice == 'd':
+        for (_, _, test, default) in all_tests:
+            if (choice == 'a' or default):
+                await test.run(result_dict)
+    else:
+        for (_, nick, test, _) in all_tests:
+            if choice == nick:
+                await test.run(result_dict)
+                break
+        else:
+            print('Invalid selection')
 
-'''
-# ask to test radio
-radio_input = input("Type Y to start the radio test, any key to cancel: ")
-if radio_input.lower() == "y":
-    antenna_attached = input("Is an antenna attached to the radio? (Y/N): ")
-    tests.radio_test.run(hardware_dict, result_dict, antenna_attached)
-else:
-    result_dict["Radio_ReceiveBeacon"] = ("Test was not run.", None)
-    result_dict["Radio_SendBeacon"] = ("Test was not run.", None)
-'''
+    print(results_to_str(result_dict))
 
-# print test results; failed tests first, and then passed tests
-print("\nTest has concluded. Printing results...\n")
-
-print("Tests not run:")
-for entry in result_dict.items():
-    if entry[1][1] is None:
-        # entry[1][0] is the string portion of the tuple
-        print(f"{entry[0]}")
-print("")
-
-print("Failed tests:")
-for entry in result_dict.items():
-    # if the test failed
-    if entry[1][1] is not None and not entry[1][1]:
-        # entry[1][0] is the string portion of the tuple
-        print(f"{entry[0]}: {entry[1][0]}")
-print("")
-
-print("Passed tests:")
-for entry in result_dict.items():
-    # if the test passed
-    if entry[1][1] is not None and entry[1][1]:
-        # entry[1][0] is the string portion of the tuple
-        print(f"{entry[0]}: {entry[1][0]}")
-print("")
+tasko.add_task(main_test(), 1)
+tasko.run()

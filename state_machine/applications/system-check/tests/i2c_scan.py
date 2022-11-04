@@ -1,7 +1,7 @@
 from lib.pycubed import cubesat
 
 
-def run():
+async def run(result_dict):
     """
     For each i2c device, print addresses of connected devices
     """
