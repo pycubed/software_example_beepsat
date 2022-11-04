@@ -1,4 +1,5 @@
 from lib.pycubed import cubesat
+from print_utils import bold, normal
 
 def test_sun_sensor(sensor, sensor_name, sensors):
     """
@@ -8,7 +9,7 @@ def test_sun_sensor(sensor, sensor_name, sensors):
     """
     if sensor is None:
         return ("not detected", False)
-    input(f'Place the {sensor_name} board face down on the table, then press enter: ')
+    input(f'Place the {bold}{sensor_name}{normal} board face down on the table, then press enter: ')
     min_lux = sensor.lux
     for i in range(len(sensors)):
         (other, other_name) = sensors[i]
