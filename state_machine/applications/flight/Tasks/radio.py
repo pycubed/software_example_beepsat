@@ -25,6 +25,8 @@ class task(Task):
     def __init__(self):
         super().__init__()
         self.msg = bytes([])
+        self.cmsg_last = None
+        self.msg_last = None
 
     async def main_task(self):
         if not cubesat.radio:
