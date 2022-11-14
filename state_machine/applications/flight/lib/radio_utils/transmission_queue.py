@@ -10,7 +10,7 @@ limit = 100
 
 def push(msg):
     """Push a msg into the transmission queue
-    
+
     :param msg: The message to push
     :type msg: Message | NaiveMessage | ChunkMessage
     """
@@ -21,7 +21,7 @@ def push(msg):
 
 def peek():
     """Returns the next message to be transmitted
-    
+
     :return: The next message to be transmitted
     :rtype: Message | NaiveMessage | ChunkMessage
     """
@@ -29,7 +29,7 @@ def peek():
 
 def pop():
     """Returns the next message to be transmitted and removes it from the transmission queue
-    
+
     :return: The next message to be transmitted
     :rtype: Message | NaiveMessage | ChunkMessage
     """
