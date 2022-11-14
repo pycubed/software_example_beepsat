@@ -86,7 +86,7 @@ def tq_len(task):
 
 def move_file(task, args):
     """
-    Move a file from source to dest. 
+    Move a file from source to dest.
     Does not work when moving from sd to flash, should copy files instead.
 
     :param task: The task that called this function
