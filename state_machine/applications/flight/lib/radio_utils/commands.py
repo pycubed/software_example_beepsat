@@ -45,7 +45,7 @@ def query(task, args):
 
 def exec_py(task, args):
     """Execute the python code, and do not return the result
-    
+
     :param task: The task that called this function
     :param args: The python code to execute
     :type args: str
@@ -55,7 +55,7 @@ def exec_py(task, args):
 
 def request_file(task, file):
     """Request a file to be downlinked
-    
+
     :param task: The task that called this function
     :param file: The path to the file to downlink
     :type file: str"""
@@ -69,7 +69,7 @@ def request_file(task, file):
 
 def list_dir(task, path):
     """List the contents of a directory, and downlink the result
-    
+
     :param task: The task that called this function
     :param path: The path to the directory to list
     :type path: str
