@@ -3,7 +3,7 @@ from . import headers
 from . import MAX_PACKET_LEN
 import os
 
-class ChunkMessage(Message):
+class DiskBufferedMessage(Message):
     """Transmits the message 251 bytes at a time.
     Sets special headers for the first packet, middle packets, and last packet.
     Reads from a file one chunk at a time.
