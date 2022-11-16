@@ -21,15 +21,21 @@ class deployment_manager(Task):
             state_machine.switch_to('Normal')
         elif self.should_burn():
             self.last_burn = time.time()
-            if await cubesat.burn(duration=10, duty_cycle=0.2):
+            self.start_time = float('inf')
+            if await cubesat.burn(duration=10, dutycycle=0.2):
                 cubesat.f_burn = True
                 self.debug('Successfully burned')
             else:
                 self.debug('Unsuccessful burn')
+        else:
+            vbatt = cubesat.battery_voltage
+            if vbatt < cubesat.LOW_VOLTAGE:
+                self.debug(f'Voltage too low ({vbatt:.1f}V < {cubesat.LOW_VOLTAGE:.1f}V) switch to safe mode')
+                state_machine.switch_to('Safe')
 
     def should_burn(self):
-        if (time.time() - self.start_time) > INITIAL_BURN_DELAY:  # first burn
+        if (time.time() - self.start_time) >= INITIAL_BURN_DELAY:  # first burn
             return True
-        elif (time.time() - self.last_burn) > BURN_INTERVAL:  # other burns
+        elif (time.time() - self.last_burn) >= BURN_INTERVAL:  # other burns
             return True
         return False
