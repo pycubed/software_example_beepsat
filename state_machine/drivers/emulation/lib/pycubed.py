@@ -84,9 +84,9 @@ class Satellite:
 
         # magnetometer and accelerometer chosen to be arbitrary non zero, non parallel values
         # to provide more interesting output from the b-cross controller.
-        self._accel = [1.0, 2.0, 3.0]
-        self._mag = [4.0, 3.0, 1.0]
-        self._gyro = [0.0, 0.0, 0.0]
+        self._accel = array([1.0, 2.0, 3.0])
+        self._mag = array([4.0, 3.0, 1.0])
+        self._gyro = array([0.0, 0.0, 0.0])
         self._torque = [0, 0, 0]
         self._cpu_temp = 30
 
