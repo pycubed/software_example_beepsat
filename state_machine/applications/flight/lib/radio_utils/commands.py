@@ -8,7 +8,7 @@ import os
 from pycubed import cubesat
 from radio_utils import transmission_queue as tq
 from radio_utils import headers
-from radio_utils.chunk import ChunkMessage
+from radio_utils.disk_buffered_message import DiskBufferedMessage
 from radio_utils.message import Message
 import json
 import supervisor
@@ -63,7 +63,7 @@ def request_file(task, file):
     :type file: str"""
     file = str(file, 'utf-8')
     if file_exists(file):
-        tq.push(ChunkMessage(1, file))
+        tq.push(DiskBufferedMessage(1, file))
     else:
         task.debug(f'File not found: {file}')
         tq.push(Message(9, b'File not found', with_ack=True))
@@ -152,14 +152,14 @@ HELPER FUNCTIONS
 """
 
 def _downlink(data, priority=1):
-    """Write data to a file, and then create a new ChunkMessage to downlink it"""
+    """Write data to a file, and then create a new DiskBufferedMessage to downlink it"""
     fname = f'/sd/downlink/{time.monotonic_ns()}.txt'
     if not file_exists('/sd/downlink'):
         os.mkdir('/sd/downlink')
     f = open(fname, 'w')
     f.write(data)
     f.close()
-    tq.push(ChunkMessage(priority, fname))
+    tq.push(DiskBufferedMessage(priority, fname))
 
 def _cp(source, dest, buffer_size=1024):
     """
