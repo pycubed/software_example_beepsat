@@ -66,7 +66,7 @@ class task(Task):
                 self.debug(f'Recieved msg "{response}", RSSI: {cubesat.radio.last_rssi - 137}')
 
                 if header == headers.NAIVE_START or header == headers.NAIVE_MID or header == headers.NAIVE_END:
-                    self.handle_naive(header, response)
+                    self.handle_memory_buffered_message(header, response)
                 elif header == headers.CHUNK_START or header == headers.CHUNK_MID or header == headers.CHUNK_END:
                     self.handle_disk_buffered_message(header, response)
                 elif header == headers.COMMAND:
@@ -76,8 +76,8 @@ class task(Task):
 
         cubesat.radio.sleep()
 
-    def handle_naive(self, header, response):
-        """Handler function for the naive message type"""
+    def handle_memory_buffered_message(self, header, response):
+        """Handler function for the memory_buffered_message message type"""
         if header == headers.NAIVE_START:
             self.msg_last = response
             self.msg = response
