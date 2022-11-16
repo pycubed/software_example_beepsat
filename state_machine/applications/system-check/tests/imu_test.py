@@ -192,7 +192,7 @@ def temp_imu_test(result_dict):
     result_dict["IMU_Temp"] = (f"Temperature: {temp} °C", temp_in_range)
 
 
-def run(result_dict):
+async def run(result_dict):
     """
     If initialized correctly, run tests and update result dictionary
     If not initialized, update result dictionary.

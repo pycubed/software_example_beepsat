@@ -1,3 +1,8 @@
+"""Has a bunch of commands that can be called via radio, with an argument.
+
+Contains a dictionary of commands mapping their 2 byte header to a function.
+"""
+
 import time
 import os
 from pycubed import cubesat
@@ -36,15 +41,24 @@ def query(task, args):
     """Execute the query as python and return the result"""
     task.debug(f'query: {args}')
     res = str(eval(args))
-    downlink(res)
+    _downlink(res)
 
 def exec_py(task, args):
-    """Execute the python code"""
+    """Execute the python code, and do not return the result
+
+    :param task: The task that called this function
+    :param args: The python code to execute
+    :type args: str
+    """
     task.debug(f'exec: {args}')
     exec(args)
 
 def request_file(task, file):
-    """Request a file to be downlinked"""
+    """Request a file to be downlinked
+
+    :param task: The task that called this function
+    :param file: The path to the file to downlink
+    :type file: str"""
     file = str(file, 'utf-8')
     try:
         os.stat(file)
@@ -54,11 +68,16 @@ def request_file(task, file):
         tq.push(Message(9, b'File not found', with_ack=True))
 
 def list_dir(task, path):
-    """List the contents of a directory"""
+    """List the contents of a directory, and downlink the result
+
+    :param task: The task that called this function
+    :param path: The path to the directory to list
+    :type path: str
+    """
     path = str(path, 'utf-8')
     res = os.listdir(path)
     res = json.dumps(res)
-    downlink(res)
+    _downlink(res)
 
 def tq_len(task):
     """Return the length of the transmission queue"""
@@ -67,11 +86,12 @@ def tq_len(task):
 
 def move_file(task, args):
     """
-    Move a file from source to dest
+    Move a file from source to dest.
+    Does not work when moving from sd to flash, should copy files instead.
 
     :param task: The task that called this function
     :param args: json string [source, dest]
-    :type args: string
+    :type args: str
     """
     try:
         args = json.loads(args)
@@ -80,7 +100,7 @@ def move_file(task, args):
         tq.push(Message(9, b'Success moving file'))
     except Exception as e:
         task.debug(f'Error moving file: {e}')
-        downlink(f'Error moving file: {e}', priority=9)
+        _downlink(f'Error moving file: {e}', priority=9)
 
 def copy_file(task, args):
     """
@@ -88,29 +108,34 @@ def copy_file(task, args):
 
     :param task: The task that called this function
     :param args: json string [source, dest]
-    :type args: string
+    :type args: str
     """
     try:
         args = json.loads(args)
         with open(args[0], 'rb') as source, open(args[1], 'wb') as dest:
-            cp(source, dest)
+            _cp(source, dest)
         task.debug('Sucess copying file')
         tq.push(Message(9, b'Success copying file'))
     except Exception as e:
         task.debug(f'Error moving file: {e}')
-        downlink(f'Error moving file: {e}', priority=9)
+        _downlink(f'Error moving file: {e}', priority=9)
 
 def delete_file(task, file):
-    """Deletes a  file"""
+    """Delete file
+
+    :param task: The task that called this function
+    :param file: The path to the file to delete
+    :type file: str
+    """
     try:
         os.remove(file)
         tq.push(Message(9, b'Success deleting file'))
     except Exception as e:
         task.debug(f'Error deleting file: {e}')
-        downlink(f'Error deleting file: {e}', priority=9)
+        _downlink(f'Error deleting file: {e}', priority=9)
 # Helper functions
 
-def downlink(data, priority=1):
+def _downlink(data, priority=1):
     """Write data to a file, and then create a new ChunkMessage to downlink it"""
     fname = f'/sd/downlink/{time.monotonic_ns()}.txt'
     f = open(fname, 'w')
@@ -118,7 +143,7 @@ def downlink(data, priority=1):
     f.close()
     tq.push(ChunkMessage(priority, fname))
 
-def cp(source, dest, buffer_size=1024):
+def _cp(source, dest, buffer_size=1024):
     """
     Copy a file from source to dest. source and dest
     must be file-like objects, i.e. any object with a read or
