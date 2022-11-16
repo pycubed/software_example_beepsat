@@ -79,13 +79,13 @@ class task(Task):
     def handle_naive(self, header, response):
         """Handler function for the naive message type"""
         if header == headers.NAIVE_START:
-            self.msg_last = response
             self.msg = response
         else:
             if response != self.msg_last:
                 self.msg += response
             else:
                 self.debug('Repeated chunk')
+        self.msg_last = response
 
         if header == headers.NAIVE_END:
             self.cmsg_last = None
@@ -121,7 +121,6 @@ class task(Task):
     def handle_chunk(self, header, response):
         """Handler function for the chunk message type"""
         if header == headers.CHUNK_START:
-            self.cmsg_last = response
             self.try_write('chunk', 'wb', response)
         else:
             if response != self.cmsg_last:
@@ -129,6 +128,7 @@ class task(Task):
             else:
                 self.debug('Repeated chunk')
 
+        self.cmsg_last = response
         if header == headers.CHUNK_END:
             self.cmsg_last = None
 
