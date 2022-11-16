@@ -3,7 +3,7 @@ import os
 from pycubed import cubesat
 from radio_utils import transmission_queue as tq
 from radio_utils import headers
-from radio_utils.chunk import DiskBufferedMessage
+from radio_utils.disk_buffered_message import DiskBufferedMessage
 from radio_utils.message import Message
 import json
 import supervisor
