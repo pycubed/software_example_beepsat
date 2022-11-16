@@ -22,7 +22,7 @@ class task(Task):
 
     def beacon_packet(self):
         """Creates a beacon packet containing the: CPU temp, IMU temp, gyro, acceleration, magnetic, and state byte.
-        The state byte is the index of the current state in the alphabetically order state list.
+        The state byte is the index of the current state in the alphabetically ordered state list.
         This data is packed into a c struct using `struct.pack`.
 
         If no IMU is attached it returns a packet of 0s.
