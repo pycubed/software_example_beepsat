@@ -27,6 +27,11 @@ class task(Task):
         self.msg = bytes([])
 
     async def main_task(self):
+        """
+        Manages all RF communications for the satelite.
+
+        In order to transmit something one should push to the transmission queue.
+        """
         if not cubesat.radio:
             self.debug('No radio attached, skipping radio task')
             return
