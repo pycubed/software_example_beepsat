@@ -68,7 +68,7 @@ class task(Task):
                 if header == headers.NAIVE_START or header == headers.NAIVE_MID or header == headers.NAIVE_END:
                     self.handle_naive(header, response)
                 elif header == headers.CHUNK_START or header == headers.CHUNK_MID or header == headers.CHUNK_END:
-                    self.handle_chunk(header, response)
+                    self.handle_disk_buffered_message(header, response)
                 elif header == headers.COMMAND:
                     self.handle_command(response)
             else:
@@ -118,14 +118,14 @@ class task(Task):
             self.debug('invalid command!')
             cubesat.radio.send(b'invalid cmd' + cmd)
 
-    def handle_chunk(self, header, response):
-        """Handler function for the chunk message type"""
+    def handle_disk_buffered_message(self, header, response):
+        """Handler function for the disk_buffered_message message type"""
         if header == headers.CHUNK_START:
             self.cmsg_last = response
-            self.try_write('chunk', 'wb', response)
+            self.try_write('disk_buffered_message', 'wb', response)
         else:
             if response != self.cmsg_last:
-                self.try_write('chunk', 'ab', response)
+                self.try_write('disk_buffered_message', 'ab', response)
             else:
                 self.debug('Repeated chunk')
 
