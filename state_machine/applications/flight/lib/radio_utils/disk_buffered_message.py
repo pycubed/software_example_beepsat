@@ -1,6 +1,6 @@
 from .message import Message
 from . import headers
-from . import MAX_DATA_LEN
+from . import PACKET_DATA_LEN
 import os
 
 class DiskBufferedMessage(Message):
@@ -14,7 +14,7 @@ class DiskBufferedMessage(Message):
     :type str: str | bytes | bytearray
     """
 
-    packet_len = MAX_DATA_LEN
+    packet_len = PACKET_DATA_LEN
 
     def __init__(self, priority, path):
         self.cursor = 0
