@@ -8,7 +8,8 @@ IMU Sensor Test
 from lib.pycubed import cubesat
 from print_utils import bold, normal
 import tasko
-from test_utils import expect, less_in_magnitude, greater_in_magnitude, vec_approx_equal_generator, vec_different_generator, between
+from test_utils import expect, less_in_magnitude, greater_in_magnitude, vec_approx_equal_generator, 
+from test_utils import vec_different_generator, between
 try:
     from ulab import numpy
 except ImportError:
