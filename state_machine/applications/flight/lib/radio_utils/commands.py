@@ -136,7 +136,10 @@ def delete_file(task, file):
         _downlink(f'Error deleting file: {e}', priority=9)
 
 async def reload(task):
-    """Reloads the flight software"""
+    """Reloads the flight software
+
+    :param task: The task that called this function
+    """
     task.debug('Reloading')
     msg = bytearray([headers.DEFAULT])
     msg.append(b'reset')
