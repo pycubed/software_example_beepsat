@@ -1,5 +1,6 @@
 from .message import Message
 from . import headers
+from . import MAX_DATA_LEN
 
 class MemoryBufferedMessage(Message):
     """Transmits the message 249 bytes at a time.
@@ -11,7 +12,7 @@ class MemoryBufferedMessage(Message):
     :type str: str | bytes | bytearray
     """
 
-    packet_len = 249  # not 251 because for some reason packet loss is extremely high at this threshold
+    packet_len = MAX_DATA_LEN
 
     def __init__(self, priority, str):
         super().__init__(priority, str)
