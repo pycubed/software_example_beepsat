@@ -9,7 +9,7 @@ J2000 = 946684800  # unix timestamp for the Julian date 2000-01-01
 MJD_ZERO = 2400000.5  # Offset of Modified Julian Days representation with respect to Julian Days.
 JD2000 = 2451545.0  # Reference epoch (J2000.0), Julian Date
 MJD2000 = 51544.5  # MJD at J2000.0
-PI2 = 2 * np.pi
+PI2 = 6.283185307179586
 EQUATORIAL_RADIUS = 6378.137  # Equatorial raduis of the Earth (km)
 
 def mjd(utime):
