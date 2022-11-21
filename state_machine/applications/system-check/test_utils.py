@@ -46,6 +46,11 @@ def cleanup_reading(reading):
 def expect(reading, condition, expected):
     """Expect reading to satisfy condition(reading, expected).
     Returns a tuple containing a description string and a boolean indicating sucess
+
+    :param reading: The reading to test
+    :param condition: A tuple containing a function and a string describing the condition
+    :type condition: (function, string)
+    :param expected: The expected value
     """
     (operator, op_desc) = condition
     if operator(reading, expected):
