@@ -21,7 +21,6 @@ class deployment_manager(Task):
             state_machine.switch_to('Normal')
         elif self.should_burn():
             self.last_burn = time.time()
-            self.start_time = float('inf')
             if await cubesat.burn(duration=10, dutycycle=0.2):
                 cubesat.f_burn = True
                 self.debug('Successfully burned')
@@ -34,7 +33,7 @@ class deployment_manager(Task):
                 state_machine.switch_to('Safe')
 
     def should_burn(self):
-        if (time.time() - self.start_time) >= INITIAL_BURN_DELAY:  # first burn
+        if (time.time() - self.start_time) >= INITIAL_BURN_DELAY and not cubesat.f_burn:  # first burn
             return True
         elif (time.time() - self.last_burn) >= BURN_INTERVAL:  # other burns
             return True
