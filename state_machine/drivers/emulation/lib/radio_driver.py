@@ -48,6 +48,6 @@ class Radio:
     def send_with_ack(self, packet, keep_listening=True):
         return True
 
-    def _push_rx_queue(self, packet: _Packet) -> bytearray | None:
+    def _push_rx_queue(self, packet):
         """Debug function to push a packet into the rx queue (lifo)"""
         self._rx_queue.put(packet)
