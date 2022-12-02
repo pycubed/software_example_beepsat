@@ -6,19 +6,28 @@ from radio_utils.message import Message
 from pycubed import cubesat
 from state_machine import state_machine
 import struct
+import time
 
 class task(Task):
     name = 'beacon'
     color = 'teal'
+    fileindex = 1
 
     async def main_task(self):
         """
         Pushes a beacon packet onto the transmission queue.
         """
+        currTime = time.time()
+        TIMEINTERVAL = 1000
+        print(currTime)
+        file = open(f"./logfiles/log{int(currTime // TIMEINTERVAL)}.txt", "ab+")
 
+        self.fileindex
         beacon_packet = self.beacon_packet()
+        file.write(bytearray(beacon_packet))
         tq.push(Message(10, beacon_packet))
         self.debug("Beacon task pushing to tq")
+        file.close()
 
     def beacon_packet(self):
         """Creates a beacon packet containing the: CPU temp, IMU temp, gyro, acceleration, magnetic, and state byte.
@@ -27,6 +36,7 @@ class task(Task):
 
         If no IMU is attached it returns a packet of 0s.
         """
+
         if not cubesat.imu:
             self.debug('IMU not initialized')
             return bytes([0, 0, 0, 0, 0])
