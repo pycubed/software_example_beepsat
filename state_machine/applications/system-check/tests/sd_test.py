@@ -1,10 +1,3 @@
-"""
-Python system check script for PyCubed satellite board
-PyCubed Mini mainboard-v02 for Pocketqube Mission
-SD Card Logging Test
-* Author(s): Yashika Batra
-"""
-
 import os
 from lib.pycubed import cubesat
 from logging import clear_all_storage
