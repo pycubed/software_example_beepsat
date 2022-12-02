@@ -12,7 +12,7 @@ config = {
                 "ScheduleLater": False
             },
             "Beacon": {
-                "Interval": 3,
+                "Interval": 30,
                 "Priority": 1,
                 "ScheduleLater": False
             },
