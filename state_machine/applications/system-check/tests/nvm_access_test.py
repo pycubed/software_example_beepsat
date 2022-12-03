@@ -85,6 +85,10 @@ def test_counter_interference(result_dict):
         maxval = vars(_Satellite)[counter_str].maxval
         setattr(cubesat, counter_str, maxval)
 
+    # restore original counter values
+    for i, counter_str in enumerate(nvm_counters):
+        setattr(cubesat, counter_str, original_values[i])
+
     if success:
         result_str = "No counter interference found"
     else:
