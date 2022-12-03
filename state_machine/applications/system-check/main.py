@@ -13,7 +13,6 @@ from print_utils import bold, normal, red, green
 # prevent board from reloading in the middle of the test
 supervisor.disable_autoreload()
 
-# initialize hardware_dict and result_dict
 result_dict = dict()
 
 """
