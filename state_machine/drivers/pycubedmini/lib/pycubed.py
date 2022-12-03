@@ -72,16 +72,6 @@ class _Satellite:
     c_downlink = multiBitFlag(register=_DWNLINK, lowest_bit=0, num_bits=8)
     c_logfail = multiBitFlag(register=_LOGFAIL, lowest_bit=0, num_bits=8)
 
-    # Define maxvals
-    max_vals = {
-        "c_boot": c_boot.maxval,
-        "c_state_err": c_state_err.maxval,
-        "c_vbus_rst": c_vbus_rst.maxval,
-        "c_deploy": c_deploy.maxval,
-        "c_downlink": c_downlink.maxval,
-        "c_logfail": c_logfail.maxval,
-    }
-
     UHF_FREQ = 433.0
 
     instance = None
@@ -434,13 +424,13 @@ class _Satellite:
         """ return the time on a monotonic clock """
         return int(time.monotonic()) - self.BOOTTIME
 
-    def reset_nvm(self):
-        """ reset all flags and counters in non volatile memory """
-        # Reset NVM flags
+    def zero_flags(self):
+        """ zero all flags in non volatile memory """
         self.f_contact = 0
         self.f_burn = 0
 
-        # Reset NVM counters
+    def zero_counters(self):
+        """ zero all counters in non volatile memory """
         self.c_boot = 0
         self.c_state_err = 0
         self.c_vbus_rst = 0
