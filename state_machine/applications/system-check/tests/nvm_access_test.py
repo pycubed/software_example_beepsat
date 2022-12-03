@@ -1,18 +1,35 @@
 from lib.pycubed import _Satellite, cubesat
+from lib.bitflags import bitFlag, multiBitFlag, multiByte
 from print_utils import bold, normal
 
 
-nvm_flags = ["f_contact",
-             "f_burn",
-             ]
+def get_nvm_flags():
+    """
+    Find all of the bitFlags in the 
+    _Satellite class.
+    """
 
-nvm_counters = ["c_boot",
-                "c_state_err",
-                "c_vbus_rst",
-                "c_deploy",
-                "c_downlink",
-                "c_logfail",
-                ]
+    sat_vars = vars(_Satellite)
+    nvm_flags = []
+    for v in sat_vars:
+        if type(sat_vars[v]) == bitFlag:
+            nvm_flags.append(v)
+
+    return nvm_flags
+
+def get_nvm_counters():
+    """
+    Find all of the multiBitFlag and multiByte counters in the 
+    _Satellite class.
+    """
+
+    sat_vars = vars(_Satellite)
+    nvm_counters = []
+    for v in sat_vars:
+        if type(sat_vars[v]) == multiBitFlag or type(sat_vars[v]) == multiByte:
+            nvm_counters.append(v)
+
+    return nvm_counters
 
 def verify_value(field_str, value):
     setattr(cubesat, field_str, value)
@@ -56,6 +73,8 @@ def test_counter_interference(result_dict):
     """ check that updating any particular nvm counter doesn't affect
     other parts of non volatile memory """
 
+    nvm_counters = get_nvm_counters()
+
     # save original values of the counters
     original_values = [getattr(cubesat, counter_str) for counter_str in nvm_counters]
 
@@ -96,24 +115,28 @@ def test_counter_interference(result_dict):
 
     result_dict["NVM_Counter_Interference"] = (result_str, success)
 
-def prompt_to_zero_counters_and_flags():
-    nvm_reset = input(f"\n\nWould you like to zero the counters and flags? Select {bold}(y){normal} for yes," +
-                      f" or {bold}(n){normal} for no:\n~> ")
-    if nvm_reset.lower() == 'y':
-        cubesat.zero_counters()
-        cubesat.zero_flags()
-
 def test_counters(result_dict):
+    """Verify each counter in _Satellite"""
+    nvm_counters = get_nvm_counters()
 
     for counter_str in nvm_counters:
         counter_success = verify_counter(counter_str)
         result_dict[f"NVM_Counter_{counter_str}"] = (f"value = {getattr(cubesat, counter_str)}", counter_success)
 
 def test_flags(result_dict):
+    """Verify each flag in _Satellite"""
+    nvm_flags = get_nvm_flags()
 
     for flag_str in nvm_flags:
         flag_success = verify_flag(flag_str)
         result_dict[f"NVM_Flag_{flag_str}"] = (f"value = {getattr(cubesat, flag_str)}", flag_success)
+
+def prompt_to_zero_counters_and_flags():
+    nvm_reset = input(f"\n\nWould you like to zero the counters and flags? Select {bold}(y){normal} for yes," +
+                      f" or {bold}(n){normal} for no:\n~> ")
+    if nvm_reset.lower() == 'y':
+        cubesat.zero_counters()
+        cubesat.zero_flags()
 
 async def run(result_dict):
     """
