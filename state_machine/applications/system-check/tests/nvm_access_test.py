@@ -5,7 +5,7 @@ from print_utils import bold, normal
 
 def get_nvm_flags():
     """
-    Find all of the bitFlags in the 
+    Find all of the bitFlags in the
     _Satellite class.
     """
 
@@ -19,7 +19,7 @@ def get_nvm_flags():
 
 def get_nvm_counters():
     """
-    Find all of the multiBitFlag and multiByte counters in the 
+    Find all of the multiBitFlag and multiByte counters in the
     _Satellite class.
     """
 
