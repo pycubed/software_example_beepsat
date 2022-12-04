@@ -19,7 +19,6 @@ import random
 import time
 import adafruit_bus_device.spi_device as spidev
 from micropython import const
-import tasko
 
 HAS_SUPERVISOR = False
 
@@ -931,7 +930,9 @@ class RFM9x:
         if internal_packet_length != packet_length - 1:
             if debug:
                 print(
-                    f"RFM9X: Received packet length ({packet_length}) does not match transmitted packet length ({internal_packet_length}), packet = {str(packet)}")
+                    f"RFM9X: Received packet length ({packet_length}) " +
+                    f"does not match transmitted packet length ({internal_packet_length}), " +
+                    f"packet = {str(packet)}")
             return None
 
         # Reject if the packet wasn't sent to my address
@@ -940,7 +941,9 @@ class RFM9x:
                 packet[1] != self.node):
             if debug:
                 print(
-                    f"RFM9X: Incorrect Address (packet address = {packet[1]} != my address = {self.node}, packet = {str(packet)}")
+                    f"RFM9X: Incorrect Address " +
+                    f"(packet address = {packet[1]} != my address = {self.node}), " +
+                    f"packet = {str(packet)}")
             return None
 
         # send ACK unless this was an ACK or a broadcast

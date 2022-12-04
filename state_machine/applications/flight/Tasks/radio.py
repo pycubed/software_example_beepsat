@@ -62,13 +62,19 @@ class task(Task):
         else:
             self.debug("No packets to send")
             cubesat.radio.listen()
-            response = await cubesat.radio.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED, with_header=False, timeout=10)
+            response = await cubesat.radio.receive(
+                keep_listening=True,
+                with_ack=ANTENNA_ATTACHED,
+                with_header=False,
+                timeout=10)
             if response is not None:
                 cubesat.f_contact = True
                 header = response[0]
                 response = response[1:]  # remove the header byte
 
-                self.debug(f'Recieved msg "{response}", RSSI: {cubesat.radio.last_rssi}, FEI: {cubesat.radio.frequency_error}')
+                self.debug(f'Recieved msg "{response}", ' +
+                           f'RSSI: {cubesat.radio.last_rssi}, ' +
+                           f'FEI: {cubesat.radio.frequency_error}')
 
                 if (header == headers.MEMORY_BUFFERED_START or
                         header == headers.MEMORY_BUFFERED_MID or
