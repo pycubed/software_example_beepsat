@@ -39,6 +39,10 @@ class Radio:
     def last_rssi(self):
         return 147
 
+    @property
+    def frequency_error(self):
+        return 1.2345
+
     def sleep(self):
         self.listening = False
 
