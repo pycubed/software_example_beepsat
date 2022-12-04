@@ -32,9 +32,6 @@ def noop(self):
 def hreset(self):
     """Hard reset"""
     self.debug('Resetting')
-    # msg = bytearray([headers.DEFAULT])
-    # msg.append(b'reset')
-    # await cubesat.radio.send(data=msg)
     cubesat.micro.on_next_reset(cubesat.micro.RunMode.NORMAL)
     cubesat.micro.reset()
 
