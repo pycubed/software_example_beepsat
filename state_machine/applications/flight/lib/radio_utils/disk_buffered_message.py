@@ -33,11 +33,11 @@ class DiskBufferedMessage(Message):
             print(f'Error reading file {self.path}: {e}')
         pkt = bytearray(len(payload) + 1)
         if self.msg_len <= self.cursor + self.packet_len:  # last packet
-            pkt[0] = headers.CHUNK_END
+            pkt[0] = headers.DISK_BUFFERED_END
         elif self.cursor == 0:
-            pkt[0] = headers.CHUNK_START
+            pkt[0] = headers.DISK_BUFFERED_START
         else:
-            pkt[0] = headers.CHUNK_MID
+            pkt[0] = headers.DISK_BUFFERED_MID
 
         pkt[1:] = payload
         return pkt, True
@@ -49,4 +49,4 @@ class DiskBufferedMessage(Message):
         self.cursor += self.packet_len
 
     def __repr__(self) -> str:
-        return f'<Chunk: {self.path}>'
+        return f'<Disk Buffer: {self.path}>'
