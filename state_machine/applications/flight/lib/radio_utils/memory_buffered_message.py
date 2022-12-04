@@ -3,7 +3,7 @@ from . import headers
 from . import PACKET_DATA_LEN
 
 class MemoryBufferedMessage(Message):
-    """Transmits the message 249 bytes at a time.
+    """Transmits the message PACKET_DATA_LEN bytes at a time.
     Sets special headers for the first packet, middle packets, and last packet.
 
     :param priority: The priority of the message (higher is better)

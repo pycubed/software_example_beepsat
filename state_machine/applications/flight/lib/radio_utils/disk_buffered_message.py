@@ -4,7 +4,7 @@ from . import PACKET_DATA_LEN
 import os
 
 class DiskBufferedMessage(Message):
-    """Transmits the message 251 bytes at a time.
+    """Transmits the message PACKET_DATA_LEN bytes at a time.
     Sets special headers for the first packet, middle packets, and last packet.
     Reads from a file one chunk at a time.
 
