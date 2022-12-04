@@ -10,11 +10,7 @@ try:
     import supervisor
 except ImportError:
     supervisor = None
-try:
-    import tasko
-except ImportError:
-    tasko = None
-    import asyncio
+import tasko
 
 
 # prevent board from reloading in the middle of the test
@@ -83,8 +79,5 @@ async def main_test():
 
     print(results_to_str(result_dict))
 
-if tasko is not None:
-    tasko.add_task(main_test(), 1)
-    tasko.run()
-else:
-    asyncio.run(main_test())
+tasko.add_task(main_test(), 1)
+tasko.run()
