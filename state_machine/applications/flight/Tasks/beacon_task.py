@@ -13,9 +13,7 @@ class task(Task):
 
     async def main_task(self):
         """
-        If you've attached a 433MHz antenna,
-        set the above ANTENNA_ATTACHED variable to True
-        to actually send the beacon packet
+        Pushes a beacon packet onto the transmission queue.
         """
 
         beacon_packet = self.beacon_packet()
@@ -23,6 +21,12 @@ class task(Task):
         self.debug("Beacon task pushing to tq")
 
     def beacon_packet(self):
+        """Creates a beacon packet containing the: CPU temp, IMU temp, gyro, acceleration, magnetic, and state byte.
+        The state byte is the index of the current state in the alphabetically ordered state list.
+        This data is packed into a c struct using `struct.pack`.
+
+        If no IMU is attached it returns a packet of 0s.
+        """
         if not cubesat.imu:
             self.debug('IMU not initialized')
             return bytes([0, 0, 0, 0, 0])

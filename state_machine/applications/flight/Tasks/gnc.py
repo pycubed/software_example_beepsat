@@ -20,6 +20,11 @@ class task(Task):
     r_eci = array([6871, -6571, -7071])
 
     async def main_task(self):
+        """
+        Guidance, navigation and control task.
+
+        Uses the b-cross control law to detumble the satelite.
+        """
 
         # compute control
         m = bcross(cubesat.magnetic, cubesat.gyro)

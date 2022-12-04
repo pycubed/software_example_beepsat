@@ -74,11 +74,6 @@ config = {
                 "Priority": 1,
                 "ScheduleLater": False
             },
-            "Safety": {
-                "Interval": 10.0,
-                "Priority": 3,
-                "ScheduleLater": False
-            }
         },
         "StepsTo": [
             "Normal",

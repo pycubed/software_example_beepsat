@@ -15,7 +15,7 @@ class MemoryBufferedMessageTests(unittest.TestCase):
 
         p = MemoryBufferedMessage(0, 'x' * packet_len)
         res, _ = p.packet()
-        self.assertEqual(res[0], headers.NAIVE_END)
+        self.assertEqual(res[0], headers.MEMORY_BUFFERED_END)
         p.ack()
         self.assertTrue(p.done())
 
@@ -24,10 +24,10 @@ class MemoryBufferedMessageTests(unittest.TestCase):
 
         p = MemoryBufferedMessage(0, 'x' * (packet_len + 1))
         res, _ = p.packet()
-        self.assertEqual(res[0], headers.NAIVE_START)
+        self.assertEqual(res[0], headers.MEMORY_BUFFERED_START)
         p.ack()
         res, _ = p.packet()
-        self.assertEqual(res[0], headers.NAIVE_END)
+        self.assertEqual(res[0], headers.MEMORY_BUFFERED_END)
         p.ack()
         self.assertTrue(p.done())
 
@@ -35,13 +35,13 @@ class MemoryBufferedMessageTests(unittest.TestCase):
         """Tests that a 3 packet message has the correct headers for each packet"""
         p = MemoryBufferedMessage(0, 'x' * (packet_len * 2 + 1))
         res, _ = p.packet()
-        self.assertEqual(res[0], headers.NAIVE_START)
+        self.assertEqual(res[0], headers.MEMORY_BUFFERED_START)
         p.ack()
         res, _ = p.packet()
-        self.assertEqual(res[0], headers.NAIVE_MID)
+        self.assertEqual(res[0], headers.MEMORY_BUFFERED_MID)
         p.ack()
         self.assertFalse(p.done())
         res, _ = p.packet()
-        self.assertEqual(res[0], headers.NAIVE_END)
+        self.assertEqual(res[0], headers.MEMORY_BUFFERED_END)
         p.ack()
         self.assertTrue(p.done())

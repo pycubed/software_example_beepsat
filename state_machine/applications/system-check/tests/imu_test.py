@@ -1,12 +1,8 @@
-"""
-Python system check script for PyCubed satellite board
-PyCubed Mini mainboard-v02 for Pocketqube Mission
-IMU Sensor Test
-* Author(s): Yashika Batra
-"""
-
 import time
-from ulab import numpy
+try:
+    import ulab.numpy as numpy
+except ImportError:
+    import numpy
 from lib.pycubed import cubesat
 
 

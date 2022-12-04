@@ -11,6 +11,9 @@ class task(Task):
     rgb_on = False
 
     async def main_task(self):
+        """
+        Switches the LED from purple to off.
+        """
         if not cubesat.neopixel:
             self.debug('No neopixel attached, skipping blink task')
             return
