@@ -5,12 +5,21 @@ import tests.imu_test
 import tests.sun_sensor_test
 import tests.coil_test
 import tests.burnwire_test
-import supervisor
-import tasko
 from print_utils import bold, normal, red, green
+try:
+    import supervisor
+except ImportError:
+    supervisor = None
+try:
+    import tasko
+except ImportError:
+    tasko = None
+    import asyncio
+
 
 # prevent board from reloading in the middle of the test
-supervisor.disable_autoreload()
+if supervisor is not None:
+    supervisor.disable_autoreload()
 
 # initialize hardware_dict and result_dict
 result_dict = {}
@@ -74,5 +83,8 @@ async def main_test():
 
     print(results_to_str(result_dict))
 
-tasko.add_task(main_test(), 1)
-tasko.run()
+if tasko is not None:
+    tasko.add_task(main_test(), 1)
+    tasko.run()
+else:
+    asyncio.run(main_test())
