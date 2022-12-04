@@ -12,7 +12,7 @@ def push(msg):
     """Push a msg into the transmission queue
 
     :param msg: The message to push
-    :type msg: Message | NaiveMessage | ChunkMessage
+    :type msg: Message | MemoryBufferedMessage | DiskBufferedMessage
     """
     if len(queue) < limit:
         pq.push(queue, msg)
@@ -23,7 +23,7 @@ def peek():
     """Returns the next message to be transmitted
 
     :return: The next message to be transmitted
-    :rtype: Message | NaiveMessage | ChunkMessage
+    :rtype: Message | MemoryBufferedMessage | DiskBufferedMessage
     """
     return queue[0]
 
@@ -31,7 +31,7 @@ def pop():
     """Returns the next message to be transmitted and removes it from the transmission queue
 
     :return: The next message to be transmitted
-    :rtype: Message | NaiveMessage | ChunkMessage
+    :rtype: Message | MemoryBufferedMessage | DiskBufferedMessage
     """
     return pq.pop(queue)
 

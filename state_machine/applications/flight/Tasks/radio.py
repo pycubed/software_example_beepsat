@@ -65,9 +65,13 @@ class task(Task):
 
                 self.debug(f'Recieved msg "{response}", RSSI: {cubesat.radio.last_rssi - 137}')
 
-                if header == headers.NAIVE_START or header == headers.NAIVE_MID or header == headers.NAIVE_END:
+                if (header == headers.MEMORY_BUFFERED_START or
+                        header == headers.MEMORY_BUFFERED_MID or
+                        header == headers.MEMORY_BUFFERED_END):
                     self.handle_memory_buffered_message(header, response)
-                elif header == headers.CHUNK_START or header == headers.CHUNK_MID or header == headers.CHUNK_END:
+                elif (header == headers.DISK_BUFFERED_START or
+                        header == headers.DISK_BUFFERED_MID or
+                        header == headers.DISK_BUFFERED_END):
                     self.handle_disk_buffered_message(header, response)
                 elif header == headers.COMMAND:
                     self.handle_command(response)
@@ -78,7 +82,7 @@ class task(Task):
 
     def handle_memory_buffered_message(self, header, response):
         """Handler function for the memory_buffered_message message type"""
-        if header == headers.NAIVE_START:
+        if header == headers.MEMORY_BUFFERED_START:
             self.msg = response
         else:
             if response != self.msg_last:
@@ -87,7 +91,7 @@ class task(Task):
                 self.debug('Repeated chunk')
         self.msg_last = response
 
-        if header == headers.NAIVE_END:
+        if header == headers.MEMORY_BUFFERED_END:
             self.msg_last = None
             self.msg = str(self.msg, 'utf-8')
 
@@ -120,7 +124,7 @@ class task(Task):
 
     def handle_disk_buffered_message(self, header, response):
         """Handler function for the disk_buffered_message message type"""
-        if header == headers.CHUNK_START:
+        if header == headers.DISK_BUFFERED_START:
             self.try_write('disk_buffered_message', 'wb', response)
         else:
             if response != self.cmsg_last:
@@ -129,7 +133,7 @@ class task(Task):
                 self.debug('Repeated chunk')
 
         self.cmsg_last = response
-        if header == headers.CHUNK_END:
+        if header == headers.DISK_BUFFERED_END:
             self.cmsg_last = None
 
     def try_write(self, file, mode, data):
