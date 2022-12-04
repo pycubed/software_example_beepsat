@@ -941,7 +941,7 @@ class RFM9x:
                 packet[1] != self.node):
             if debug:
                 print(
-                    f"RFM9X: Incorrect Address " +
+                    "RFM9X: Incorrect Address " +
                     f"(packet address = {packet[1]} != my address = {self.node}), " +
                     f"packet = {str(packet)}")
             return None
