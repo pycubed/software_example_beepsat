@@ -29,7 +29,7 @@ class Radio:
 
     @property
     def last_rssi(self):
-        return 147
+        return -147
 
     def sleep(self):
         self.listening = False

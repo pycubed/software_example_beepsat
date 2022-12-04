@@ -1,7 +1,7 @@
 import time
 from lib.pycubed import cubesat
 try:
-    from ulab import numpy
+    import ulab.numpy as numpy
 except ImportError:
     import numpy
 
