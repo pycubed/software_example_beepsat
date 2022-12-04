@@ -1,10 +1,10 @@
 from .message import Message
 from . import headers
-from . import MAX_PACKET_LEN
+from . import PACKET_DATA_LEN
 import os
 
-class ChunkMessage(Message):
-    """Transmits the message 251 bytes at a time.
+class DiskBufferedMessage(Message):
+    """Transmits the message PACKET_DATA_LEN bytes at a time.
     Sets special headers for the first packet, middle packets, and last packet.
     Reads from a file one chunk at a time.
 
@@ -14,7 +14,7 @@ class ChunkMessage(Message):
     :type str: str | bytes | bytearray
     """
 
-    packet_len = MAX_PACKET_LEN - 1
+    packet_len = PACKET_DATA_LEN
 
     def __init__(self, priority, path):
         self.cursor = 0
@@ -33,11 +33,11 @@ class ChunkMessage(Message):
             print(f'Error reading file {self.path}: {e}')
         pkt = bytearray(len(payload) + 1)
         if self.msg_len <= self.cursor + self.packet_len:  # last packet
-            pkt[0] = headers.CHUNK_END
+            pkt[0] = headers.DISK_BUFFERED_END
         elif self.cursor == 0:
-            pkt[0] = headers.CHUNK_START
+            pkt[0] = headers.DISK_BUFFERED_START
         else:
-            pkt[0] = headers.CHUNK_MID
+            pkt[0] = headers.DISK_BUFFERED_MID
 
         pkt[1:] = payload
         return pkt, True
@@ -49,4 +49,4 @@ class ChunkMessage(Message):
         self.cursor += self.packet_len
 
     def __repr__(self) -> str:
-        return f'<Chunk: {self.path}>'
+        return f'<Disk Buffer: {self.path}>'
