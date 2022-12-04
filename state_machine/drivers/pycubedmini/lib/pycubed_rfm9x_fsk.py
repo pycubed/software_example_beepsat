@@ -11,23 +11,25 @@ adapted from the Radiohead library RF95 code from:
 http: www.airspayce.com/mikem/arduino/RadioHead/
 
 * Author(s): Tony DiCola, Jerry Needell
+
+====================================================
+Modified to use FSK in 2022 by Jacob Willis
 """
 import random
 import time
 import adafruit_bus_device.spi_device as spidev
 from micropython import const
+import tasko
 
 HAS_SUPERVISOR = False
 
 try:
     import supervisor
-
     if hasattr(supervisor, "ticks_ms"):
         HAS_SUPERVISOR = True
 except ImportError:
     pass
-__version__ = "2.2.3"
-__repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_RFM9x.git"
+
 
 # Internal constants:
 # Register names
@@ -686,8 +688,8 @@ class RFM9x:
         else:
             raise ValueError(f"RX bandwidth mantissa {mant_binary} invalid")
 
-        rxbw = _RH_RF95_FXOSC / (mant * (2**(exp+2)))
-        return rxbw/1000
+        rxbw = _RH_RF95_FXOSC / (mant * (2**(exp + 2)))
+        return rxbw / 1000
 
     @rx_bandwidth.setter
     def rx_bandwidth(self, val):
@@ -884,8 +886,7 @@ class RFM9x:
                 self.listen()
 
             # check if we have timed out
-            if ((HAS_SUPERVISOR and (ticks_diff(supervisor.ticks_ms(), start) >= timeout * 1000))
-                    or
+            if ((HAS_SUPERVISOR and (ticks_diff(supervisor.ticks_ms(), start) >= timeout * 1000)) or
                     (not HAS_SUPERVISOR and (time.monotonic() - start >= timeout))):
                 # timed out
                 if debug:
@@ -934,18 +935,18 @@ class RFM9x:
             return None
 
         # Reject if the packet wasn't sent to my address
-        if (self.node != _RH_BROADCAST_ADDRESS
-                and packet[1] != _RH_BROADCAST_ADDRESS
-                and packet[1] != self.node):
+        if (self.node != _RH_BROADCAST_ADDRESS and
+                packet[1] != _RH_BROADCAST_ADDRESS and
+                packet[1] != self.node):
             if debug:
                 print(
                     f"RFM9X: Incorrect Address (packet address = {packet[1]} != my address = {self.node}, packet = {str(packet)}")
             return None
 
         # send ACK unless this was an ACK or a broadcast
-        if (with_ack
-                and ((packet[4] & _RH_FLAGS_ACK) == 0)
-                and (packet[1] != _RH_BROADCAST_ADDRESS)):
+        if (with_ack and
+                ((packet[4] & _RH_FLAGS_ACK) == 0) and
+                (packet[1] != _RH_BROADCAST_ADDRESS)):
             # delay before sending Ack to give receiver a chance to get ready
             if self.ack_delay is not None:
                 time.sleep(self.ack_delay)
