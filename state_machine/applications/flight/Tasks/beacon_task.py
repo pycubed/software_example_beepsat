@@ -7,11 +7,11 @@ from pycubed import cubesat
 from state_machine import state_machine
 import struct
 import time
+import os
 
 class task(Task):
     name = 'beacon'
     color = 'teal'
-    fileindex = 1
 
     async def main_task(self):
         """
@@ -19,15 +19,25 @@ class task(Task):
         """
         currTime = time.time()
         TIMEINTERVAL = 1000
-        print(currTime)
-        file = open(f"./logfiles/log{int(currTime // TIMEINTERVAL)}.txt", "ab+")
+        logDir = os.path.join(os.getcwd(), ".sd")
 
-        self.fileindex
+        try:
+            file = open(f".sd/logfiles/log{int(currTime//TIMEINTERVAL)}.txt", "ab+")
+        except FileNotFoundError:
+            try:
+                os.mkdir(logDir)
+                os.mkdir(os.path.join(logDir, "logfiles"))
+                file = open(f".sd/logfiles/log{int(currTime//TIMEINTERVAL)}.txt", "ab+")
+            except Exception as e:
+                print(e)
+        except Exception as e:
+            print(e)
+
         beacon_packet = self.beacon_packet()
         file.write(bytearray(beacon_packet))
+        file.close()
         tq.push(Message(10, beacon_packet))
         self.debug("Beacon task pushing to tq")
-        file.close()
 
     def beacon_packet(self):
         """Creates a beacon packet containing the: CPU temp, IMU temp, gyro, acceleration, magnetic, and state byte.
@@ -36,7 +46,6 @@ class task(Task):
 
         If no IMU is attached it returns a packet of 0s.
         """
-
         if not cubesat.imu:
             self.debug('IMU not initialized')
             return bytes([0, 0, 0, 0, 0])
