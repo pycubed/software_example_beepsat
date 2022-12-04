@@ -5,12 +5,17 @@ import tests.imu_test
 import tests.sun_sensor_test
 import tests.coil_test
 import tests.burnwire_test
-import supervisor
-import tasko
 from print_utils import bold, normal, red, green
+try:
+    import supervisor
+except ImportError:
+    supervisor = None
+import tasko
+
 
 # prevent board from reloading in the middle of the test
-supervisor.disable_autoreload()
+if supervisor is not None:
+    supervisor.disable_autoreload()
 
 # initialize hardware_dict and result_dict
 result_dict = {}

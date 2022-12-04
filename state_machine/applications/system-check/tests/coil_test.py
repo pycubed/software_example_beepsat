@@ -1,6 +1,9 @@
 import time
 from lib.pycubed import cubesat
-from ulab import numpy
+try:
+    import ulab.numpy as numpy
+except ImportError:
+    import numpy
 
 # voltage level constants; set between -1 and 1
 v1 = 0.25
