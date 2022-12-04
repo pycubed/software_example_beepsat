@@ -3,7 +3,7 @@ CircuitPython driver for PyCubed-Mini
 """
 
 import sdcardio
-import pycubed_rfm9x
+import pycubed_rfm9x_fsk
 import board
 import microcontroller
 import busio
@@ -209,10 +209,19 @@ class _Satellite:
             print('[ERROR][Initializing Radio]', e)
 
         try:
-            radio = pycubed_rfm9x.RFM9x(
+            radio = pycubed_rfm9x_fsk.RFM9x(
                 self.spi, self._rf_cs, self._rf_rst,
-                self.UHF_FREQ)
+                self.UHF_FREQ, crc=False)
             radio.dio0 = self.radio_DIO0
+
+            radio.tx_power = 23
+            radio.bitrate = 2400
+            radio.frequency_deviation = 10000
+            radio.rx_bandwidth = 25.0
+            radio.preamble_length = 16
+            radio.ack_delay = 0.2
+            radio.ack_wait = 5
+
             radio.node = 0xAB  # our ID
             radio.destination = 0xBA  # target's ID
             radio.sleep()
