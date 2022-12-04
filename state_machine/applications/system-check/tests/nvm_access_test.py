@@ -145,11 +145,11 @@ async def run(result_dict):
     region in non volatile memory.
     """
 
+    prompt_to_zero_counters_and_flags()
     print("Starting NVM Test...")
     test_counters(result_dict)
     test_counter_interference(result_dict)
     test_flags(result_dict)
-    prompt_to_zero_counters_and_flags()
     print("NVM Test Complete.\n")
 
     return result_dict
