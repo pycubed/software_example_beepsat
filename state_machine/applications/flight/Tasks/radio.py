@@ -65,9 +65,13 @@ class task(Task):
 
                 self.debug(f'Recieved msg "{response}", RSSI: {cubesat.radio.last_rssi - 137}')
 
-                if header == headers.MEMORY_BUFFERED_START or header == headers.MEMORY_BUFFERED_MID or header == headers.MEMORY_BUFFERED_END:
+                if (header == headers.MEMORY_BUFFERED_START or
+                        header == headers.MEMORY_BUFFERED_MID or
+                        header == headers.MEMORY_BUFFERED_END):
                     self.handle_memory_buffered_message(header, response)
-                elif header == headers.DISK_BUFFERED_START or header == headers.DISK_BUFFERED_MID or header == headers.DISK_BUFFERED_END:
+                elif (header == headers.DISK_BUFFERED_START or
+                        header == headers.DISK_BUFFERED_MID or
+                        header == headers.DISK_BUFFERED_END):
                     self.handle_disk_buffered_message(header, response)
                 elif header == headers.COMMAND:
                     self.handle_command(response)
