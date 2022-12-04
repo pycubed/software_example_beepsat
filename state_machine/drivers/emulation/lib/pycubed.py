@@ -8,7 +8,7 @@ try:
     from ulab.numpy import array
 except ImportError:
     from numpy import array
-    
+
 class Burnwire:
     def __init__(self):
         pass
