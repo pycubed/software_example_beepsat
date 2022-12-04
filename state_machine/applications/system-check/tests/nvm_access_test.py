@@ -31,7 +31,8 @@ def get_nvm_counters():
 
     return nvm_counters
 
-def verify_value(field_str, value):
+def verify_nvm_field_value(field_str, value):
+    """ Returns true if the cubesat attribute named {field_str} is equal to value """
     setattr(cubesat, field_str, value)
     if not getattr(cubesat, field_str) == value:
         return False
@@ -44,10 +45,9 @@ def verify_counter(counter_str):
     counter_prev = getattr(cubesat, counter_str)
     maxval = vars(_Satellite)[counter_str].maxval
 
-    success = True
-    success &= verify_value(counter_str, 0)
-    success &= verify_value(counter_str, maxval)
-    success &= not verify_value(counter_str, maxval + 1)
+    success = verify_nvm_field_value(counter_str, 0)
+    success &= verify_nvm_field_value(counter_str, maxval)
+    success &= not verify_nvm_field_value(counter_str, maxval + 1)
 
     # restore counter value
     setattr(cubesat, counter_str, counter_prev)
@@ -60,9 +60,8 @@ def verify_flag(flag_str):
     # save current flag value
     flag_prev = getattr(cubesat, flag_str)
 
-    success = True
-    success &= verify_value(flag_str, 0)
-    success &= verify_value(flag_str, 1)
+    success = verify_nvm_field_value(flag_str, 0)
+    success &= verify_nvm_field_value(flag_str, 1)
 
     # restore flag value
     setattr(cubesat, flag_str, flag_prev)
