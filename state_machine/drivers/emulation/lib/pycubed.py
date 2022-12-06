@@ -1,8 +1,9 @@
 import time
 import tasko
 
-from radio_driver import Radio
-import reader as reader
+import lib.reader as reader
+from lib.bitflags import bitFlag, multiBitFlag, multiByte
+from lib.radio_driver import Radio
 import random
 try:
     from ulab.numpy import array
@@ -24,7 +25,27 @@ class HardwareInitException(Exception):
     pass
 
 
-class Satellite:
+# NVM register numbers
+_FLAG = 20
+_DWNLINK = 4
+_DCOUNT = 3
+_RSTERRS = 2
+_BOOTCNT = 0
+_LOGFAIL = 5
+
+class _Satellite:
+    # Define NVM flags
+    f_contact = bitFlag(register=_FLAG, bit=1)
+    f_burn = bitFlag(register=_FLAG, bit=2)
+
+    # Define NVM counters
+    c_boot = multiByte(num_bytes=2, lowest_register=_BOOTCNT)
+    c_state_err = multiBitFlag(register=_RSTERRS, lowest_bit=4, num_bits=4)
+    c_vbus_rst = multiBitFlag(register=_RSTERRS, lowest_bit=0, num_bits=4)
+    c_deploy = multiBitFlag(register=_DCOUNT, lowest_bit=0, num_bits=8)
+    c_downlink = multiBitFlag(register=_DWNLINK, lowest_bit=0, num_bits=8)
+    c_logfail = multiBitFlag(register=_LOGFAIL, lowest_bit=0, num_bits=8)
+
     tasko = None
     _RGB = (0, 0, 0)
     vlowbatt = 4.0
@@ -46,10 +67,6 @@ class Satellite:
         self.burnwire1 = Burnwire()
 
         self.data_cache = {}
-        self.c_gs_resp = 1
-        self.c_state_err = 0
-        self.c_boot = None
-        self.f_contact = True
 
         # magnetometer and accelerometer chosen to be arbitrary non zero, non parallel values
         # to provide more interesting output from the b-cross controller.
@@ -146,5 +163,19 @@ class Satellite:
             print('[ERROR][Burning]', e)
             return False
 
+    def zero_flags(self):
+        """ zero all flags in non volatile memory """
+        self.f_contact = 0
+        self.f_burn = 0
 
-cubesat = Satellite()
+    def zero_counters(self):
+        """ zero all counters in non volatile memory """
+        self.c_boot = 0
+        self.c_state_err = 0
+        self.c_vbus_rst = 0
+        self.c_deploy = 0
+        self.c_downlink = 0
+        self.c_logfail = 0
+
+
+cubesat = _Satellite()
