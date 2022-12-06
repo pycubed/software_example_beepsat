@@ -1,5 +1,4 @@
 from lib.pycubed import _Satellite, cubesat
-from lib.bitflags import bitFlag, multiBitFlag, multiByte
 from print_utils import bold, normal
 
 
