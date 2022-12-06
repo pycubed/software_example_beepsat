@@ -1,5 +1,6 @@
 from lib.debugcolor import co
 from state_machine import state_machine
+import traceback
 
 
 class Task:
@@ -55,4 +56,5 @@ class Task:
         """
         Called when an error is raised in the task.
         """
-        self.debug(f'[Error] {error}')
+        formated_exception = traceback.format_exception(error, error, error.__traceback__)
+        self.debug(f'[Error] {formated_exception}')
