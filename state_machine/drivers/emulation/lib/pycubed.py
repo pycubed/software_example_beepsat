@@ -3,7 +3,7 @@ import tasko
 
 import lib.reader as reader
 from lib.bitflags import bitFlag, multiBitFlag, multiByte
-from radio_driver import Radio
+from lib.radio_driver import Radio
 import random
 try:
     from ulab.numpy import array
