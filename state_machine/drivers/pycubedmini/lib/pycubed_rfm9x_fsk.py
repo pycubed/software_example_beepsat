@@ -974,4 +974,4 @@ class RFM9x:
         if (not with_header):  # skip the header if not wanted
             packet = packet[5:]
 
-        return packet
+        return packet[:packet_length]
