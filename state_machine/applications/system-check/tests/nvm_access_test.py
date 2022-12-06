@@ -9,10 +9,10 @@ def get_nvm_flags():
     _Satellite class.
     """
 
-    sat_vars = vars(_Satellite)
+    sat_vars = _Satellite.__dict__
     nvm_flags = []
     for v in sat_vars:
-        if type(sat_vars[v]) == bitFlag:
+        if "bitFlag" in str(type(sat_vars[v])):
             nvm_flags.append(v)
 
     return nvm_flags
@@ -23,10 +23,10 @@ def get_nvm_counters():
     _Satellite class.
     """
 
-    sat_vars = vars(_Satellite)
+    sat_vars = _Satellite.__dict__
     nvm_counters = []
     for v in sat_vars:
-        if type(sat_vars[v]) == multiBitFlag or type(sat_vars[v]) == multiByte:
+        if "multiBitFlag" in str(type(sat_vars[v])) or "multiByte" in str(type(sat_vars[v])):
             nvm_counters.append(v)
 
     return nvm_counters
@@ -43,7 +43,7 @@ def verify_counter(counter_str):
 
     # save current counter value
     counter_prev = getattr(cubesat, counter_str)
-    maxval = vars(_Satellite)[counter_str].maxval
+    maxval = _Satellite.__dict__[counter_str].maxval
 
     success = verify_nvm_field_value(counter_str, 0)
     success &= verify_nvm_field_value(counter_str, maxval)
@@ -79,7 +79,7 @@ def test_counter_interference(result_dict):
 
     # set each counter in nvm to their maximum values
     for counter_str in nvm_counters:
-        maxval = vars(_Satellite)[counter_str].maxval
+        maxval = _Satellite.__dict__[counter_str].maxval
         setattr(cubesat, counter_str, maxval)
 
     # change each counter to 0, make sure no other counter changed
@@ -93,14 +93,14 @@ def test_counter_interference(result_dict):
             if remaining_counter_str == counter_str:
                 continue
 
-            maxval = vars(_Satellite)[remaining_counter_str].maxval
+            maxval = _Satellite.__dict__[remaining_counter_str].maxval
             val = getattr(cubesat, remaining_counter_str)
             if not val == maxval:
                 success = False
                 interfering_counters.append(f"{counter_str} interfers with {remaining_counter_str}")
 
         # set counter back to max
-        maxval = vars(_Satellite)[counter_str].maxval
+        maxval = _Satellite.__dict__[counter_str].maxval
         setattr(cubesat, counter_str, maxval)
 
     # restore original counter values
