@@ -156,6 +156,7 @@ def _downlink(data, priority=1):
             tq.push(MemoryBufferedMessage(priority, data))
         else:
             tq.push(Message(priority, b'Downlink too large (sd missing)'))
+        return
     fname = f'/sd/downlink/{time.monotonic_ns()}.txt'
     if not file_exists('/sd/downlink'):
         os.mkdir('/sd/downlink')
