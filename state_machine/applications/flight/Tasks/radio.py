@@ -66,7 +66,6 @@ class task(Task):
                 with_ack=ANTENNA_ATTACHED,
                 with_header=False,
                 timeout=10)
-            self.debug(response)
             if response is not None:
                 cubesat.f_contact = True
                 header = response[0]
