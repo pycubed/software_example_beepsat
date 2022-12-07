@@ -891,7 +891,7 @@ class RFM9x:
                 # Enter idle mode to stop receiving other packets.
                 self.idle()
                 # read packet
-                packet = self._process_packet(with_header=with_header, with_ack=with_ack, debug=debug)
+                packet = await self._process_packet(with_header=with_header, with_ack=with_ack, debug=debug)
                 if packet is not None:
                     break  # packet valid - return it
                 # packet invalid - continue listening
@@ -938,11 +938,13 @@ class RFM9x:
                     f"packet = {str(packet)}")
             return None
 
+        packet = packet[:packet_length]
         # Reject if the packet does not pass the checksum
         if self.checksum:
             if not bsd_checksum(packet[:-2]) == packet[-2:]:
                 if debug:
-                    print(f"RFM9X: Checksum failed, packet = {str(packet)}")
+                    print(
+                        f"RFM9X: Checksum failed, packet = {str(packet)}, bsd_checksum(packet[:-2]) = {bsd_checksum(packet[:-2])}, packet[-2:] = {packet[-2:]}")
                 self.checksum_error_count += 1
                 return None
             else:
@@ -966,7 +968,7 @@ class RFM9x:
                 (packet[1] != _RH_BROADCAST_ADDRESS)):
             # delay before sending Ack to give receiver a chance to get ready
             if self.ack_delay is not None:
-                time.sleep(self.ack_delay)
+                await tasko.sleep(self.ack_delay)
             # send ACK packet to sender (data is b'!')
             await self.send(
                 b"!",
@@ -988,7 +990,7 @@ class RFM9x:
         if (not with_header):  # skip the header if not wanted
             packet = packet[5:]
 
-        return packet[:packet_length]
+        return packet
 
 def bsd_checksum(bytedata):
     """Very simple, not secure, but fast 2 byte checksum"""
