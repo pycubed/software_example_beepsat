@@ -61,7 +61,6 @@ class task(Task):
                 tq.pop()
         else:
             self.debug("No packets to send")
-            cubesat.radio.listen()
             response = await cubesat.radio.receive(
                 keep_listening=True,
                 with_ack=ANTENNA_ATTACHED,
@@ -88,8 +87,6 @@ class task(Task):
                     self.handle_command(response)
             else:
                 self.debug('No packets received')
-
-        cubesat.radio.sleep()
 
     def handle_memory_buffered_message(self, header, response):
         """Handler function for the memory_buffered_message message type"""
