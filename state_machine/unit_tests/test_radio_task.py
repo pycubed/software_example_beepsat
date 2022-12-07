@@ -10,11 +10,16 @@ import Tasks.radio as radio
 from radio_driver import _Packet as Packet
 import radio_utils.headers as headers
 import radio_utils.commands as cdh
+from radio_utils.memory_buffered_message import MemoryBufferedMessage
 from pycubed import cubesat
 from state_machine import state_machine
 
 radio.ANTENNA_ATTACHED = True
 state_machine.state = 'Debug'
+
+# Make radio rx return instantly
+cubesat.radio._rx_time_bias = 0.0
+cubesat.radio._rx_time_dev = 0.0
 
 def command_data(command_code, args):
     return bytes([headers.COMMAND]) + b'p\xba\xb8C' + command_code + args
@@ -52,3 +57,23 @@ class RXCommandTest(IsolatedAsyncioTestCase):
         cdh.commands[cdh.QUERY] = query.command
         await rt.main_task()
         self.assertEqual(noop.called, True, "Query command was not called")
+
+class MemBuffRXTest(IsolatedAsyncioTestCase):
+
+    async def test(self):
+        """Test that RX of a command with and without args works"""
+        self.rt = radio.task()
+
+        small_msg = "This is a small test message"
+        await self.rx_string(small_msg)
+        await self.rx_string(small_msg * 100)
+
+    async def rx_string(self, str):
+        msg = MemoryBufferedMessage(10, bytearray(str, "ascii"))
+        while not msg.done():
+            pkt_data, _ = msg.packet()
+            small_packet = Packet(pkt_data)
+            cubesat.radio._push_rx_queue(small_packet)
+            await self.rt.main_task()
+            msg.ack()
+        self.assertEqual(self.rt.msg, str)
