@@ -19,6 +19,7 @@ import random
 import time
 import adafruit_bus_device.spi_device as spidev
 from micropython import const
+import tasko
 
 HAS_SUPERVISOR = False
 
@@ -718,7 +719,7 @@ class RFM9x:
         return (self._read_u8(_RH_RF95_REG_3F_IRQ_FLAGS_2) & (0b1 << 6)) >> 6
 
     # pylint: disable=too-many-branches
-    def send(
+    async def send(
         self,
         data,
         *,
@@ -784,11 +785,15 @@ class RFM9x:
             while not timed_out and not self.tx_done():
                 if ticks_diff(supervisor.ticks_ms(), start) >= self.xmit_timeout * 1000:
                     timed_out = True
+                else:
+                    await tasko.sleep(0)
         else:
             start = time.monotonic()
             while not timed_out and not self.tx_done():
                 if time.monotonic() - start >= self.xmit_timeout:
                     timed_out = True
+                else:
+                    await tasko.sleep(0)
 
         # Done transmitting - change modes (interrupt automatically cleared on mode change)
         if keep_listening:
@@ -798,7 +803,7 @@ class RFM9x:
             self.idle()
         return not timed_out
 
-    def send_with_ack(self, data, debug=False):
+    async def send_with_ack(self, data, debug=False):
         """Reliable Datagram mode:
         Send a packet with data and wait for an ACK response.
         The packet header is automatically generated.
@@ -831,7 +836,7 @@ class RFM9x:
             # pause before next retry -- random delay
             if not got_ack:
                 # delay by random amount before next try
-                time.sleep(self.ack_wait * random.random())
+                await tasko.sleep(self.ack_wait * random.random())
                 if debug:
                     print(f"No ACK, retrying send - retries remaining: {retries_remaining}")
             retries_remaining = retries_remaining - 1
@@ -840,7 +845,7 @@ class RFM9x:
         self.flags = 0  # clear flags
         return got_ack
 
-    def receive(
+    async def receive(
         self, *, keep_listening=True, with_header=False, with_ack=False, timeout=None, debug=False
     ):
         """Wait to receive a packet from the receiver. If a packet is found the payload bytes
@@ -891,6 +896,8 @@ class RFM9x:
                 if debug:
                     print("RFM9X: RX timed out")
                 break
+
+            await tasko.sleep(0)
 
         # Exit
         if keep_listening:
