@@ -210,7 +210,7 @@ class _Satellite:
         try:
             radio = pycubed_rfm9x_fsk.RFM9x(
                 self.spi, self._rf_cs, self._rf_rst,
-                self.UHF_FREQ, crc=False)
+                self.UHF_FREQ, checksum=True)
             radio.dio0 = self.radio_DIO0
 
             radio.tx_power = 23
@@ -218,7 +218,7 @@ class _Satellite:
             radio.frequency_deviation = 10000
             radio.rx_bandwidth = 25.0
             radio.preamble_length = 16
-            radio.ack_delay = 0.2
+            radio.ack_delay = 1.0
             radio.ack_wait = 5
 
             radio.node = 0xAB  # our ID

@@ -84,7 +84,7 @@ class task(Task):
                         header == headers.DISK_BUFFERED_END):
                     self.handle_disk_buffered_message(header, response)
                 elif header == headers.COMMAND:
-                    self.handle_command(response)
+                    await self.handle_command(response)
             else:
                 self.debug('No packets received')
 
@@ -103,7 +103,7 @@ class task(Task):
             self.msg_last = None
             self.msg = str(self.msg, 'utf-8')
 
-    def handle_command(self, response):
+    async def handle_command(self, response):
         """Handler function for commands"""
         if len(response) < 6 or response[:4] != self.super_secret_code:
             return
@@ -125,10 +125,10 @@ class task(Task):
                     cdh.commands[cmd](self)
             except Exception as e:
                 self.debug(f'something went wrong: {e}')
-                cubesat.radio.send(str(e).encode())
+                await cubesat.radio.send(str(e).encode())
         else:
             self.debug('invalid command!')
-            cubesat.radio.send(b'invalid cmd' + cmd)
+            await cubesat.radio.send(b'invalid cmd' + cmd)
 
     def handle_disk_buffered_message(self, header, response):
         """Handler function for the disk_buffered_message message type"""
