@@ -817,13 +817,13 @@ class RFM9x:
         self.sequence_number = (self.sequence_number + 1) & 0xFF
         while not got_ack and retries_remaining:
             self.identifier = self.sequence_number
-            self.send(data, keep_listening=True)
+            await self.send(data, keep_listening=True)
             # Don't look for ACK from Broadcast message
             if self.destination == _RH_BROADCAST_ADDRESS:
                 got_ack = True
             else:
                 # wait for a packet from our destination
-                ack_packet = self.receive(
+                ack_packet = await self.receive(
                     timeout=self.ack_wait, with_header=True, debug=debug)
                 if ack_packet is not None:
                     if ack_packet[4] & _RH_FLAGS_ACK:
@@ -907,7 +907,7 @@ class RFM9x:
 
         return packet
 
-    def _process_packet(self, with_header=False, with_ack=False, debug=False):
+    async def _process_packet(self, with_header=False, with_ack=False, debug=False):
 
         # check for CRC error before reading data (flag is cleared when FIFO is read)
         crc_error = False
@@ -961,7 +961,7 @@ class RFM9x:
             if self.ack_delay is not None:
                 time.sleep(self.ack_delay)
             # send ACK packet to sender (data is b'!')
-            self.send(
+            await self.send(
                 b"!",
                 destination=packet[2],
                 node=packet[1],
