@@ -88,6 +88,15 @@ class task(Task):
             else:
                 self.debug('No packets received')
 
+    def verify_integrity(self, packet):
+        """Verifies the checksum of a packet, returns None on failure.
+        If the packet is valid, returns the packet without the checksum."""
+        if bsdChecksum(packet[1:-2]) == packet[-2:]:
+            return packet[:-2]
+        else:
+            self.debug('Checksum failed')
+            return None
+
     def handle_memory_buffered_message(self, header, response):
         """Handler function for the memory_buffered_message message type"""
         if header == headers.MEMORY_BUFFERED_START:
