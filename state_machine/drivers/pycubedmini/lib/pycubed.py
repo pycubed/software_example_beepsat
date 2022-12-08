@@ -223,7 +223,7 @@ class _Satellite:
     def sun_yn(self):
         """ Initialize the -Y sun sensor on I2C2 """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c3, address=0x29)
+            return adafruit_tsl2561.TSL2561(self.i2c1, address=0x29)
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor -Y]', e)
 
@@ -231,7 +231,7 @@ class _Satellite:
     def sun_zn(self):
         """ Initialize the -Z sun sensor on I2C2 """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c3, address=0x39)
+            return adafruit_tsl2561.TSL2561(self.i2c2, address=0x29)
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor -Z]', e)
 
@@ -239,7 +239,7 @@ class _Satellite:
     def sun_xn(self):
         """ Initialize the -X sun sensor on I2C1 """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c2, address=0x49)
+            return adafruit_tsl2561.TSL2561(self.i2c3, address=0x29)
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor -X]', e)
 
@@ -247,7 +247,7 @@ class _Satellite:
     def sun_yp(self):
         """ Initialize the +Y sun sensor on I2C1 """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c3, address=0x49)
+            return adafruit_tsl2561.TSL2561(self.i2c1, address=0x49)
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor +Y]', e)
 
@@ -255,7 +255,7 @@ class _Satellite:
     def sun_zp(self):
         """ Initialize the +Z sun sensor on I2C1 """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c2, address=0x39)
+            return adafruit_tsl2561.TSL2561(self.i2c2, address=0x49)
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor +Z]', e)
 
@@ -263,7 +263,7 @@ class _Satellite:
     def sun_xp(self):
         """ Initialize the +X sun sensor on I2C2 """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c2, address=0x29)
+            return adafruit_tsl2561.TSL2561(self.i2c3, address=0x49)
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor +X]', e)
 
