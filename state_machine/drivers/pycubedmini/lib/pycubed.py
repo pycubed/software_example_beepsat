@@ -22,6 +22,7 @@ import adafruit_tsl2561
 import time
 import tasko
 from ulab.numpy import array
+import radio_defaults
 
 class device:
     """
@@ -71,8 +72,6 @@ class _Satellite:
     c_deploy = multiBitFlag(register=_DCOUNT, lowest_bit=0, num_bits=8)
     c_downlink = multiBitFlag(register=_DWNLINK, lowest_bit=0, num_bits=8)
     c_logfail = multiBitFlag(register=_LOGFAIL, lowest_bit=0, num_bits=8)
-
-    UHF_FREQ = 433.0
 
     instance = None
     data_cache = {}
@@ -209,20 +208,24 @@ class _Satellite:
 
         try:
             radio = pycubed_rfm9x_fsk.RFM9x(
-                self.spi, self._rf_cs, self._rf_rst,
-                self.UHF_FREQ, checksum=True)
+                self.spi,
+                self._rf_cs,
+                self._rf_rst,
+                radio_defaults.FREQUENCY,
+                checksum=radio_defaults.CHECKSUM)
+
             radio.dio0 = self.radio_DIO0
 
-            radio.tx_power = 23
-            radio.bitrate = 2400
-            radio.frequency_deviation = 10000
-            radio.rx_bandwidth = 25.0
-            radio.preamble_length = 16
-            radio.ack_delay = 1.0
-            radio.ack_wait = 5
+            radio.tx_power = radio_defaults.TX_POWER
+            radio.bitrate = radio_defaults.BITRATE
+            radio.frequency_deviation = radio_defaults.FREQUENCY_DEVIATION
+            radio.rx_bandwidth = radio_defaults.RX_BANDWIDTH
+            radio.preamble_length = radio_defaults.PREAMBLE_LENGTH
+            radio.ack_delay = radio_defaults.ACK_DELAY
+            radio.ack_wait = radio_defaults.ACK_WAIT
+            radio.node = radio_defaults.SATELLITE_ID
+            radio.destination = radio_defaults.GROUNDSTATION_ID
 
-            radio.node = 0xAB  # our ID
-            radio.destination = 0xBA  # target's ID
             radio.sleep()
             return radio
         except Exception as e:
