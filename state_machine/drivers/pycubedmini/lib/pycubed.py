@@ -311,7 +311,7 @@ class _Satellite:
             print('[ERROR][Initializing RTC]', e)
 
     def imuToBodyFrame(self, vec):
-        return array([-vec[0], vec[2], vec[1]])
+        return array([-vec[1], vec[2], -vec[0]])
 
     @property
     def acceleration(self):
