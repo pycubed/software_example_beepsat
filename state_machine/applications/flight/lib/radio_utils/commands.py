@@ -191,3 +191,19 @@ commands = {
     DELETE_FILE: delete_file,
     RELOAD: reload,
 }
+
+command_name_map = {
+    "NO_OP": [NO_OP, False],
+    "HARD_RESET": [HARD_RESET, False],
+    "QUERY": [QUERY, True],
+    "EXEC_PY": [EXEC_PY, False],
+    "REQUEST_FILE": [REQUEST_FILE, True],
+    "LIST_DIR": [TQ_LEN, True],
+    "TQ_LEN": [TQ_LEN, True],
+    "MOVE_FILE": [MOVE_FILE, True],
+    "COPY_FILE": [COPY_FILE, True],
+    "DELETE_FILE": [DELETE_FILE, True],
+    "RELOAD": [RELOAD, True],
+}
+
+super_secret_code = b'p\xba\xb8C'

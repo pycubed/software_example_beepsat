@@ -20,7 +20,6 @@ def should_transmit():
 class task(Task):
     name = 'radio'
     color = 'teal'
-    super_secret_code = b'p\xba\xb8C'
 
     def __init__(self):
         super().__init__()
@@ -105,7 +104,7 @@ class task(Task):
 
     async def handle_command(self, response):
         """Handler function for commands"""
-        if len(response) < 6 or response[:4] != self.super_secret_code:
+        if len(response) < 6 or response[:4] != cdh.super_secret_code:
             return
 
         cmd = bytes(response[4:6])  # [pass-code(4 bytes)] [cmd 2 bytes] [args]
