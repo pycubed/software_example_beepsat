@@ -202,7 +202,7 @@ class _Satellite:
                 self.i2c(hw_config.IMU_I2C),
                 address=hw_config.IMU_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing IMU] {e},'
+            print(f'[ERROR][Initializing IMU] {e},' +
                   f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
@@ -253,7 +253,7 @@ class _Satellite:
                 self.i2c(hw_config.SUN_YN_I2C),
                 address=hw_config.SUN_YN_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Sun Sensor -Y] {e},'
+            print(f'[ERROR][Initializing Sun Sensor -Y] {e},' +
                   f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
@@ -264,7 +264,7 @@ class _Satellite:
                 self.i2c(hw_config.SUN_ZN_I2C),
                 address=hw_config.SUN_ZN_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Sun Sensor -Z] {e},'
+            print(f'[ERROR][Initializing Sun Sensor -Z] {e},' +
                   f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
@@ -275,7 +275,7 @@ class _Satellite:
                 self.i2c(hw_config.SUN_XN_I2C),
                 address=hw_config.SUN_XN_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Sun Sensor -X] {e},'
+            print(f'[ERROR][Initializing Sun Sensor -X] {e},' +
                   f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
@@ -286,7 +286,7 @@ class _Satellite:
                 self.i2c(hw_config.SUN_YP_I2C),
                 address=hw_config.SUN_YP_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Sun Sensor +Y] {e},'
+            print(f'[ERROR][Initializing Sun Sensor +Y] {e},' +
                   f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
@@ -297,7 +297,7 @@ class _Satellite:
                 self.i2c(hw_config.SUN_ZP_I2C),
                 address=hw_config.SUN_ZP_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Sun Sensor +Z] {e},'
+            print(f'[ERROR][Initializing Sun Sensor +Z] {e},' +
                   f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
@@ -308,7 +308,7 @@ class _Satellite:
                 self.i2c(hw_config.SUN_XP_I2C),
                 address=hw_config.SUN_XP_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Sun Sensor +X] {e},'
+            print(f'[ERROR][Initializing Sun Sensor +X] {e},' +
                   f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
@@ -319,7 +319,7 @@ class _Satellite:
                 self.i2c(hw_config.COIL_X_I2C),
                 hw_config.COIL_X_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Coil X H-Bridge] {e},'
+            print(f'[ERROR][Initializing Coil X H-Bridge] {e},' +
                   f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
@@ -330,7 +330,7 @@ class _Satellite:
                 self.i2c(hw_config.COIL_Y_I2C),
                 hw_config.COIL_Y_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Coil Y H-Bridge] {e},'
+            print(f'[ERROR][Initializing Coil Y H-Bridge] {e},' +
                   f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
@@ -341,7 +341,7 @@ class _Satellite:
                 self.i2c(hw_config.COIL_Z_I2C),
                 hw_config.COIL_Z_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Coil Z H-Bridge] {e},'
+            print(f'[ERROR][Initializing Coil Z H-Bridge] {e},' +
                   f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
@@ -361,7 +361,7 @@ class _Satellite:
         try:
             return PCF8523(self.i2c(hw_config.RTC_I2C))
         except Exception as e:
-            print(f'[ERROR][Initializing RTC] {e},'
+            print(f'[ERROR][Initializing RTC] {e},' +
                   f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     def imuToBodyFrame(self, vec):
