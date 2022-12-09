@@ -22,7 +22,7 @@ from hardware_configuration import config, HARDWARE_VERSION
 import adafruit_tsl2561
 import time
 import tasko
-from ulab.numpy import array
+from ulab.numpy import array, dot
 
 class device:
     """
@@ -342,7 +342,7 @@ class _Satellite:
             print(f'[ERROR][Initializing RTC] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
 
     def imuToBodyFrame(self, vec):
-        return config["R_imu2body"] @ vec
+        return dot(config["R_imu2body"], array(vec))
 
     @property
     def acceleration(self):
