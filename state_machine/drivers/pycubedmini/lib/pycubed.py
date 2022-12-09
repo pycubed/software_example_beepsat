@@ -18,6 +18,7 @@ import drv8830
 from adafruit_pcf8523 import PCF8523
 from bitflags import bitFlag, multiBitFlag, multiByte
 from micropython import const
+from hardware_configuration import config
 import adafruit_tsl2561
 import time
 import tasko
@@ -188,7 +189,9 @@ class _Satellite:
     def imu(self):
         """ Define IMU parameters and initialize """
         try:
-            return bmx160.BMX160_I2C(self.i2c1, address=0x69)
+            return bmx160.BMX160_I2C(
+                self.__dict__[config["imu_i2c"]],
+                address=config["imu_address"])
         except Exception as e:
             print(f'[ERROR][Initializing IMU] {e}\n\tMaybe try address=0x68?')
 
@@ -221,75 +224,93 @@ class _Satellite:
 
     @device
     def sun_yn(self):
-        """ Initialize the -Y sun sensor on I2C2 """
+        """ Initialize the -Y sun sensor """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c1, address=0x29)
+            return adafruit_tsl2561.TSL2561(
+                self.__dict__[config["sun_yn_i2c"]],
+                address=config["sun_yn_address"])
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor -Y]', e)
 
     @device
     def sun_zn(self):
-        """ Initialize the -Z sun sensor on I2C2 """
+        """ Initialize the -Z sun sensor """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c2, address=0x29)
+            return adafruit_tsl2561.TSL2561(
+                self.__dict__[config["sun_zn_i2c"]],
+                address=config["sun_zn_address"])
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor -Z]', e)
 
     @device
     def sun_xn(self):
-        """ Initialize the -X sun sensor on I2C1 """
+        """ Initialize the -X sun sensor """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c3, address=0x29)
+            return adafruit_tsl2561.TSL2561(
+                self.__dict__[config["sun_xn_i2c"]],
+                address=config["sun_xn_address"])
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor -X]', e)
 
     @device
     def sun_yp(self):
-        """ Initialize the +Y sun sensor on I2C1 """
+        """ Initialize the +Y sun sensor """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c1, address=0x49)
+            return adafruit_tsl2561.TSL2561(
+                self.__dict__[config["sun_yp_i2c"]],
+                address=config["sun_yp_address"])
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor +Y]', e)
 
     @device
     def sun_zp(self):
-        """ Initialize the +Z sun sensor on I2C1 """
+        """ Initialize the +Z sun sensor """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c2, address=0x49)
+            return adafruit_tsl2561.TSL2561(
+                self.__dict__[config["sun_zp_i2c"]],
+                address=config["sun_zp_address"])
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor +Z]', e)
 
     @device
     def sun_xp(self):
-        """ Initialize the +X sun sensor on I2C2 """
+        """ Initialize the +X sun sensor """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c3, address=0x49)
+            return adafruit_tsl2561.TSL2561(
+                self.__dict__[config["sun_xp_i2c"]],
+                address=config["sun_xp_address"])
         except Exception as e:
             print('[ERROR][Initializing Sun Sensor +X]', e)
 
     @device
     def drv_x(self):
-        """ Initialize Coil Driver X on I2C3, set mode and voltage """
+        """ Initialize Coil Driver X """
         try:
-            return drv8830.DRV8830(self.i2c1, 0x60)  # U7
+            return drv8830.DRV8830(
+                self.__dict__[config["coil_x_i2c"]],
+                config["coil_x_address"])
         except Exception as e:
-            print('[ERROR][Initializing H-Bridge U7]', e)
+            print('[ERROR][Initializing Coil X H-Bridge]', e)
 
     @device
     def drv_y(self):
-        """ Initialize Coil Driver Y on I2C3, set mode and voltage """
+        """ Initialize Coil Driver Y """
         try:
-            return drv8830.DRV8830(self.i2c1, 0x62)  # U8
+            return drv8830.DRV8830(
+                self.__dict__[config["coil_y_i2c"]],
+                config["coil_y_address"])
         except Exception as e:
-            print('[ERROR][Initializing H-Bridge U8]', e)
+            print('[ERROR][Initializing Coil Y H-Bridge]', e)
 
     @device
     def drv_z(self):
-        """ Initialize Coil Driver Z on I2C3, set mode and voltage """
+        """ Initialize Coil Driver Z """
         try:
-            return drv8830.DRV8830(self.i2c1, 0x68)  # U9
+            return drv8830.DRV8830(
+                self.__dict__[config["coil_z_i2c"]],
+                config["coil_z_address"])
         except Exception as e:
-            print('[ERROR][Initializing H-Bridge U9]', e)
+            print('[ERROR][Initializing Coil Z H-Bridge]', e)
 
     @device
     def burnwire1(self):
@@ -306,7 +327,7 @@ class _Satellite:
     def rtc(self):
         """ Initialize Real Time Clock """
         try:
-            return PCF8523(self.i2c2)
+            return PCF8523(self.__dict__[config["rtc_i2c"]])
         except Exception as e:
             print('[ERROR][Initializing RTC]', e)
 
