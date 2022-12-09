@@ -6,36 +6,36 @@ config = dict()
 
 if HARDWARE_VERSION == "B2/01":
 
-    config["sun_xn_i2c"] = "i2c3"
+    config["sun_xn_i2c"] = 3
     config["sun_xn_address"] = 0x29
 
-    config["sun_yn_i2c"] = "i2c1"
+    config["sun_yn_i2c"] = 1
     config["sun_yn_address"] = 0x29
 
-    config["sun_zn_i2c"] = "i2c2"
+    config["sun_zn_i2c"] = 2
     config["sun_zn_address"] = 0x29
 
-    config["sun_xp_i2c"] = "i2c3"
+    config["sun_xp_i2c"] = 3
     config["sun_xp_address"] = 0x49
 
-    config["sun_yp_i2c"] = "i2c1"
+    config["sun_yp_i2c"] = 1
     config["sun_yp_address"] = 0x49
 
-    config["sun_zp_i2c"] = "i2c2"
+    config["sun_zp_i2c"] = 2
     config["sun_zp_address"] = 0x49
 
-    config["coil_x_i2c"] = "i2c1"
+    config["coil_x_i2c"] = 1
     config["coil_x_address"] = 0x60
 
-    config["coil_y_i2c"] = "i2c1"
+    config["coil_y_i2c"] = 1
     config["coil_y_address"] = 0x62
 
-    config["coil_z_i2c"] = "i2c1"
+    config["coil_z_i2c"] = 1
     config["coil_z_address"] = 0x68
 
-    config["rtc_i2c"] = "i2c2"
+    config["rtc_i2c"] = 2
 
-    config["imu_i2c"] = "i2c1"
+    config["imu_i2c"] = 1
     config["imu_address"] = 0x69
 
 elif HARDWARE_VERSION == "B1/02":
