@@ -18,7 +18,7 @@ import drv8830
 from adafruit_pcf8523 import PCF8523
 from bitflags import bitFlag, multiBitFlag, multiByte
 from micropython import const
-from hardware_configuration import config, HARDWARE_VERSION
+import hardware_configuration as config
 import adafruit_tsl2561
 import time
 import tasko
@@ -200,10 +200,10 @@ class _Satellite:
         """ Define IMU parameters and initialize """
         try:
             return bmx160.BMX160_I2C(
-                self.i2c(config["imu_i2c"]),
-                address=config["imu_address"])
+                self.i2c(config.IMU_I2C),
+                address=config.IMU_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing IMU] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
+            print(f'[ERROR][Initializing IMU] {e},\n\tis HARDWARE_VERSION = {config.HARDWARE_VERSION} correct?')
 
     @device
     def radio(self):
@@ -237,90 +237,90 @@ class _Satellite:
         """ Initialize the -Y sun sensor """
         try:
             return adafruit_tsl2561.TSL2561(
-                self.i2c(config["sun_yn_i2c"]),
-                address=config["sun_yn_address"])
+                self.i2c(config.SUN_YN_I2C),
+                address=config.SUN_YN_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Sun Sensor -Y] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
+            print(f'[ERROR][Initializing Sun Sensor -Y] {e},\n\tis HARDWARE_VERSION = {config.HARDWARE_VERSION} correct?')
 
     @device
     def sun_zn(self):
         """ Initialize the -Z sun sensor """
         try:
             return adafruit_tsl2561.TSL2561(
-                self.i2c(config["sun_zn_i2c"]),
-                address=config["sun_zn_address"])
+                self.i2c(config.SUN_ZN_I2C),
+                address=config.SUN_ZN_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Sun Sensor -Z] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
+            print(f'[ERROR][Initializing Sun Sensor -Z] {e},\n\tis HARDWARE_VERSION = {config.HARDWARE_VERSION} correct?')
 
     @device
     def sun_xn(self):
         """ Initialize the -X sun sensor """
         try:
             return adafruit_tsl2561.TSL2561(
-                self.i2c(config["sun_xn_i2c"]),
-                address=config["sun_xn_address"])
+                self.i2c(config.SUN_XN_I2C),
+                address=config.SUN_XN_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Sun Sensor -X] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
+            print(f'[ERROR][Initializing Sun Sensor -X] {e},\n\tis HARDWARE_VERSION = {config.HARDWARE_VERSION} correct?')
 
     @device
     def sun_yp(self):
         """ Initialize the +Y sun sensor """
         try:
             return adafruit_tsl2561.TSL2561(
-                self.i2c(config["sun_yp_i2c"]),
-                address=config["sun_yp_address"])
+                self.i2c(config.SUN_YP_I2C),
+                address=config.SUN_YP_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Sun Sensor +Y] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
+            print(f'[ERROR][Initializing Sun Sensor +Y] {e},\n\tis HARDWARE_VERSION = {config.HARDWARE_VERSION} correct?')
 
     @device
     def sun_zp(self):
         """ Initialize the +Z sun sensor """
         try:
             return adafruit_tsl2561.TSL2561(
-                self.i2c(config["sun_zp_i2c"]),
-                address=config["sun_zp_address"])
+                self.i2c(config.SUN_ZP_I2C),
+                address=config.SUN_ZP_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Sun Sensor +Z] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
+            print(f'[ERROR][Initializing Sun Sensor +Z] {e},\n\tis HARDWARE_VERSION = {config.HARDWARE_VERSION} correct?')
 
     @device
     def sun_xp(self):
         """ Initialize the +X sun sensor """
         try:
             return adafruit_tsl2561.TSL2561(
-                self.i2c(config["sun_xp_i2c"]),
-                address=config["sun_xp_address"])
+                self.i2c(config.SUN_XP_I2C),
+                address=config.SUN_XP_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Sun Sensor +X] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
+            print(f'[ERROR][Initializing Sun Sensor +X] {e},\n\tis HARDWARE_VERSION = {config.HARDWARE_VERSION} correct?')
 
     @device
     def drv_x(self):
         """ Initialize Coil Driver X """
         try:
             return drv8830.DRV8830(
-                self.i2c(config["coil_x_i2c"]),
-                config["coil_x_address"])
+                self.i2c(config.COIL_X_I2C),
+                config.COIL_X_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Coil X H-Bridge] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
+            print(f'[ERROR][Initializing Coil X H-Bridge] {e},\n\tis HARDWARE_VERSION = {config.HARDWARE_VERSION} correct?')
 
     @device
     def drv_y(self):
         """ Initialize Coil Driver Y """
         try:
             return drv8830.DRV8830(
-                self.i2c(config["coil_y_i2c"]),
-                config["coil_y_address"])
+                self.i2c(config.COIL_Y_I2C),
+                config.COIL_Y_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Coil Y H-Bridge] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
+            print(f'[ERROR][Initializing Coil Y H-Bridge] {e},\n\tis HARDWARE_VERSION = {config.HARDWARE_VERSION} correct?')
 
     @device
     def drv_z(self):
         """ Initialize Coil Driver Z """
         try:
             return drv8830.DRV8830(
-                self.i2c(config["coil_z_i2c"]),
-                config["coil_z_address"])
+                self.i2c(config.COIL_Z_I2C),
+                config.COIL_Z_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing Coil Z H-Bridge] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
+            print(f'[ERROR][Initializing Coil Z H-Bridge] {e},\n\tis HARDWARE_VERSION = {config.HARDWARE_VERSION} correct?')
 
     @device
     def burnwire1(self):
@@ -337,12 +337,12 @@ class _Satellite:
     def rtc(self):
         """ Initialize Real Time Clock """
         try:
-            return PCF8523(self.i2c(config["rtc_i2c"]))
+            return PCF8523(self.i2c(config.RTC_I2C))
         except Exception as e:
-            print(f'[ERROR][Initializing RTC] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
+            print(f'[ERROR][Initializing RTC] {e},\n\tis HARDWARE_VERSION = {config.HARDWARE_VERSION} correct?')
 
     def imuToBodyFrame(self, vec):
-        return dot(config["R_imu2body"], array(vec))
+        return dot(config.R_IMU2BODY, array(vec))
 
     @property
     def acceleration(self):
