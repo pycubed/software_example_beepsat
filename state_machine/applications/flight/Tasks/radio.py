@@ -61,14 +61,19 @@ class task(Task):
                 tq.pop()
         else:
             self.debug("No packets to send")
-            cubesat.radio.listen()
-            response = await cubesat.radio.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED, timeout=10)
+            response = await cubesat.radio.receive(
+                keep_listening=True,
+                with_ack=ANTENNA_ATTACHED,
+                with_header=False,
+                timeout=10)
             if response is not None:
                 cubesat.f_contact = True
                 header = response[0]
                 response = response[1:]  # remove the header byte
 
-                self.debug(f'Recieved msg "{response}", RSSI: {cubesat.radio.last_rssi - 137}')
+                self.debug(f'Recieved msg "{response}", ' +
+                           f'RSSI: {cubesat.radio.last_rssi}, ' +
+                           f'FEI: {cubesat.radio.frequency_error}')
 
                 if (header == headers.MEMORY_BUFFERED_START or
                         header == headers.MEMORY_BUFFERED_MID or
@@ -79,11 +84,9 @@ class task(Task):
                         header == headers.DISK_BUFFERED_END):
                     self.handle_disk_buffered_message(header, response)
                 elif header == headers.COMMAND:
-                    self.handle_command(response)
+                    await self.handle_command(response)
             else:
                 self.debug('No packets received')
-
-        cubesat.radio.sleep()
 
     def handle_memory_buffered_message(self, header, response):
         """Handler function for the memory_buffered_message message type"""
@@ -100,7 +103,7 @@ class task(Task):
             self.msg_last = None
             self.msg = str(self.msg, 'utf-8')
 
-    def handle_command(self, response):
+    async def handle_command(self, response):
         """Handler function for commands"""
         if len(response) < 6 or response[:4] != self.super_secret_code:
             return
@@ -122,10 +125,10 @@ class task(Task):
                     cdh.commands[cmd](self)
             except Exception as e:
                 self.debug(f'something went wrong: {e}')
-                cubesat.radio.send(str(e).encode())
+                await cubesat.radio.send(str(e).encode())
         else:
             self.debug('invalid command!')
-            cubesat.radio.send(b'invalid cmd' + cmd)
+            await cubesat.radio.send(b'invalid cmd' + cmd)
 
     def handle_disk_buffered_message(self, header, response):
         """Handler function for the disk_buffered_message message type"""
