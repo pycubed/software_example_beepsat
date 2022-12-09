@@ -18,7 +18,7 @@ import drv8830
 from adafruit_pcf8523 import PCF8523
 from bitflags import bitFlag, multiBitFlag, multiByte
 from micropython import const
-from hardware_configuration import config
+from hardware_configuration import config, HARDWARE_VERSION
 import adafruit_tsl2561
 import time
 import tasko
@@ -203,7 +203,7 @@ class _Satellite:
                 self.i2c(config["imu_i2c"]),
                 address=config["imu_address"])
         except Exception as e:
-            print(f'[ERROR][Initializing IMU] {e}\n\tMaybe try address=0x68?')
+            print(f'[ERROR][Initializing IMU] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
 
     @device
     def radio(self):
@@ -240,7 +240,7 @@ class _Satellite:
                 self.i2c(config["sun_yn_i2c"]),
                 address=config["sun_yn_address"])
         except Exception as e:
-            print('[ERROR][Initializing Sun Sensor -Y]', e)
+            print(f'[ERROR][Initializing Sun Sensor -Y] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
 
     @device
     def sun_zn(self):
@@ -250,7 +250,7 @@ class _Satellite:
                 self.i2c(config["sun_zn_i2c"]),
                 address=config["sun_zn_address"])
         except Exception as e:
-            print('[ERROR][Initializing Sun Sensor -Z]', e)
+            print(f'[ERROR][Initializing Sun Sensor -Z] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
 
     @device
     def sun_xn(self):
@@ -260,7 +260,7 @@ class _Satellite:
                 self.i2c(config["sun_xn_i2c"]),
                 address=config["sun_xn_address"])
         except Exception as e:
-            print('[ERROR][Initializing Sun Sensor -X]', e)
+            print(f'[ERROR][Initializing Sun Sensor -X] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
 
     @device
     def sun_yp(self):
@@ -270,7 +270,7 @@ class _Satellite:
                 self.i2c(config["sun_yp_i2c"]),
                 address=config["sun_yp_address"])
         except Exception as e:
-            print('[ERROR][Initializing Sun Sensor +Y]', e)
+            print(f'[ERROR][Initializing Sun Sensor +Y] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
 
     @device
     def sun_zp(self):
@@ -280,7 +280,7 @@ class _Satellite:
                 self.i2c(config["sun_zp_i2c"]),
                 address=config["sun_zp_address"])
         except Exception as e:
-            print('[ERROR][Initializing Sun Sensor +Z]', e)
+            print(f'[ERROR][Initializing Sun Sensor +Z] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
 
     @device
     def sun_xp(self):
@@ -290,7 +290,7 @@ class _Satellite:
                 self.i2c(config["sun_xp_i2c"]),
                 address=config["sun_xp_address"])
         except Exception as e:
-            print('[ERROR][Initializing Sun Sensor +X]', e)
+            print(f'[ERROR][Initializing Sun Sensor +X] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
 
     @device
     def drv_x(self):
@@ -300,7 +300,7 @@ class _Satellite:
                 self.i2c(config["coil_x_i2c"]),
                 config["coil_x_address"])
         except Exception as e:
-            print('[ERROR][Initializing Coil X H-Bridge]', e)
+            print(f'[ERROR][Initializing Coil X H-Bridge] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
 
     @device
     def drv_y(self):
@@ -310,7 +310,7 @@ class _Satellite:
                 self.i2c(config["coil_y_i2c"]),
                 config["coil_y_address"])
         except Exception as e:
-            print('[ERROR][Initializing Coil Y H-Bridge]', e)
+            print(f'[ERROR][Initializing Coil Y H-Bridge] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
 
     @device
     def drv_z(self):
@@ -320,7 +320,7 @@ class _Satellite:
                 self.i2c(config["coil_z_i2c"]),
                 config["coil_z_address"])
         except Exception as e:
-            print('[ERROR][Initializing Coil Z H-Bridge]', e)
+            print(f'[ERROR][Initializing Coil Z H-Bridge] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
 
     @device
     def burnwire1(self):
