@@ -2,6 +2,7 @@ import sys
 from unittest import IsolatedAsyncioTestCase
 
 sys.path.insert(0, './state_machine/drivers/emulation/lib')
+sys.path.insert(0, './state_machine/drivers/emulation/')
 sys.path.insert(0, './state_machine/applications/flight')
 sys.path.insert(0, './state_machine/applications/flight/lib')
 sys.path.insert(0, './state_machine/frame/')
@@ -64,7 +65,7 @@ class MemBuffRXTest(IsolatedAsyncioTestCase):
         """Test that RX of a command with and without args works"""
         self.rt = radio.task()
 
-        small_msg = "This is a small test message"
+        small_msg = "This is a small test message!"
         await self.rx_string(small_msg)
         await self.rx_string(small_msg * 100)
 
