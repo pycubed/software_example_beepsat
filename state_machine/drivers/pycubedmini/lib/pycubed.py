@@ -18,7 +18,7 @@ import drv8830
 from adafruit_pcf8523 import PCF8523
 from bitflags import bitFlag, multiBitFlag, multiByte
 from micropython import const
-import hardware_configuration as config
+import configuration.hardware_configuration as config
 import adafruit_tsl2561
 import time
 import tasko
