@@ -339,10 +339,10 @@ class _Satellite:
         try:
             return PCF8523(self.i2c(config["rtc_i2c"]))
         except Exception as e:
-            print('[ERROR][Initializing RTC]', e)
+            print(f'[ERROR][Initializing RTC] {e},\n\tis HARDWARE_VERSION = {HARDWARE_VERSION} correct?')
 
     def imuToBodyFrame(self, vec):
-        return array([-vec[1], vec[2], -vec[0]])
+        return config["R_imu2body"] @ vec
 
     @property
     def acceleration(self):
