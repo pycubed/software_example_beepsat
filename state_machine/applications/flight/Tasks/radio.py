@@ -116,12 +116,13 @@ class task(Task):
 
         if cmd in cdh.commands:
             try:
+                cmd_fn = cdh.commands[cmd]["function"]
                 if cmd_args:
-                    self.debug(f'running {cdh.commands[cmd]} (with args: {cmd_args})')
-                    cdh.commands[cmd](self, cmd_args)
+                    self.debug(f'running {cmd_fn} (with args: {cmd_args})')
+                    cmd_fn(self, cmd_args)
                 else:
-                    self.debug(f'running {cdh.commands[cmd]} (no args)')
-                    cdh.commands[cmd](self)
+                    self.debug(f'running {cmd_fn} (no args)')
+                    cmd_fn
             except Exception as e:
                 self.debug(f'something went wrong: {e}')
                 await cubesat.radio.send(str(e).encode())
