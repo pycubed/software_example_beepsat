@@ -22,7 +22,7 @@ import adafruit_tsl2561
 import time
 import tasko
 from ulab.numpy import array
-import radio_defaults
+import radio_configuration
 
 class device:
     """
@@ -211,20 +211,20 @@ class _Satellite:
                 self.spi,
                 self._rf_cs,
                 self._rf_rst,
-                radio_defaults.FREQUENCY,
-                checksum=radio_defaults.CHECKSUM)
+                radio_configuration.FREQUENCY,
+                checksum=radio_configuration.CHECKSUM)
 
             radio.dio0 = self.radio_DIO0
 
-            radio.tx_power = radio_defaults.TX_POWER
-            radio.bitrate = radio_defaults.BITRATE
-            radio.frequency_deviation = radio_defaults.FREQUENCY_DEVIATION
-            radio.rx_bandwidth = radio_defaults.RX_BANDWIDTH
-            radio.preamble_length = radio_defaults.PREAMBLE_LENGTH
-            radio.ack_delay = radio_defaults.ACK_DELAY
-            radio.ack_wait = radio_defaults.ACK_WAIT
-            radio.node = radio_defaults.SATELLITE_ID
-            radio.destination = radio_defaults.GROUNDSTATION_ID
+            radio.tx_power = radio_configuration.TX_POWER
+            radio.bitrate = radio_configuration.BITRATE
+            radio.frequency_deviation = radio_configuration.FREQUENCY_DEVIATION
+            radio.rx_bandwidth = radio_configuration.RX_BANDWIDTH
+            radio.preamble_length = radio_configuration.PREAMBLE_LENGTH
+            radio.ack_delay = radio_configuration.ACK_DELAY
+            radio.ack_wait = radio_configuration.ACK_WAIT
+            radio.node = radio_configuration.SATELLITE_ID
+            radio.destination = radio_configuration.GROUNDSTATION_ID
 
             radio.sleep()
             return radio
