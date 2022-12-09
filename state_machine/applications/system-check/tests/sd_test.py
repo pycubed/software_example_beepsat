@@ -8,6 +8,7 @@ def sd_test():
     read from a file, delete file and test existence. Return result_dict
     values accordingly
     """
+    cubesat.clear_logs()
 
     # create filepaths
     filepath = "test.txt"
@@ -52,6 +53,8 @@ def sd_test():
 
     if filepath in os.listdir("/sd/"):
         return ("File deletion failed.", False)
+
+    cubesat.clear_logs()
 
     # if nothing has failed so far, return success
     return ("""SD Card passed all tests: New file was created, wrote to,
