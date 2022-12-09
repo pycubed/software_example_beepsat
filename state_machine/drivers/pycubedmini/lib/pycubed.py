@@ -23,6 +23,7 @@ import adafruit_tsl2561
 import time
 import tasko
 from ulab.numpy import array, dot
+import logging
 
 class device:
     """
@@ -123,6 +124,16 @@ class _Satellite:
         self.drv_y
         self.drv_z
         self.burnwire1
+        self.logger
+
+        # create aliases
+        self.log = self.logger.log
+        self.storage_stats = self.logger.storage_stats
+        self.clear_logs = self.logger.clear_logs
+    
+    @device
+    def logger(self):
+        return logging.Logger(self)
 
     @device
     def i2c1(self):
