@@ -198,7 +198,7 @@ command_name_map = {
     "QUERY": [QUERY, True],
     "EXEC_PY": [EXEC_PY, False],
     "REQUEST_FILE": [REQUEST_FILE, True],
-    "LIST_DIR": [TQ_LEN, True],
+    "LIST_DIR": [LIST_DIR, True],
     "TQ_LEN": [TQ_LEN, True],
     "MOVE_FILE": [MOVE_FILE, True],
     "COPY_FILE": [COPY_FILE, True],
