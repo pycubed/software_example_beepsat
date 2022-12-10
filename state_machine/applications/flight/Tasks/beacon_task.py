@@ -3,7 +3,6 @@
 from lib.template_task import Task
 import radio_utils.transmission_queue as tq
 from radio_utils.message import Message
-from state_machine import state_machine
 import logs
 
 class task(Task):
