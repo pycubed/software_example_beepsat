@@ -1,8 +1,6 @@
 # Transmit "Hello World" beacon
 
 from lib.template_task import Task
-import radio_utils.transmission_queue as tq
-from radio_utils.message import Message
 import time
 import os
 import logs
@@ -17,22 +15,14 @@ class task(Task):
         """
         currTime = time.time()
         TIMEINTERVAL = 1000
-        logDir = os.path.join(os.getcwd(), ".sd")
 
         try:
-            file = open(f".sd/logfiles/log{int(currTime//TIMEINTERVAL)}.txt", "ab+")
-        except FileNotFoundError:
+            beacon_packet = logs.beacon_packet(self)
+            file = open(f"/sd/logs/log{int(currTime//TIMEINTERVAL)}.txt", "ab+")
+            file.write(bytearray(beacon_packet))
+            file.close()
+        except Exception:
             try:
-                os.mkdir(logDir)
-                os.mkdir(os.path.join(logDir, "logfiles"))
-                file = open(f".sd/logfiles/log{int(currTime//TIMEINTERVAL)}.txt", "ab+")
+                os.mkdir('/sd/logs/')
             except Exception as e:
-                print(e)
-        except Exception as e:
-            print(e)
-
-        beacon_packet = logs.beacon_packet(self)
-        file.write(bytearray(beacon_packet))
-        file.close()
-
-        self.debug("Beacon task pushing to tq")
+                self.debug(e)
