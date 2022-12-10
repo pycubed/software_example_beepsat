@@ -14,6 +14,6 @@ class task(Task):
         Pushes a beacon packet onto the transmission queue.
         """
 
-        beacon_packet = logs.beacon_packet()
+        beacon_packet = logs.beacon_packet(self)
         tq.push(Message(10, beacon_packet))
         self.debug("Beacon task pushing to tq")

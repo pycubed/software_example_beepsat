@@ -151,7 +151,7 @@ def request_beacon(task):
 
     :param task: The task that called this function
     """
-    _downlink_msg(beacon_packet(), header=headers.BEACON, priority=10, with_ack=False)
+    _downlink_msg(beacon_packet(task), header=headers.BEACON, priority=10, with_ack=False)
 
 
 """
