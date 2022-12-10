@@ -160,7 +160,7 @@ HELPER FUNCTIONS
 """
 
 def _downlink_msg(data, priority=1, header=0x00, with_ack=True):
-    assert(len(data) <= radio_utils.MAX_PACKET_LEN)
+    assert (len(data) <= radio_utils.MAX_PACKET_LEN)
     tq.push(Message(priority, data, header=header, with_ack=with_ack))
 
 def _downlink(data, priority=1):
@@ -200,16 +200,18 @@ def file_exists(path):
 
 
 commands = {
-    NO_OP: noop,
-    HARD_RESET: hreset,
-    QUERY: query,
-    EXEC_PY: exec_py,
-    REQUEST_FILE: request_file,
-    LIST_DIR: list_dir,
-    TQ_LEN: tq_len,
-    MOVE_FILE: move_file,
-    COPY_FILE: copy_file,
-    DELETE_FILE: delete_file,
-    RELOAD: reload,
-    REQUEST_BEACON: request_beacon,
+    NO_OP: {"function": noop, "name":  "NO_OP", "will_respond": False, "has_args": False},
+    HARD_RESET: {"function": hreset, "name": "HARD_RESET", "will_respond": False, "has_args": False},
+    QUERY: {"function": query, "name": "QUERY", "will_respond": True, "has_args": True},
+    EXEC_PY: {"function": exec_py, "name": "EXEC_PY", "will_respond": False, "has_args": True},
+    REQUEST_FILE: {"function": request_file, "name": "REQUEST_FILE", "will_respond": True, "has_args": True},
+    LIST_DIR: {"function": list_dir, "name": "LIST_DIR", "will_respond": True, "has_args": True},
+    TQ_LEN: {"function": tq_len, "name": "TQ_LEN", "will_respond": True, "has_args": False},
+    MOVE_FILE: {"function": move_file, "name": "MOVE_FILE", "will_respond": True, "has_args": True},
+    COPY_FILE: {"function": copy_file, "name": "COPY_FILE", "will_respond": True, "has_args": True},
+    DELETE_FILE: {"function": delete_file, "name": "DELETE_FILE", "will_respond": True, "has_args": True},
+    RELOAD: {"function": reload, "name": "RELOAD", "will_respond": True, "has_args": False},
+    REQUEST_BEACON: {"function": request_beacon, "name": "REQUEST_BEACON", "will_respond": True, "has_args": False},
 }
+
+super_secret_code = b'p\xba\xb8C'

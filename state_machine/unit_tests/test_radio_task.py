@@ -48,14 +48,14 @@ class RXCommandTest(IsolatedAsyncioTestCase):
         noop_packet = Packet(command_data(cdh.NO_OP, b''))
         cubesat.radio._push_rx_queue(noop_packet)
         noop = AssertCalled(cdh.noop)
-        cdh.commands[cdh.NO_OP] = noop.command
+        cdh.commands[cdh.NO_OP]["function"] = noop.command
         await rt.main_task()
         self.assertEqual(noop.called, True, "No-op command was not called")
 
         query_packet = Packet(command_data(cdh.QUERY, b'5+5'))
         cubesat.radio._push_rx_queue(query_packet)
         query = AssertCalled(cdh.query)
-        cdh.commands[cdh.QUERY] = query.command
+        cdh.commands[cdh.QUERY]["function"] = query.command
         await rt.main_task()
         self.assertEqual(noop.called, True, "Query command was not called")
 
