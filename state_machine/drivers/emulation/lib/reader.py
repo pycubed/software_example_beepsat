@@ -4,6 +4,7 @@ import json
 
 def read(cubesat):
     # While there is something on stdin read it (non blocking)
+    return
     while select.select([sys.stdin, ], [], [], 0.0)[0]:
         data = sys.stdin.readline()
         if len(data) > 3 and data[0:3] == ">>>":
