@@ -59,7 +59,7 @@ class task(Task):
             if tq.peek().done():
                 tq.pop()
         else:
-            self.debug("No packets to send")
+            self.debug("No packets to send, listening for packets...")
             response = await cubesat.radio.receive(
                 keep_listening=True,
                 with_ack=ANTENNA_ATTACHED,

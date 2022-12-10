@@ -10,6 +10,7 @@ import radio_utils
 from radio_utils import transmission_queue as tq
 from radio_utils import headers
 from radio_utils.disk_buffered_message import DiskBufferedMessage
+from radio_utils.memory_buffered_message import MemoryBufferedMessage
 from radio_utils.message import Message
 import json
 import supervisor
@@ -151,7 +152,7 @@ def request_beacon(task):
 
     :param task: The task that called this function
     """
-    _downlink_msg(beacon_packet(), header=headers.BEACON, priority=10, with_ack=False)
+    _downlink_msg(beacon_packet(task), header=headers.BEACON, priority=10, with_ack=False)
 
 
 """
@@ -164,6 +165,12 @@ def _downlink_msg(data, priority=1, header=0x00, with_ack=True):
 
 def _downlink(data, priority=1):
     """Write data to a file, and then create a new DiskBufferedMessage to downlink it"""
+    if not (cubesat.sdcard and cubesat.vfs):
+        if len(data) < 1024:  # 1kb limit for downlink
+            tq.push(MemoryBufferedMessage(priority, data))
+        else:
+            tq.push(Message(priority, b'Downlink too large (sd missing)'))
+        return
     fname = f'/sd/downlink/{time.monotonic_ns()}.txt'
     if not file_exists('/sd/downlink'):
         os.mkdir('/sd/downlink')

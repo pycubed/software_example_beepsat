@@ -1,8 +1,8 @@
 from pycubed import cubesat
-import state_machine
+from state_machine import state_machine
 import struct
 
-def beacon_packet(self):
+def beacon_packet(task):
     """Creates a beacon packet containing the: CPU temp, IMU temp, gyro, acceleration, magnetic, and state byte.
     The state byte is the index of the current state in the alphabetically ordered state list.
     This data is packed into a c struct using `struct.pack`.
@@ -10,7 +10,7 @@ def beacon_packet(self):
     If no IMU is attached it returns a packet of 0s.
     """
     if not cubesat.imu:
-        self.debug('IMU not initialized')
+        task.debug('IMU not initialized')
         return bytes([0, 0, 0, 0, 0])
 
     cpu_temp = cubesat.temperature_cpu
