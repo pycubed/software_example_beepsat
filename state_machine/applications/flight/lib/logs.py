@@ -1,6 +1,11 @@
 from pycubed import cubesat
 from state_machine import state_machine
 import struct
+try:
+    from ulab.numpy import array
+except ImportError:
+    from numpy import array
+
 
 beacon_format = 'b' + 'f' * 11  # 1 char + 11 floats
 
@@ -30,3 +35,14 @@ def beacon_packet(task):
 def unpack_beacon(bytes):
     """Unpacks the fields from the beacon packet packed by `beacon_packet`
     """
+
+    gyro = 0.0 * array(3)
+    acc = 0.0 * array(3)
+    mag = 0.0 * array(3)
+
+    (state_byte, cpu_temp, imu_temp,
+     gyro[0], gyro[1], gyro[2],
+     acc[0], acc[1], acc[2],
+     mag[0], mag[1], mag[2]) = struct.unpack(beacon_format, bytes)
+
+    return state_byte, cpu_temp, imu_temp, gyro, acc, mag
