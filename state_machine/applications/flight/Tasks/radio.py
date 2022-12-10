@@ -122,7 +122,7 @@ class task(Task):
                     cmd_fn(self, cmd_args)
                 else:
                     self.debug(f'running {cmd_fn} (no args)')
-                    cmd_fn
+                    cmd_fn(self)
             except Exception as e:
                 self.debug(f'something went wrong: {e}')
                 await cubesat.radio.send(str(e).encode())
