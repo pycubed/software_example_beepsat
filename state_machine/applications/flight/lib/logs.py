@@ -36,13 +36,13 @@ def unpack_beacon(bytes):
     """Unpacks the fields from the beacon packet packed by `beacon_packet`
     """
 
-    gyro = 0.0 * array(3)
-    acc = 0.0 * array(3)
-    mag = 0.0 * array(3)
-
     (state_byte, cpu_temp, imu_temp,
-     gyro[0], gyro[1], gyro[2],
-     acc[0], acc[1], acc[2],
-     mag[0], mag[1], mag[2]) = struct.unpack(beacon_format, bytes)
+     gyro0, gyro1, gyro2,
+     acc0, acc1, acc2,
+     mag0, mag1, mag2) = struct.unpack(beacon_format, bytes)
+
+    gyro = array([gyro0, gyro1, gyro2])
+    acc = array([acc0, acc1, acc2])
+    mag = array([mag0, mag1, mag2])
 
     return state_byte, cpu_temp, imu_temp, gyro, acc, mag
