@@ -6,12 +6,14 @@ Contains a dictionary of commands mapping their 2 byte header to a function.
 import time
 import os
 from pycubed import cubesat
+import radio_utils
 from radio_utils import transmission_queue as tq
 from radio_utils import headers
 from radio_utils.disk_buffered_message import DiskBufferedMessage
 from radio_utils.message import Message
 import json
 import supervisor
+from logs import beacon_packet
 
 NO_OP = b'\x00\x00'
 HARD_RESET = b'\x00\x01'
@@ -24,6 +26,7 @@ MOVE_FILE = b'\x00\x08'
 COPY_FILE = b'\x00\x09'
 DELETE_FILE = b'\x00\x10'
 RELOAD = b'\x00\x11'
+REQUEST_BEACON = b'\x00\x12'
 
 def noop(self):
     """No operation"""
@@ -143,10 +146,21 @@ async def reload(task):
     await cubesat.radio.send(data=msg)
     supervisor.reload()
 
+def request_beacon(task):
+    """Request a beacon packet
+
+    :param task: The task that called this function
+    """
+    _downlink_msg(beacon_packet(), header=headers.BEACON, priority=10, with_ack=False)
+
 
 """
 HELPER FUNCTIONS
 """
+
+def _downlink_msg(data, priority=1, header=0x00, with_ack=True):
+    assert(len(data) <= radio_utils.MAX_PACKET_LEN)
+    tq.push(Message(priority, data, header=header, with_ack=with_ack))
 
 def _downlink(data, priority=1):
     """Write data to a file, and then create a new DiskBufferedMessage to downlink it"""
@@ -190,6 +204,7 @@ commands = {
     COPY_FILE: {"function": copy_file, "name": "COPY_FILE", "will_respond": True, "has_args": True},
     DELETE_FILE: {"function": delete_file, "name": "DELETE_FILE", "will_respond": True, "has_args": True},
     RELOAD: {"function": reload, "name": "RELOAD", "will_respond": True, "has_args": False},
+    REQUEST_BEACON: {"function": request_beacon, "name": "REQUEST_BEACON", "will_respond": True, "has_args": False},
 }
 
 super_secret_code = b'p\xba\xb8C'
