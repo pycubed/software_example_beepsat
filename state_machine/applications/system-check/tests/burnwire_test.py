@@ -1,10 +1,3 @@
-"""
-Python system check script for PyCubed satellite board
-PyCubed Mini mainboard-v02 for Pocketqube Mission
-Burnwire Deployment Test
-* Author(s): Yashika Batra
-"""
-
 from lib.pycubed import cubesat
 
 

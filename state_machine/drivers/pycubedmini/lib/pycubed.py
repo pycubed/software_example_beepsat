@@ -3,7 +3,7 @@ CircuitPython driver for PyCubed-Mini
 """
 
 import sdcardio
-import pycubed_rfm9x
+import pycubed_rfm9x_fsk
 import board
 import microcontroller
 import busio
@@ -16,12 +16,14 @@ import pwmio
 import bmx160
 import drv8830
 from adafruit_pcf8523 import PCF8523
-from bitflags import bitFlag, multiBitFlag
+from bitflags import bitFlag, multiBitFlag, multiByte
 from micropython import const
+import configuration.hardware_configuration as hw_config
+import configuration.radio_configuration as rf_config
 import adafruit_tsl2561
 import time
 import tasko
-from ulab.numpy import array
+from ulab.numpy import array, dot
 
 class device:
     """
@@ -63,18 +65,14 @@ class _Satellite:
     # Define NVM flags
     f_contact = bitFlag(register=_FLAG, bit=1)
     f_burn = bitFlag(register=_FLAG, bit=2)
-    f_free1 = bitFlag(register=_FLAG, bit=3)
-    f_free2 = bitFlag(register=_FLAG, bit=4)
 
     # Define NVM counters
-    c_boot = multiBitFlag(register=_BOOTCNT, lowest_bit=0, num_bits=8)
+    c_boot = multiByte(num_bytes=2, lowest_register=_BOOTCNT)
     c_state_err = multiBitFlag(register=_RSTERRS, lowest_bit=4, num_bits=4)
     c_vbus_rst = multiBitFlag(register=_RSTERRS, lowest_bit=0, num_bits=4)
     c_deploy = multiBitFlag(register=_DCOUNT, lowest_bit=0, num_bits=8)
     c_downlink = multiBitFlag(register=_DWNLINK, lowest_bit=0, num_bits=8)
     c_logfail = multiBitFlag(register=_LOGFAIL, lowest_bit=0, num_bits=8)
-
-    UHF_FREQ = 433.0
 
     instance = None
     data_cache = {}
@@ -100,6 +98,7 @@ class _Satellite:
         """ Big init routine as the whole board is brought up. """
         self.BOOTTIME = int(time.monotonic())  # get monotonic time at initialization
         self.micro = microcontroller
+        self.c_boot += 1  # increment boot count (can only do this after self.micro is set up)
         self._vbatt = analogio.AnalogIn(board.BATTERY)  # Battery voltage
 
         # To force initialization of hardware
@@ -148,6 +147,16 @@ class _Satellite:
         except Exception as e:
             print("[ERROR][Initializing I2C3]", e)
 
+    def i2c(self, index):
+        if index == 1:
+            return self.i2c1
+        if index == 2:
+            return self.i2c2
+        if index == 3:
+            return self.i2c3
+
+        raise ValueError("Invalid I2C Index")
+
     @device
     def spi(self):
         """ Initialize SPI bus """
@@ -189,9 +198,12 @@ class _Satellite:
     def imu(self):
         """ Define IMU parameters and initialize """
         try:
-            return bmx160.BMX160_I2C(self.i2c1, address=0x69)
+            return bmx160.BMX160_I2C(
+                self.i2c(hw_config.IMU_I2C),
+                address=hw_config.IMU_ADDRESS)
         except Exception as e:
-            print(f'[ERROR][Initializing IMU] {e}\n\tMaybe try address=0x68?')
+            print(f'[ERROR][Initializing IMU] {e},' +
+                  f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
     def radio(self):
@@ -209,12 +221,25 @@ class _Satellite:
             print('[ERROR][Initializing Radio]', e)
 
         try:
-            radio = pycubed_rfm9x.RFM9x(
-                self.spi, self._rf_cs, self._rf_rst,
-                self.UHF_FREQ)
+            radio = pycubed_rfm9x_fsk.RFM9x(
+                self.spi,
+                self._rf_cs,
+                self._rf_rst,
+                rf_config.FREQUENCY,
+                checksum=rf_config.CHECKSUM)
+
             radio.dio0 = self.radio_DIO0
-            radio.node = 0xAB  # our ID
-            radio.destination = 0xBA  # target's ID
+
+            radio.tx_power = rf_config.TX_POWER
+            radio.bitrate = rf_config.BITRATE
+            radio.frequency_deviation = rf_config.FREQUENCY_DEVIATION
+            radio.rx_bandwidth = rf_config.RX_BANDWIDTH
+            radio.preamble_length = rf_config.PREAMBLE_LENGTH
+            radio.ack_delay = rf_config.ACK_DELAY
+            radio.ack_wait = rf_config.ACK_WAIT
+            radio.node = rf_config.SATELLITE_ID
+            radio.destination = rf_config.GROUNDSTATION_ID
+
             radio.sleep()
             return radio
         except Exception as e:
@@ -222,75 +247,102 @@ class _Satellite:
 
     @device
     def sun_yn(self):
-        """ Initialize the -Y sun sensor on I2C2 """
+        """ Initialize the -Y sun sensor """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c3, address=0x29)
+            return adafruit_tsl2561.TSL2561(
+                self.i2c(hw_config.SUN_YN_I2C),
+                address=hw_config.SUN_YN_ADDRESS)
         except Exception as e:
-            print('[ERROR][Initializing Sun Sensor -Y]', e)
+            print(f'[ERROR][Initializing Sun Sensor -Y] {e},' +
+                  f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
     def sun_zn(self):
-        """ Initialize the -Z sun sensor on I2C2 """
+        """ Initialize the -Z sun sensor """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c3, address=0x39)
+            return adafruit_tsl2561.TSL2561(
+                self.i2c(hw_config.SUN_ZN_I2C),
+                address=hw_config.SUN_ZN_ADDRESS)
         except Exception as e:
-            print('[ERROR][Initializing Sun Sensor -Z]', e)
+            print(f'[ERROR][Initializing Sun Sensor -Z] {e},' +
+                  f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
     def sun_xn(self):
-        """ Initialize the -X sun sensor on I2C1 """
+        """ Initialize the -X sun sensor """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c2, address=0x49)
+            return adafruit_tsl2561.TSL2561(
+                self.i2c(hw_config.SUN_XN_I2C),
+                address=hw_config.SUN_XN_ADDRESS)
         except Exception as e:
-            print('[ERROR][Initializing Sun Sensor -X]', e)
+            print(f'[ERROR][Initializing Sun Sensor -X] {e},' +
+                  f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
     def sun_yp(self):
-        """ Initialize the +Y sun sensor on I2C1 """
+        """ Initialize the +Y sun sensor """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c3, address=0x49)
+            return adafruit_tsl2561.TSL2561(
+                self.i2c(hw_config.SUN_YP_I2C),
+                address=hw_config.SUN_YP_ADDRESS)
         except Exception as e:
-            print('[ERROR][Initializing Sun Sensor +Y]', e)
+            print(f'[ERROR][Initializing Sun Sensor +Y] {e},' +
+                  f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
     def sun_zp(self):
-        """ Initialize the +Z sun sensor on I2C1 """
+        """ Initialize the +Z sun sensor """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c2, address=0x39)
+            return adafruit_tsl2561.TSL2561(
+                self.i2c(hw_config.SUN_ZP_I2C),
+                address=hw_config.SUN_ZP_ADDRESS)
         except Exception as e:
-            print('[ERROR][Initializing Sun Sensor +Z]', e)
+            print(f'[ERROR][Initializing Sun Sensor +Z] {e},' +
+                  f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
     def sun_xp(self):
-        """ Initialize the +X sun sensor on I2C2 """
+        """ Initialize the +X sun sensor """
         try:
-            return adafruit_tsl2561.TSL2561(self.i2c2, address=0x29)
+            return adafruit_tsl2561.TSL2561(
+                self.i2c(hw_config.SUN_XP_I2C),
+                address=hw_config.SUN_XP_ADDRESS)
         except Exception as e:
-            print('[ERROR][Initializing Sun Sensor +X]', e)
+            print(f'[ERROR][Initializing Sun Sensor +X] {e},' +
+                  f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
     def drv_x(self):
-        """ Initialize Coil Driver X on I2C3, set mode and voltage """
+        """ Initialize Coil Driver X """
         try:
-            return drv8830.DRV8830(self.i2c1, 0xC4 >> 1)  # U7
+            return drv8830.DRV8830(
+                self.i2c(hw_config.COIL_X_I2C),
+                hw_config.COIL_X_ADDRESS)
         except Exception as e:
-            print('[ERROR][Initializing H-Bridge U7]', e)
+            print(f'[ERROR][Initializing Coil X H-Bridge] {e},' +
+                  f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
     def drv_y(self):
-        """ Initialize Coil Driver Y on I2C3, set mode and voltage """
+        """ Initialize Coil Driver Y """
         try:
-            return drv8830.DRV8830(self.i2c1, 0xC0 >> 1)  # U8
+            return drv8830.DRV8830(
+                self.i2c(hw_config.COIL_Y_I2C),
+                hw_config.COIL_Y_ADDRESS)
         except Exception as e:
-            print('[ERROR][Initializing H-Bridge U8]', e)
+            print(f'[ERROR][Initializing Coil Y H-Bridge] {e},' +
+                  f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
     def drv_z(self):
-        """ Initialize Coil Driver Z on I2C3, set mode and voltage """
+        """ Initialize Coil Driver Z """
         try:
-            return drv8830.DRV8830(self.i2c1, 0xD0 >> 1)  # U9
+            return drv8830.DRV8830(
+                self.i2c(hw_config.COIL_Z_I2C),
+                hw_config.COIL_Z_ADDRESS)
         except Exception as e:
-            print('[ERROR][Initializing H-Bridge U9]', e)
+            print(f'[ERROR][Initializing Coil Z H-Bridge] {e},' +
+                  f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     @device
     def burnwire1(self):
@@ -307,12 +359,13 @@ class _Satellite:
     def rtc(self):
         """ Initialize Real Time Clock """
         try:
-            return PCF8523(self.i2c2)
+            return PCF8523(self.i2c(hw_config.RTC_I2C))
         except Exception as e:
-            print('[ERROR][Initializing RTC]', e)
+            print(f'[ERROR][Initializing RTC] {e},' +
+                  f'\n\tis HARDWARE_VERSION = {hw_config.HARDWARE_VERSION} correct?')
 
     def imuToBodyFrame(self, vec):
-        return array([-vec[0], vec[2], vec[1]])
+        return dot(hw_config.R_IMU2BODY, array(vec))
 
     @property
     def acceleration(self):
@@ -425,16 +478,18 @@ class _Satellite:
         """ return the time on a monotonic clock """
         return int(time.monotonic()) - self.BOOTTIME
 
-    def reset_boot_count(self):
-        """ reset boot count in non-volatile memory (nvm) """
+    def zero_flags(self):
+        """ zero all flags in non volatile memory """
+        self.f_contact = 0
+        self.f_burn = 0
+
+    def zero_counters(self):
+        """ zero all counters in non volatile memory """
         self.c_boot = 0
-
-    def incr_logfail_count(self):
-        """ increment logfail count in non-volatile memory (nvm) """
-        self.c_logfail += 1
-
-    def reset_logfail_count(self):
-        """ reset logfail count in non-volatile memory (nvm) """
+        self.c_state_err = 0
+        self.c_vbus_rst = 0
+        self.c_deploy = 0
+        self.c_downlink = 0
         self.c_logfail = 0
 
 

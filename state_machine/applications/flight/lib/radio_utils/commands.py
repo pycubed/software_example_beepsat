@@ -6,11 +6,15 @@ Contains a dictionary of commands mapping their 2 byte header to a function.
 import time
 import os
 from pycubed import cubesat
+import radio_utils
 from radio_utils import transmission_queue as tq
 from radio_utils import headers
-from radio_utils.chunk import ChunkMessage
+from radio_utils.disk_buffered_message import DiskBufferedMessage
+from radio_utils.memory_buffered_message import MemoryBufferedMessage
 from radio_utils.message import Message
 import json
+import supervisor
+from logs import beacon_packet
 
 NO_OP = b'\x00\x00'
 HARD_RESET = b'\x00\x01'
@@ -22,18 +26,17 @@ TQ_LEN = b'\x00\x07'
 MOVE_FILE = b'\x00\x08'
 COPY_FILE = b'\x00\x09'
 DELETE_FILE = b'\x00\x10'
+RELOAD = b'\x00\x11'
+REQUEST_BEACON = b'\x00\x12'
 
 def noop(self):
     """No operation"""
     self.debug('no-op')
 
-async def hreset(self):
+def hreset(self):
     """Hard reset"""
     self.debug('Resetting')
-    msg = bytearray([headers.DEFAULT])
-    msg.append(b'reset')
-    await cubesat.radio.send(data=msg)
-    cubesat.micro.on_next_reset(self.cubesat.micro.RunMode.NORMAL)
+    cubesat.micro.on_next_reset(cubesat.micro.RunMode.NORMAL)
     cubesat.micro.reset()
 
 
@@ -60,10 +63,9 @@ def request_file(task, file):
     :param file: The path to the file to downlink
     :type file: str"""
     file = str(file, 'utf-8')
-    try:
-        os.stat(file)
-        tq.push(ChunkMessage(1, file))
-    except Exception:
+    if file_exists(file):
+        tq.push(DiskBufferedMessage(1, file))
+    else:
         task.debug(f'File not found: {file}')
         tq.push(Message(9, b'File not found', with_ack=True))
 
@@ -133,15 +135,49 @@ def delete_file(task, file):
     except Exception as e:
         task.debug(f'Error deleting file: {e}')
         _downlink(f'Error deleting file: {e}', priority=9)
-# Helper functions
+
+async def reload(task):
+    """Reloads the flight software
+
+    :param task: The task that called this function
+    """
+    task.debug('Reloading')
+    msg = bytearray([headers.DEFAULT])
+    msg.append(b'reset')
+    await cubesat.radio.send(data=msg)
+    supervisor.reload()
+
+def request_beacon(task):
+    """Request a beacon packet
+
+    :param task: The task that called this function
+    """
+    _downlink_msg(beacon_packet(), header=headers.BEACON, priority=10, with_ack=False)
+
+
+"""
+HELPER FUNCTIONS
+"""
+
+def _downlink_msg(data, priority=1, header=0x00, with_ack=True):
+    assert(len(data) <= radio_utils.MAX_PACKET_LEN)
+    tq.push(Message(priority, data, header=header, with_ack=with_ack))
 
 def _downlink(data, priority=1):
-    """Write data to a file, and then create a new ChunkMessage to downlink it"""
+    """Write data to a file, and then create a new DiskBufferedMessage to downlink it"""
+    if not (cubesat.sdcard and cubesat.vfs):
+        if len(data) < 1024:  # 1kb limit for downlink
+            tq.push(MemoryBufferedMessage(priority, data))
+        else:
+            tq.push(Message(priority, b'Downlink too large (sd missing)'))
+        return
     fname = f'/sd/downlink/{time.monotonic_ns()}.txt'
+    if not file_exists('/sd/downlink'):
+        os.mkdir('/sd/downlink')
     f = open(fname, 'w')
     f.write(data)
     f.close()
-    tq.push(ChunkMessage(priority, fname))
+    tq.push(DiskBufferedMessage(priority, fname))
 
 def _cp(source, dest, buffer_size=1024):
     """
@@ -155,6 +191,13 @@ def _cp(source, dest, buffer_size=1024):
             break
         dest.write(copy_buffer)
 
+def file_exists(path):
+    try:
+        os.stat(path)
+        return True
+    except Exception:
+        return False
+
 
 commands = {
     NO_OP: noop,
@@ -167,4 +210,6 @@ commands = {
     MOVE_FILE: move_file,
     COPY_FILE: copy_file,
     DELETE_FILE: delete_file,
+    RELOAD: reload,
+    REQUEST_BEACON: request_beacon,
 }

@@ -25,6 +25,8 @@ class task(Task):
     def __init__(self):
         super().__init__()
         self.msg = bytes([])
+        self.cmsg_last = None
+        self.msg_last = None
 
     async def main_task(self):
         """
@@ -59,42 +61,49 @@ class task(Task):
                 tq.pop()
         else:
             self.debug("No packets to send")
-            cubesat.radio.listen()
-            response = await cubesat.radio.receive(keep_listening=True, with_ack=ANTENNA_ATTACHED, timeout=10)
+            response = await cubesat.radio.receive(
+                keep_listening=True,
+                with_ack=ANTENNA_ATTACHED,
+                with_header=False,
+                timeout=10)
             if response is not None:
                 cubesat.f_contact = True
                 header = response[0]
                 response = response[1:]  # remove the header byte
 
-                self.debug(f'Recieved msg "{response}", RSSI: {cubesat.radio.last_rssi - 137}')
+                self.debug(f'Recieved msg "{response}", ' +
+                           f'RSSI: {cubesat.radio.last_rssi}, ' +
+                           f'FEI: {cubesat.radio.frequency_error}')
 
-                if header == headers.NAIVE_START or header == headers.NAIVE_MID or header == headers.NAIVE_END:
-                    self.handle_naive(header, response)
-                elif header == headers.CHUNK_START or header == headers.CHUNK_MID or header == headers.CHUNK_END:
-                    self.handle_chunk(header, response)
+                if (header == headers.MEMORY_BUFFERED_START or
+                        header == headers.MEMORY_BUFFERED_MID or
+                        header == headers.MEMORY_BUFFERED_END):
+                    self.handle_memory_buffered_message(header, response)
+                elif (header == headers.DISK_BUFFERED_START or
+                        header == headers.DISK_BUFFERED_MID or
+                        header == headers.DISK_BUFFERED_END):
+                    self.handle_disk_buffered_message(header, response)
                 elif header == headers.COMMAND:
-                    self.handle_command(response)
+                    await self.handle_command(response)
             else:
                 self.debug('No packets received')
 
-        cubesat.radio.sleep()
-
-    def handle_naive(self, header, response):
-        """Handler function for the naive message type"""
-        if header == headers.NAIVE_START:
-            self.msg_last = response
+    def handle_memory_buffered_message(self, header, response):
+        """Handler function for the memory_buffered_message message type"""
+        if header == headers.MEMORY_BUFFERED_START:
             self.msg = response
         else:
             if response != self.msg_last:
                 self.msg += response
             else:
                 self.debug('Repeated chunk')
+        self.msg_last = response
 
-        if header == headers.NAIVE_END:
-            self.cmsg_last = None
+        if header == headers.MEMORY_BUFFERED_END:
+            self.msg_last = None
             self.msg = str(self.msg, 'utf-8')
 
-    def handle_command(self, response):
+    async def handle_command(self, response):
         """Handler function for commands"""
         if len(response) < 6 or response[:4] != self.super_secret_code:
             return
@@ -116,23 +125,23 @@ class task(Task):
                     cdh.commands[cmd](self)
             except Exception as e:
                 self.debug(f'something went wrong: {e}')
-                cubesat.radio.send(str(e).encode())
+                await cubesat.radio.send(str(e).encode())
         else:
             self.debug('invalid command!')
-            cubesat.radio.send(b'invalid cmd' + cmd)
+            await cubesat.radio.send(b'invalid cmd' + cmd)
 
-    def handle_chunk(self, header, response):
-        """Handler function for the chunk message type"""
-        if header == headers.CHUNK_START:
-            self.cmsg_last = response
-            self.try_write('chunk', 'wb', response)
+    def handle_disk_buffered_message(self, header, response):
+        """Handler function for the disk_buffered_message message type"""
+        if header == headers.DISK_BUFFERED_START:
+            self.try_write('disk_buffered_message', 'wb', response)
         else:
             if response != self.cmsg_last:
-                self.try_write('chunk', 'ab', response)
+                self.try_write('disk_buffered_message', 'ab', response)
             else:
                 self.debug('Repeated chunk')
 
-        if header == headers.CHUNK_END:
+        self.cmsg_last = response
+        if header == headers.DISK_BUFFERED_END:
             self.cmsg_last = None
 
     def try_write(self, file, mode, data):
