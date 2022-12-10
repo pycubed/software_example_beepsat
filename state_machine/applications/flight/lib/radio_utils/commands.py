@@ -160,7 +160,7 @@ HELPER FUNCTIONS
 """
 
 def _downlink_msg(data, priority=1, header=0x00, with_ack=True):
-    assert(len(data) <= radio_utils.MAX_PACKET_LEN)
+    assert (len(data) <= radio_utils.MAX_PACKET_LEN)
     tq.push(Message(priority, data, header=header, with_ack=with_ack))
 
 def _downlink(data, priority=1):
