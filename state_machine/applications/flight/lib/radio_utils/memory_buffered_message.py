@@ -6,15 +6,14 @@ class MemoryBufferedMessage(Message):
     """Transmits the message PACKET_DATA_LEN bytes at a time.
     Sets special headers for the first packet, middle packets, and last packet.
 
-    :param priority: The priority of the message (higher is better)
-    :type priority: int
     :param str: The message to send
     :type str: str | bytes | bytearray
     """
 
     packet_len = PACKET_DATA_LEN
 
-    def __init__(self, priority, str):
+    def __init__(self, str):
+        priority = 2  # fixed so MemoryBufferedMessage packets don't interleave
         super().__init__(priority, str)
         self.cursor = 0
 

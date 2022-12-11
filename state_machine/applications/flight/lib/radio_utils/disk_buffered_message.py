@@ -16,9 +16,9 @@ class DiskBufferedMessage(Message):
 
     packet_len = PACKET_DATA_LEN
 
-    def __init__(self, priority, path):
+    def __init__(self, path):
         self.cursor = 0
-        self.priority = priority
+        self.priority = 1  # fixed so DiskBufferredMessage packets don't interleave
         self.path = path
         self.msg_len = os.stat(path)[6]
 

@@ -13,7 +13,7 @@ class MemoryBufferedMessageTests(unittest.TestCase):
     def test_short_message(self):
         """Tests that a 1 packet message has the correct headers"""
 
-        p = MemoryBufferedMessage(0, 'x' * packet_len)
+        p = MemoryBufferedMessage('x' * packet_len)
         res, _ = p.packet()
         self.assertEqual(res[0], headers.MEMORY_BUFFERED_END)
         p.ack()
@@ -22,7 +22,7 @@ class MemoryBufferedMessageTests(unittest.TestCase):
     def test_medium_message(self):
         """Tests that a 2 packet message has the correct headers for each packet"""
 
-        p = MemoryBufferedMessage(0, 'x' * (packet_len + 1))
+        p = MemoryBufferedMessage('x' * (packet_len + 1))
         res, _ = p.packet()
         self.assertEqual(res[0], headers.MEMORY_BUFFERED_START)
         p.ack()
@@ -33,7 +33,7 @@ class MemoryBufferedMessageTests(unittest.TestCase):
 
     def test_long_message(self):
         """Tests that a 3 packet message has the correct headers for each packet"""
-        p = MemoryBufferedMessage(0, 'x' * (packet_len * 2 + 1))
+        p = MemoryBufferedMessage('x' * (packet_len * 2 + 1))
         res, _ = p.packet()
         self.assertEqual(res[0], headers.MEMORY_BUFFERED_START)
         p.ack()

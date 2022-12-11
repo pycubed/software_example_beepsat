@@ -70,7 +70,7 @@ class MemBuffRXTest(IsolatedAsyncioTestCase):
         await self.rx_string(small_msg * 100)
 
     async def rx_string(self, str):
-        msg = MemoryBufferedMessage(10, bytearray(str, "ascii"))
+        msg = MemoryBufferedMessage(bytearray(str, "ascii"))
         while not msg.done():
             pkt_data, _ = msg.packet()
             small_packet = Packet(pkt_data)
