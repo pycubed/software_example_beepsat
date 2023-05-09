@@ -66,4 +66,6 @@ class task(Task):
                 # restart all tasks
                 for t in self.cubesat.scheduled_tasks:
                     self.cubesat.scheduled_tasks[t].start()
-
+        # otherwise stay in normal mode
+        else:
+            self.cubesat.powermode('normal')
