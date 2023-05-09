@@ -717,6 +717,7 @@ class RFM9x:
             return (self._read_u8(_RH_RF95_REG_12_IRQ_FLAGS) & 0x40) >> 6
 
     async def await_rx(self,timeout=60):
+        self.listen()
         _t=time.monotonic()+timeout
         while not self.rx_done():
             if time.monotonic() < _t:
