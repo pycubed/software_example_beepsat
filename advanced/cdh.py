@@ -46,7 +46,7 @@ def shutdown(self,args):
 
 def query(self,args):
     self.debug('query: {}'.format(args))
-    self.cubesat.radio1.send(data=str(eval(args)))
+    self.cubesat.radio1.send(data=str(eval(args)), keep_listening=True)
 
 def exec_cmd(self,args):
     self.debug('exec: {}'.format(args))
