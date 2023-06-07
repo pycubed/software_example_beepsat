@@ -306,12 +306,12 @@ class Satellite:
         if self.hardware['SDcard']:
             with open(self.logfile, "a+") as f:
                 t=int(time.monotonic())
-                f.write('{}, {}\n'.format(t,msg))
+                f.write(f'{t}, {msg}\n')
 
     def print_file(self,filedir=None,binary=False):
         if filedir==None:
             return
-        print('\n--- Printing File: {} ---'.format(filedir))
+        print(f'\n--- Printing File: {filedir} ---')
         if binary:
             with open(filedir, "rb") as file:
                 print(file.read())
@@ -376,16 +376,16 @@ class Satellite:
             n=0
             _folder=substring[:substring.rfind('/')+1]
             _file=substring[substring.rfind('/')+1:]
-            print('Creating new file in directory: /sd{} with file prefix: {}'.format(_folder,_file))
+            print(f'Creating new file in directory: /sd{_folder} with file prefix: {_file}')
             try: chdir('/sd'+_folder)
             except OSError:
-                print('Directory {} not found. Creating...'.format(_folder))
+                print(f'Directory {_folder} not found. Creating...')
                 try: mkdir('/sd'+_folder)
                 except Exception as e:
                     print(e)
                     return None
             for i in range(0xFFFF):
-                ff='/sd{}{}{:05}.txt'.format(_folder,_file,(n+i)%0xFFFF)
+                ff=f'/sd{_folder}{_file}{(n+i)%0xFFFF:05}.txt'
                 try:
                     if n is not None:
                         stat(ff)
@@ -417,7 +417,7 @@ class Satellite:
         # convert duty cycle % into 16-bit fractional up time
         dtycycl=int((dutycycle/100)*(0xFFFF))
         print('----- BURN WIRE CONFIGURATION -----')
-        print('\tFrequency of: {}Hz\n\tDuty cycle of: {}% (int:{})\n\tDuration of {}sec'.format(freq,(100*dtycycl/0xFFFF),dtycycl,duration))
+        print(f'\tFrequency of: {freq}Hz\n\tDuty cycle of: {(100*dtycycl/0xFFFF)}% (int:{dtycycl})\n\tDuration of {duration}sec')
         # create our PWM object for the respective pin
         # not active since duty_cycle is set to 0 (for now)
         if '1' in burn_num:

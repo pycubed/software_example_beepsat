@@ -31,7 +31,7 @@ for file in os.listdir('Tasks'):
         continue
 
     # auto-magically import the task file
-    exec('import Tasks.{}'.format(file))
+    exec(f'import Tasks.{file}')
     # create a helper object for scheduling the task
     task_obj=eval('Tasks.'+file).task(cubesat)
 
@@ -50,13 +50,13 @@ try:
     # should run forever
     cubesat.tasko.run()
 except Exception as e:
-    formated_exception = traceback.format_exception(e, e, e.__traceback__)
-    print(formated_exception)
+    formatted_exception = traceback.format_exception(e, e, e.__traceback__)
+    print(formatted_exception)
     try:
         # increment our NVM error counter
         cubesat.c_state_err+=1
         # try to log everything
-        cubesat.log('{},{},{}'.format(formated_exception,cubesat.c_state_err,cubesat.c_boot))
+        cubesat.log(f'{formatted_exception},{cubesat.c_state_err},{cubesat.c_boot}')
     except:
         pass
 

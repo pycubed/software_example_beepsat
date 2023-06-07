@@ -20,7 +20,7 @@ class task(Task):
         else:
             comp_var = '<'
 
-        self.debug('{:.1f}V {} threshold: {:.1f}V'.format(vbatt,comp_var,self.cubesat.vlowbatt))
+        self.debug(f'{vbatt:.1f}V {comp_var} threshold: {self.cubesat.vlowbatt:.1f}V')
 
         ########### ADVANCED ###########
         # respond to a low power condition
@@ -40,9 +40,9 @@ class task(Task):
                 while time.monotonic() < _timer:
                     # sleep for half our remaining time
                     _sleeptime = self.timeout/10
-                    self.debug('sleeping for {}s'.format(_sleeptime),2)
+                    self.debug(f'sleeping for {_sleeptime}s', 2)
                     time.sleep(_sleeptime)
-                    self.debug('vbatt: {:.1f}V'.format(self.cubesat.battery_voltage),2)
+                    self.debug(f'vbatt: {self.cubesat.battery_voltage:.1f}V', 2)
                     vbatt=self.cubesat.battery_voltage
                     if vbatt > self.cubesat.vlowbatt:
                         self.debug('batteries above threshold',2)

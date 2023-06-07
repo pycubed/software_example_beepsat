@@ -36,9 +36,9 @@ class Task:
 
         """
         if level==1:
-            print('{:>30} {}'.format('['+co(msg=self.name,color=self.color)+']',msg))
+            print(f'[{co(msg=self.name,color=self.color):>30}] {msg}')
         else:
-            print('{}{}'.format('\t   └── ',msg))
+            print(f'\t   └── {msg}')
 
     async def main_task(self, *args, **kwargs):
         """
