@@ -27,7 +27,7 @@ for file in os.listdir('Tasks'):
         continue
 
     # auto-magically import the task file
-    exec('import Tasks.{}'.format(file))
+    exec(f'import Tasks.{file}')
     # create a helper object for scheduling the task
     task_obj=eval('Tasks.'+file).task(cubesat)
 
